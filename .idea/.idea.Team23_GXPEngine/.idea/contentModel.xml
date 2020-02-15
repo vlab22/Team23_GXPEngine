@@ -12,6 +12,7 @@
         <e p="DeliveryPoint.cs" t="Include" />
         <e p="DrawableTweener.cs" t="Include" />
         <e p="DroneGameObject.cs" t="Include" />
+        <e p="DroneManager.cs" t="Include" />
         <e p="Easing.cs" t="Include" />
         <e p="FollowCamera.cs" t="Include" />
         <e p="GameLocalEvents" t="Include">
@@ -74,6 +75,7 @@
         </e>
         <e p="GXPEngine.csproj" t="IncludeRecursive" />
         <e p="HUD.cs" t="Include" />
+        <e p="HudSlider.cs" t="Include" />
         <e p="HudTextBoard.cs" t="Include" />
         <e p="IGridDataUpdater.cs" t="Include" />
         <e p="IHasSpeed.cs" t="Include" />

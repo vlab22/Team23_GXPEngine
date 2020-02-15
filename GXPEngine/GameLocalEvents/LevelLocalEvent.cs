@@ -9,10 +9,12 @@ namespace GXPEngine.GameLocalEvents
         {
             LEVEL_START_COUNTER_START,
             LEVEL_START_COUNTER_END,
+            DRONE_DETECTED_ENEMY,
         }
 
         public Level level;
         public Stork stork;
+        public DroneGameObject drone;
         public int index;
         public Color color;
         public EventType evt;
@@ -28,6 +30,12 @@ namespace GXPEngine.GameLocalEvents
             stork = pStork;
             index = pIndex;
             color = pColor;
+        }
+        
+        public LevelLocalEvent(GameObject player, DroneGameObject pDrone, Level pLevel, EventType pEvt) : this(pLevel, pEvt)
+        {
+            stork = player as Stork;
+            drone = pDrone;
         }
     }
 }

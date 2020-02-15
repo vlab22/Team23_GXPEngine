@@ -20,11 +20,21 @@ namespace GXPEngine
 
         public static Vector2 InsideUnitCircle()
         {
-            float angle = (Range(1f, 360f)).DegToRad();
+            float angle = Range(Mathf.PI / 180, Mathf.PI * 2);
             float mag = Range(0f, 1f);
             
             float x = Mathf.Cos(angle) - mag;
             float y = Mathf.Sin(angle) - mag;
+            
+            return new Vector2(x, y);
+        }
+        
+        public static Vector2 OnUnitCircle()
+        {
+            float angle = Range(Mathf.PI / 180, Mathf.PI * 2);
+            
+            float x = Mathf.Cos(angle);
+            float y = Mathf.Sin(angle);
             
             return new Vector2(x, y);
         }

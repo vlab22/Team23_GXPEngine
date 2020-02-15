@@ -44,12 +44,14 @@
     <Compile Include="DeliveryPoint.cs" />
     <Compile Include="DrawableTweener.cs" />
     <Compile Include="DroneGameObject.cs" />
+    <Compile Include="DroneManager.cs" />
     <Compile Include="Easing.cs" />
     <Compile Include="FollowCamera.cs" />
     <Compile Include="GameLocalEvents\GameLocalEvent.cs" />
     <Compile Include="GameLocalEvents\LevelLocalEvent.cs" />
     <Compile Include="GameLocalEvents\StorkLocalEvent.cs" />
     <Compile Include="HUD.cs" />
+    <Compile Include="HudSlider.cs" />
     <Compile Include="HudTextBoard.cs" />
     <Compile Include="IGridDataUpdater.cs" />
     <Compile Include="IHasSpeed.cs" />

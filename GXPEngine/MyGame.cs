@@ -8,10 +8,10 @@ using TiledMapParserExtended;
 
 public class MyGame : Game
 {
-    public static bool Debug = true;
+    public static bool Debug = false;
 
-    public const int SCREEN_WIDTH = 1280;
-    public const int SCREEN_HEIGHT = 720;
+    public const int SCREEN_WIDTH = 1280; //1920
+    public const int SCREEN_HEIGHT = 720; //1080
     
     public static int HALF_SCREEN_WIDTH = SCREEN_WIDTH / 2;
     public static int HALF_SCREEN_HEIGHT = SCREEN_HEIGHT / 2;
@@ -92,4 +92,6 @@ public class MyGame : Game
     }
 
     public FollowCamera Camera => _camera;
+
+    public Level CurrentLevel => _currentLevel;
 }

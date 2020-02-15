@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GXPEngine.Core;
@@ -15,20 +16,18 @@ namespace GXPEngine
         private Vector2 _spawnPoint;
 
         private List<Airplane> _airplanes;
-        private List<DroneGameObject> _drones;
 
-        
         private StorkStateManager _storkStateManager;
         private Stork _stork;
 
-
+        private DroneManager _dronesManager;
+        
         public Level(FollowCamera pCam, MapGameObject pMap)
         {
             _cam = pCam;
             _map = pMap;
 
             _airplanes = new List<Airplane>();
-            _drones = new List<DroneGameObject>();
 
             var spawnPointObject = _map.ObjectGroup.Objects.FirstOrDefault(o => o.Name == "spawn point");
             _spawnPoint = new Vector2(spawnPointObject.X, spawnPointObject.Y);
@@ -43,7 +42,8 @@ namespace GXPEngine
 
             SpawnAirplanes();
 
-            SpawnDrones();
+            _dronesManager = new DroneManager(this);
+            _dronesManager.SpawnDrones();
 
             var playerInput = new PlayerInput();
             AddChild(playerInput);
@@ -55,9 +55,7 @@ namespace GXPEngine
                 StorkInput = playerInput
             };
 
-            // var pizza = new PizzaGameObject("data/pizza00.png");
-            // _stork.AddChildAt(pizza, 0);
-            // pizza.x = 15;
+            _dronesManager.SetDronesTarget(_stork);
 
             CoroutineManager.StartCoroutine(SetCamTargetRoutine(_stork));
 
@@ -77,7 +75,7 @@ namespace GXPEngine
                 CoroutineManager.StartCoroutine(_storkStateManager.DropPizzaRoutine(_stork.Pos));
             }
         }
-        
+
         public void SpawnAirplanes()
         {
             //Load Airplanes
@@ -103,34 +101,6 @@ namespace GXPEngine
                 if (_airplanes[i].Destroyed)
                 {
                     _airplanes.RemoveAt(i);
-                }
-            }
-        }
-        
-        private void SpawnDrones()
-        {
-            //Load Drones
-            var droneObjects = _map.ObjectGroup.Objects.Where(o => o.Name.StartsWith("drone")).ToArray();
-
-            for (int i = 0; i < droneObjects.Length; i++)
-            {
-                var droneData = droneObjects[i];
-
-                float droneSpeed = droneData.GetFloatProperty("speed", 100);
-
-                var drone = new DroneGameObject(droneData.X, droneData.Y, droneData.Width, droneData.Height, droneSpeed,
-                    droneData.rotation);
-
-                _drones.Add(drone);
-
-                AddChild(drone);
-            }
-
-            for (int i = _drones.Count() - 1; i > -1; i--)
-            {
-                if (_drones[i].Destroyed)
-                {
-                    _drones.RemoveAt(i);
                 }
             }
         }

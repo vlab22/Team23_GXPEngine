@@ -23,6 +23,8 @@ namespace GXPEngine
         private Sprite[] _pizzasPool;
         private int _pizzaPoolIndex = 0;
 
+        private GameObject _lastMarker;
+
         public StorkStateManager(Stork pStork, Level pLevel)
         {
             _stork = pStork;
@@ -38,6 +40,8 @@ namespace GXPEngine
 
                 _pizzasPool[i] = pizza;
             }
+
+            _lastMarker = _level.GetChildren(false).Where(o => o is DeliveryPoint).LastOrDefault();
         }
 
         void IColliderListener.OnCollisionWith(GameObject go, GameObject other)
@@ -94,7 +98,7 @@ namespace GXPEngine
 
         private IEnumerator CollisionWithAirplaneRoutine(Airplane plane)
         {
-            _stork.InputEnabled = false;
+            //_stork.InputEnabled = false;
 
             //Shake Camera
             MyGame.ThisInstance.Camera.shakeDuration = 500;
@@ -108,7 +112,7 @@ namespace GXPEngine
 
             yield return new WaitForMilliSeconds(1500);
 
-            _stork.InputEnabled = true;
+            //_stork.InputEnabled = true;
             _inCollisionWithAirplane = false;
         }
 
@@ -150,6 +154,8 @@ namespace GXPEngine
 
             int scaleTime = 0;
 
+            bool hasChangedDepthFlag = false;
+            
             while (time < duration)
             {
                 //TODO: parei aqui, apremder os easing
@@ -173,9 +179,13 @@ namespace GXPEngine
                 {
                     scaleX = Easing.Ease(Easing.Equation.CubicEaseIn, scaleTime - 400, 1.5f, 0f - 1.5f, duration - 400);
                     scaleY = Easing.Ease(Easing.Equation.CubicEaseIn, scaleTime - 400, 1.5f, 0f - 1.5f, duration - 400);
+                 
+                    if (!hasChangedDepthFlag && scaleX < 1)
+                    {
+                        hasChangedDepthFlag = true;
+                        pizza.parent.SetChildIndex(pizza, _lastMarker.Index+1);
+                    }
                 }
-
-                Console.WriteLine($"scaleX: {scaleX}");
 
                 pizza.SetScaleXY(scaleX, scaleY);
 
@@ -184,7 +194,7 @@ namespace GXPEngine
                 yield return null;
             }
 
-            ParticleManager.Instance.PlaySmallSmoke(_level, toX, toY);
+            ParticleManager.Instance.PlaySmallSmoke(_level, toX, toY, 1500, _lastMarker.Index+1);
         }
     }
 }

@@ -74,14 +74,29 @@ namespace GXPEngine
             _smoke00.visible = false;
         }
 
-        public void PlaySmallSmoke(GameObject parentObj, float px = 0, float py = 0, int duration = 500)
+        public void PlaySmallSmoke(GameObject parentObj, float px = 0, float py = 0, int duration = 500, int depthIndex = -1)
         {
-            CoroutineManager.StartCoroutine(PlaySmallSmokeRoutine(parentObj, px, py, duration));
+            CoroutineManager.StartCoroutine(PlaySmallSmokeRoutine(parentObj, px, py, duration, depthIndex));
         }
 
-        private IEnumerator PlaySmallSmokeRoutine(GameObject parentObj, float px, float py, int duration)
+        private IEnumerator PlaySmallSmokeRoutine(GameObject parentObj, float px, float py, int duration, int depthIndex)
         {
-            parentObj.AddChild(_smallBlackSmoke00);
+            if (depthIndex < 0)
+            {
+                parentObj.AddChild(_smallBlackSmoke00);
+            }
+            else
+            {
+                parentObj.AddChildAt(_smallBlackSmoke00, depthIndex);
+            }
+
+            var childs = parentObj.GetChildren();
+            Console.WriteLine($"{this}: smoke: {_smallBlackSmoke00}");
+            for (int i = 0; i < childs.Count; i++)
+            {
+                Console.WriteLine($"\t{childs[i]}");
+            }
+            
             _smallBlackSmoke00.visible = true;
             _smallBlackSmoke00.SetXY(px, py);
 
@@ -102,6 +117,7 @@ namespace GXPEngine
             }
             
             _smallBlackSmoke00.visible = false;
+            parentObj?.RemoveChild(_smallBlackSmoke00);
         }
     }
 }
