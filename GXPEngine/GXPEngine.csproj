@@ -38,11 +38,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Airplane.cs" />
     <Compile Include="CanvasDebugger2.cs" />
+    <Compile Include="CompoundCollider.cs" />
     <Compile Include="DeliveryPoint.cs" />
     <Compile Include="DrawableTweener.cs" />
+    <Compile Include="DroneGameObject.cs" />
     <Compile Include="Easing.cs" />
     <Compile Include="FollowCamera.cs" />
+    <Compile Include="GameLocalEvents\GameLocalEvent.cs" />
+    <Compile Include="GameLocalEvents\LevelLocalEvent.cs" />
+    <Compile Include="GameLocalEvents\StorkLocalEvent.cs" />
     <Compile Include="HUD.cs" />
     <Compile Include="HudTextBoard.cs" />
     <Compile Include="IGridDataUpdater.cs" />
@@ -94,6 +100,7 @@
     <Compile Include="GXPEngine\FMOD\FMODSoundSystem.cs" />
     <Compile Include="GXPEngine\SoLoud\Soloud.cs" />
     <Compile Include="GXPEngine\SoLoud\SoloudSoundSystem.cs" />
+    <Compile Include="ParticleManager.cs" />
     <Compile Include="PizzaGameObject.cs" />
     <Compile Include="PlayerInput.cs" />
     <Compile Include="StopWatchTool.cs" />

@@ -208,10 +208,10 @@ public static class Easing
     /// <returns>The correct value.</returns>
     public static float Linear(float t, float b, float c, float d)
     {
-        //return c * t / d + b;
+        return c * t / d + b;
 
-        float value = t / d;
-        return Mathf.Map(value, 0, 1, @b, c);
+        //float value = t / d;
+        //return Mathf.Map(value, 0, 1, @b, c);
     }
 
     #endregion

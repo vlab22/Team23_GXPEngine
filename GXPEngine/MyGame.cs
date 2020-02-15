@@ -10,8 +10,11 @@ public class MyGame : Game
 {
     public static bool Debug = true;
 
-    public static int HALF_SCREEN_WIDTH = 1280 / 2;
-    public static int HALF_SCREEN_HEIGHT = 720 / 2;
+    public const int SCREEN_WIDTH = 1280;
+    public const int SCREEN_HEIGHT = 720;
+    
+    public static int HALF_SCREEN_WIDTH = SCREEN_WIDTH / 2;
+    public static int HALF_SCREEN_HEIGHT = SCREEN_HEIGHT / 2;
 
     public static MyGame ThisInstance;
 
@@ -25,8 +28,10 @@ public class MyGame : Game
 
     private MapGameObject _map;
     private CanvasDebugger2 _canvasDebugger;
+    private LevelManager _levelManager;
+    private ParticleManager _particleManager;
 
-    public MyGame() : base(1280, 720, false) // Create a window that's 800x600 and NOT fullscreen
+    public MyGame() : base(SCREEN_WIDTH, SCREEN_HEIGHT, false) // Create a window that's 800x600 and NOT fullscreen
     {
         ThisInstance = this;
 
@@ -47,6 +52,9 @@ public class MyGame : Game
         {
             RemoveChild(_canvasDebugger);
             RemoveChild(_currentLevel);
+            RemoveChild(_levelManager);
+            RemoveChild(_particleManager);
+            _levelManager.Destroy();
             _currentLevel.RemoveChild(_camera);
             _currentLevel.RemoveChild(_map);
             _currentLevel.Destroy();
@@ -54,6 +62,12 @@ public class MyGame : Game
 
         _currentLevel = new Level(_camera, _map);
         AddChild(_currentLevel);
+        
+        _levelManager = new LevelManager(_currentLevel);
+        AddChild(_levelManager);
+        
+        _particleManager = new ParticleManager();
+        AddChild(_particleManager);
         
         AddChild(_canvasDebugger);
     }

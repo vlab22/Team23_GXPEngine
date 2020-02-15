@@ -5,12 +5,20 @@
     <e p="C:\Users\vlab22\.Rider2019.3\system\resharper-host\local\Transient\ReSharperHost\v193\SolutionCaches\_Team23_GXPEngine.835382544.00" t="ExcludeRecursive" />
     <e p="C:\Users\vlab22\gamedev\gxpengine\Team23_gxpengine" t="IncludeFlat">
       <e p="gxpengine" t="IncludeRecursive">
+        <e p="Airplane.cs" t="Include" />
         <e p="bin" t="ExcludeRecursive" />
         <e p="CanvasDebugger2.cs" t="Include" />
+        <e p="CompoundCollider.cs" t="Include" />
         <e p="DeliveryPoint.cs" t="Include" />
         <e p="DrawableTweener.cs" t="Include" />
+        <e p="DroneGameObject.cs" t="Include" />
         <e p="Easing.cs" t="Include" />
         <e p="FollowCamera.cs" t="Include" />
+        <e p="GameLocalEvents" t="Include">
+          <e p="GameLocalEvent.cs" t="Include" />
+          <e p="LevelLocalEvent.cs" t="Include" />
+          <e p="StorkLocalEvent.cs" t="Include" />
+        </e>
         <e p="gxpengine" t="Include">
           <e p="AddOns" t="Include">
             <e p="Camera.cs" t="Include" />
@@ -80,6 +88,7 @@
         <e p="MVector2.cs" t="Include" />
         <e p="MyGame.cs" t="Include" />
         <e p="obj" t="ExcludeRecursive" />
+        <e p="ParticleManager.cs" t="Include" />
         <e p="PizzaGameObject.cs" t="Include" />
         <e p="PlayerInput.cs" t="Include" />
         <e p="StopWatchTool.cs" t="Include" />

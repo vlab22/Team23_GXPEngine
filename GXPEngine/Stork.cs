@@ -54,12 +54,16 @@ namespace GXPEngine
         private bool _hasIColliderListener;
         private IColliderListener _iColliderListener;
 
+        private bool _inputEnabled;
+
         public Stork() : base("data/Stork Background.png")
         {
             // easy = new EasyDraw(85, 85, false);
             // easy.SetOrigin(85f / 2, 85f / 2);
             // easy.Clear(Color.Black);
             // AddChild(easy);
+
+            _inputEnabled = true;
 
             SetOrigin(85f / 2, 85f / 2);
 
@@ -112,7 +116,7 @@ namespace GXPEngine
             _lastPos.x = x;
             _lastPos.y = y;
 
-            if (_hasStorkInput)
+            if (_inputEnabled && _hasStorkInput)
             {
                 _leftWingPressure = _storkInput.LeftWingPressure;
                 _rightWingPressure = _storkInput.RightWingPressure;
@@ -218,19 +222,19 @@ namespace GXPEngine
             
             //onsole.WriteLine($"{this}: angularpushDelta: {_angularPushDelta:0.00}");
             
-            if (angularPushDeltaAbs >= 0)
+            if (true)//angularPushDeltaAbs >= 0)
             {
                 _angularPush = _angularPushDelta * 15;
                 Turn(-1 * _angularPush * delta);
                 
-                if (_angularPushDelta > 0.5f)
+                if (_angularPushDelta > 0.050f)
                 {
                     _body.visible = true;
                     _leftWing.visible = false;
                     _rightWing.visible = false;
                     _body.SetFrame(2);
                 }
-                else if (_angularPushDelta < -0.5f)
+                else if (_angularPushDelta < -0.050f)
                 {
                     _body.visible = true;
                     _leftWing.visible = false;
@@ -257,7 +261,7 @@ namespace GXPEngine
             //Console.WriteLine($"{this.name} ==> {other.name}");
             if (_hasIColliderListener)
             {
-                ColliderListener.OnCollisionWith(this, other);
+                _iColliderListener.OnCollisionWith(this, other);
             }
         }
 
@@ -319,6 +323,16 @@ namespace GXPEngine
                 _hasIColliderListener = value != null;
             }
         }
+
+        public bool InputEnabled
+        {
+            get => _inputEnabled;
+            set => _inputEnabled = value;
+        }
+
+        public Vector2 Pos => _pos;
+
+        public Vector2 Forward => _forward;
     }
 
     public interface IColliderListener

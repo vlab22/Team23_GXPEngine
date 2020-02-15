@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using GXPEngine;
 
 /// <summary>
-/// 
+/// This class was inspired in Coroutines of Unity
 /// </summary>
 public static class CoroutineManager
 {

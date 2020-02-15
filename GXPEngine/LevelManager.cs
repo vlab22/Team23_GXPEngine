@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections;
+using System.Linq;
 using TiledMapParserExtended;
 
 namespace GXPEngine
@@ -14,6 +15,20 @@ namespace GXPEngine
             _level = pLevel;
 
             _endLayerIndex = _level.Map.GetLayerIndex("end point layer");
+
+            CoroutineManager.StartCoroutine(SpawnAirplanes());
+        }
+
+        private IEnumerator SpawnAirplanes()
+        {
+            while (!_level.Destroyed)
+            {
+                yield return new WaitForMilliSeconds(10000);
+                
+                _level.SpawnAirplanes();
+            }
+            
+            //Add more yields here
         }
 
         void Update()

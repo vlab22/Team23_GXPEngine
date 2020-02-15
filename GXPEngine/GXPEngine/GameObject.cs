@@ -16,7 +16,7 @@ namespace GXPEngine
 		private GameObject _parent = null;
 		
 		public bool visible = true;
-		private bool destroyed = false;
+		private bool _destroyed = false;
 
 		//------------------------------------------------------------------------------------------------------------------------
 		//														GameObject()
@@ -147,7 +147,7 @@ namespace GXPEngine
 				}
 				_parent = value;
 				if (value != null) {
-					if (destroyed) {
+					if (_destroyed) {
 						throw new Exception ("Destroyed game objects cannot be added to the game!");
 					}
 					_parent.addChild(this);
@@ -160,6 +160,8 @@ namespace GXPEngine
 				}
 			}
 		}
+
+		public bool Destroyed => _destroyed;
 
 		//------------------------------------------------------------------------------------------------------------------------
 		//														OnDestroy()
@@ -182,7 +184,7 @@ namespace GXPEngine
 		/// </summary>
 		public virtual void Destroy ()
 		{
-			destroyed = true;
+			_destroyed = true;
 			// Detach from parent (and thus remove it from the managers):
 			if (parent != null) parent = null;
 

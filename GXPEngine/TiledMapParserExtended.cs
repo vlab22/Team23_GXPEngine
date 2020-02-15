@@ -406,7 +406,7 @@ namespace TiledMapParserExtended
         [XmlAttribute("name")] public string Name;
         [XmlElement("object")] public TiledObject[] Objects;
 
-        override public string ToString()
+        public override string ToString()
         {
             string output = "Object group: Name: " + Name + " Objects:\n";
             foreach (TiledObject obj in Objects)
@@ -456,6 +456,7 @@ namespace TiledMapParserExtended
 
         [XmlAttribute("x")] public float X;
         [XmlAttribute("y")] public float Y;
+        [XmlAttribute("rotation")] public float rotation;
         [XmlElement("text")] public Text textField;
         [XmlElement("polyline")] public PolylineObject[] polylines;
         [XmlElement("polygon")] public PolygonObject[] polygons;
