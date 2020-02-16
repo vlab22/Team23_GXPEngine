@@ -88,8 +88,6 @@ namespace GXPEngine
             x = pX; // + width / 2;
             y = pY; // - height + height / 2f;
 
-            float diag = Mathf.Sqrt(width * width + height * height);
-
             SetOrigin(originalWidth / 2f, originalHeight / 2f);
 
             Turn(pRotation);
@@ -129,6 +127,7 @@ namespace GXPEngine
             _easyDrawDebug.SetOrigin(0, _easyDrawDebug.height * 0.5f);
             _easyDrawDebug.Clear(Color.Black);
             AddChild(_easyDrawDebug);
+            _easyDrawDebug.TextFont("data/Gaiatype.ttf", 8);
             _easyDrawDebug.x = 0;
             _easyDrawDebug.y = -40;
 
@@ -389,10 +388,9 @@ namespace GXPEngine
                 //     Console.WriteLine($"\t{string.Join(Environment.NewLine + "\t", _iesDebug)}");
                 // }
 
-                _easyDrawDebug.Clear(Color.FromArgb(100, 1, 1, 1));
+                _easyDrawDebug.Clear(Color.FromArgb(200, 1, 1, 1));
                 _easyDrawDebug.Fill(Color.White);
                 _easyDrawDebug.Stroke(Color.Aquamarine);
-                _easyDrawDebug.TextSize(10);
 
                 string str = $"state: {_state.ToString()}";
 

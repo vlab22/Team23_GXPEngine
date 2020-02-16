@@ -125,6 +125,14 @@ public static class CoroutineManager
     {
         return "Total routines: " + routines.Count;
     }
+
+    public static void ClearAllRoutines()
+    {
+        routines.Clear();
+        routinesToAdd.Clear();
+        routinesToRemove.Clear();
+        routineWaitMap.Clear();
+    }
 }
 
 /// <summary>

@@ -37,7 +37,7 @@ namespace GXPEngine
             var centerText = $@"<= and => arrows to flap wings
 Turn is weird flapping one wing while the other is static";
 
-            _centerTextBoard = new HudTextBoard(centerText, 312, 32, 22, CenterMode.Center, CenterMode.Center);
+            _centerTextBoard = new HudTextBoard(centerText, 312, 32, 20, CenterMode.Center, CenterMode.Center);
             _centerTextBoard.SetText(centerText);
             _centerTextBoard.visible = true;
             _centerTextBoard.Centralize();

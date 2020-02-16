@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Linq;
 // System contains a lot of default C# libraries 
 using GXPEngine;
 using TiledMapParserExtended;
@@ -10,13 +11,13 @@ public class MyGame : Game
 {
     public static bool Debug = false;
 
-    // public const int SCREEN_WIDTH = 1280; //1920
-    // public const int SCREEN_HEIGHT = 720; //1080
-    // public const bool FULLSCREEN = false;
+    public const int SCREEN_WIDTH = 1280; //1920
+    public const int SCREEN_HEIGHT = 720; //1080
+    public const bool FULLSCREEN = false;
 
-    public const int SCREEN_WIDTH = 1920;
-    public const int SCREEN_HEIGHT = 1080;
-    public const bool FULLSCREEN = true;
+    // public const int SCREEN_WIDTH = 1920;
+    // public const int SCREEN_HEIGHT = 1080;
+    // public const bool FULLSCREEN = true;
     
     public static int HALF_SCREEN_WIDTH = SCREEN_WIDTH / 2;
     public static int HALF_SCREEN_HEIGHT = SCREEN_HEIGHT / 2;
@@ -25,7 +26,7 @@ public class MyGame : Game
 
     private FollowCamera _camera;
 
-    private string[] _levelFiles = new []{"Level00.tmx"};
+    private string[] _levelFiles = new string[0];
 
     private Level _currentLevel;
 
@@ -36,11 +37,18 @@ public class MyGame : Game
     private LevelManager _levelManager;
     private ParticleManager _particleManager;
 
-    public MyGame() : base(SCREEN_WIDTH, SCREEN_HEIGHT, FULLSCREEN) // Create a window that's 800x600 and NOT fullscreen
+    public MyGame(string[] tmxFileNames, int levelIndex) : base(SCREEN_WIDTH, SCREEN_HEIGHT, FULLSCREEN) // Create a window that's 800x600 and NOT fullscreen
     {
         ThisInstance = this;
 
-        _mapData = TiledMapParserExtended.MapParser.ReadMap(_levelFiles[0]);
+        _levelFiles = tmxFileNames;
+
+        if (_levelFiles.Length == 0)
+        {
+            throw new ApplicationException($"_levelFiles.Length == 0, no tmx files found in {AppDomain.CurrentDomain.DynamicDirectory}");
+        }
+
+        _mapData = TiledMapParserExtended.MapParser.ReadMap(_levelFiles[levelIndex]);
         
         _map = new MapGameObject(_mapData);
         
@@ -53,6 +61,8 @@ public class MyGame : Game
 
     public void ResetLevel(int levelId)
     {
+        CoroutineManager.ClearAllRoutines();
+        
         if (_currentLevel != null)
         {
             RemoveChild(_canvasDebugger);
@@ -91,9 +101,23 @@ public class MyGame : Game
         }
     }
 
-    static void Main() // Main() is the first method that's called when the program is run
+    static void Main(string[] args) // Main() is the first method that's called when the program is run
     {
-        new MyGame().Start(); // Create a "MyGame" and start it
+        Console.WriteLine($"main args: {string.Join(Environment.NewLine, args.Select(arg => $"'{arg}'"))}");
+        
+        var tmxFileNames = TmxFilesLoader.GetTmxFileNames();
+
+        int levelIndex = 0;
+        if (args.Length > 0 && !string.IsNullOrWhiteSpace(args[0]))
+        {
+            levelIndex = Array.FindIndex(tmxFileNames, t => t.Equals(args[0], StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        levelIndex = (levelIndex == -1) ? 0 : levelIndex;
+        
+        var myGame = new MyGame(tmxFileNames, levelIndex);
+
+        myGame.Start();
     }
 
     public FollowCamera Camera => _camera;

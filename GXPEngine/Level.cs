@@ -21,10 +21,11 @@ namespace GXPEngine
         private Stork _stork;
 
         private DroneManager _dronesManager;
-        
+
         private readonly Sprite[] _pizzasPool = new Sprite[10];
         private int _pizzaPoolIndex = 0;
-        
+        private HuntersManager _huntersManager;
+
         public Level(FollowCamera pCam, MapGameObject pMap)
         {
             _cam = pCam;
@@ -52,14 +53,17 @@ namespace GXPEngine
                 y = _spawnPoint.y,
                 StorkInput = playerInput
             };
-            
+
+            _huntersManager = new HuntersManager(this);
+            _huntersManager.SpawnHunters();
+
             AddChild(_stork);
 
             _dronesManager = new DroneManager(this);
             _dronesManager.SpawnDrones();
-            
+
             _dronesManager.SetDronesTarget(_stork);
-            
+
             for (int i = 0; i < _pizzasPool.Length; i++)
             {
                 var pizza = new PizzaGameObject("data/pizza00.png");
@@ -68,9 +72,9 @@ namespace GXPEngine
 
                 _pizzasPool[i] = pizza;
             }
-            
+
             SpawnAirplanes();
-            
+
             CoroutineManager.StartCoroutine(SetCamTargetRoutine(_stork));
 
             _storkStateManager = new StorkStateManager(_stork, this);
@@ -132,7 +136,7 @@ namespace GXPEngine
             _cam.Target = stork;
             _cam.TargetFrontDistance = 200;
         }
-        
+
         public Sprite GetPizzaFromPool()
         {
             var pizza = _pizzasPool[_pizzaPoolIndex];
@@ -146,7 +150,7 @@ namespace GXPEngine
         {
             return string.Join(Environment.NewLine, GetChildren().Select(c => c.name));
         }
-        
+
         public MapGameObject Map => _map;
 
         public List<Airplane> AirPlanes => _airplanes;

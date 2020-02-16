@@ -53,6 +53,9 @@
     <Compile Include="HUD.cs" />
     <Compile Include="HudSlider.cs" />
     <Compile Include="HudTextBoard.cs" />
+    <Compile Include="HunterCrossHairGameObject.cs" />
+    <Compile Include="HunterGameObject.cs" />
+    <Compile Include="HuntersManager.cs" />
     <Compile Include="IGridDataUpdater.cs" />
     <Compile Include="IHasSpeed.cs" />
     <Compile Include="IStorkInput.cs" />
@@ -111,6 +114,7 @@
     <Compile Include="StorkDataUpdater.cs" />
     <Compile Include="StorkStateManager.cs" />
     <Compile Include="TiledMapParserExtended.cs" />
+    <Compile Include="TmxFilesLoader.cs" />
     <Compile Include="Utils\CoroutineManager.cs" />
   </ItemGroup>
   <ItemGroup />

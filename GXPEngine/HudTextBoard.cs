@@ -21,17 +21,12 @@ namespace GXPEngine
             CenterMode hor = CenterMode.Min,
             CenterMode ver = CenterMode.Min)
         {
-            PrivateFontCollection pfc = new PrivateFontCollection();
-            pfc.AddFontFile(@"data/Gaiatype.ttf");
-            
-            var font = new Font(pfc.Families[0], 22, FontStyle.Regular);
-
             this.x = px;
             this.y = py;
             this._text = pText;
 
             _easyDraw = new EasyDraw(width, height, false);
-            _easyDraw.TextFont(font);
+            _easyDraw.TextFont("data/Gaiatype.ttf", 12);
             
             if (!string.IsNullOrEmpty(pText))
             {
@@ -52,7 +47,7 @@ namespace GXPEngine
 
                 _easyDraw = new EasyDraw(wr, hr, false);
             }
-            _easyDraw.TextFont(font);
+            _easyDraw.TextFont("data/Gaiatype.ttf", 12);
             _easyDraw.TextSize(textSize);
             _easyDraw.TextAlign(hor, ver);
            

@@ -23,6 +23,7 @@ namespace GXPEngine
 		public SolidBrush brush	{ get; protected set;}
 		protected bool _stroke=true;
 		protected bool _fill=true;
+		private PrivateFontCollection _pfc;
 
 		public EasyDraw (int width, int height, bool addCollider=true) : base (new Bitmap (width, height),addCollider)
 		{
@@ -54,9 +55,12 @@ namespace GXPEngine
 
 		//////////// Setting Font
 
-		public void TextFont(Font newFont) 
+		public void TextFont(string fontPath, float pointSize)
 		{
-			font = newFont;
+			_pfc = new PrivateFontCollection();
+			_pfc.AddFontFile(fontPath);
+            
+			font = new Font(_pfc.Families[0], pointSize, FontStyle.Regular);
 		}
 
 		public void TextFont(string fontName, float pointSize, FontStyle style = FontStyle.Regular) 
@@ -66,7 +70,7 @@ namespace GXPEngine
 
 		public void TextSize(float pointSize) 
 		{
-			font = new Font (font.OriginalFontName, pointSize, font.Style);
+			font = new Font(_pfc.Families[0], pointSize, font.Style);
 		}
 
 		//////////// Setting Alignment for text, ellipses and rects
