@@ -42,6 +42,12 @@ namespace GXPEngine
 				return previousFrameTime; 
 			}
 		}
+		
+		public static float delta {
+			get { 
+				return previousFrameTime * 0.001f; 
+			}
+		}
 
 		internal static void newFrame() {
 			previousFrameTime = time - previousTime;

@@ -105,6 +105,7 @@
     <Compile Include="ParticleManager.cs" />
     <Compile Include="PizzaGameObject.cs" />
     <Compile Include="PlayerInput.cs" />
+    <Compile Include="SpriteTweener.cs" />
     <Compile Include="StopWatchTool.cs" />
     <Compile Include="Stork.cs" />
     <Compile Include="StorkDataUpdater.cs" />

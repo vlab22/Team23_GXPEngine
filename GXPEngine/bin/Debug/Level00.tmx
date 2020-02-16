@@ -148,7 +148,7 @@
 </data>
  </layer>
  <objectgroup id="3" name="Object Layer 1">
-  <object id="3" name="spawn point" gid="3" x="1681.95" y="1064.97" width="64" height="64"/>
+  <object id="3" name="spawn point" gid="3" x="1645.95" y="1244.97" width="64" height="64"/>
   <object id="6" name="delivery point" gid="668" x="3113.7" y="716.606" width="512" height="512"/>
   <object id="8" name="airplane 0" gid="669" x="1824.64" y="-389.977" width="665.333" height="665.333" rotation="47.3953">
    <properties>
@@ -157,8 +157,6 @@
     <property name="speed" type="float" value="200"/>
    </properties>
   </object>
-  <object id="13" name="drone" gid="670" x="2760.95" y="1011.98" width="260.758" height="260.758"/>
-  <object id="50" name="drone" gid="670" x="2308.62" y="597.621" width="260.758" height="260.758"/>
-  <object id="72" name="drone" gid="670" x="2686.62" y="1525.62" width="260.758" height="260.758"/>
+  <object id="13" name="drone" gid="670" x="2052.95" y="1251.98" width="260.758" height="260.758"/>
  </objectgroup>
 </map>

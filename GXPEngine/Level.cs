@@ -22,6 +22,9 @@ namespace GXPEngine
 
         private DroneManager _dronesManager;
         
+        private readonly Sprite[] _pizzasPool = new Sprite[10];
+        private int _pizzaPoolIndex = 0;
+        
         public Level(FollowCamera pCam, MapGameObject pMap)
         {
             _cam = pCam;
@@ -40,11 +43,6 @@ namespace GXPEngine
                 deliveryPointObject.Width, deliveryPointObject.Height);
             AddChild(deliveryPoint);
 
-            SpawnAirplanes();
-
-            _dronesManager = new DroneManager(this);
-            _dronesManager.SpawnDrones();
-
             var playerInput = new PlayerInput();
             AddChild(playerInput);
 
@@ -54,14 +52,28 @@ namespace GXPEngine
                 y = _spawnPoint.y,
                 StorkInput = playerInput
             };
+            
+            AddChild(_stork);
 
+            _dronesManager = new DroneManager(this);
+            _dronesManager.SpawnDrones();
+            
             _dronesManager.SetDronesTarget(_stork);
+            
+            for (int i = 0; i < _pizzasPool.Length; i++)
+            {
+                var pizza = new PizzaGameObject("data/pizza00.png");
+                pizza.visible = false;
+                this.AddChild(pizza);
 
+                _pizzasPool[i] = pizza;
+            }
+            
+            SpawnAirplanes();
+            
             CoroutineManager.StartCoroutine(SetCamTargetRoutine(_stork));
 
             _storkStateManager = new StorkStateManager(_stork, this);
-
-            AddChild(_stork);
 
             AddChild(_cam);
 
@@ -88,7 +100,7 @@ namespace GXPEngine
                 float airSpeed = airData.GetFloatProperty("speed", 200);
                 int lifeTime = (int) (airData.GetFloatProperty("life_time", 12) * 1000);
 
-                var airplane = new Airplane(airData.X, airData.Y, airData.Width, airData.Height, airSpeed,
+                var airplane = new Airplane(airData.X, airData.Y, airData.Width, airData.Height, this, airSpeed,
                     airData.rotation, lifeTime);
 
                 _airplanes.Add(airplane);
@@ -120,9 +132,25 @@ namespace GXPEngine
             _cam.Target = stork;
             _cam.TargetFrontDistance = 200;
         }
+        
+        public Sprite GetPizzaFromPool()
+        {
+            var pizza = _pizzasPool[_pizzaPoolIndex];
+            _pizzaPoolIndex++;
+            _pizzaPoolIndex %= _pizzasPool.Length;
 
+            return pizza;
+        }
+
+        public string ChildrenToString()
+        {
+            return string.Join(Environment.NewLine, GetChildren().Select(c => c.name));
+        }
+        
         public MapGameObject Map => _map;
 
         public List<Airplane> AirPlanes => _airplanes;
+
+        public int FirstAirplaneIndex => _airplanes.Count > 0 ? _airplanes[0].Index : GetChildren().Count;
     }
 }

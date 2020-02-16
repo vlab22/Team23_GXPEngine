@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using GXPEngine.Core;
 using GXPEngine.GameLocalEvents;
 
 namespace GXPEngine
@@ -9,6 +11,7 @@ namespace GXPEngine
     {
         Level _level;
         List<DroneGameObject> _drones;
+        private IEnumerator _droneReleasePizzaRoutine;
 
         public DroneManager(Level pLevel) : base(false)
         {
@@ -29,6 +32,8 @@ namespace GXPEngine
 
                 var drone = new DroneGameObject(droneData.X, droneData.Y, droneData.Width, droneData.Height, droneSpeed,
                     droneData.rotation);
+
+                drone.DroneBehaviorListener = this;
 
                 _drones.Add(drone);
 
@@ -62,8 +67,99 @@ namespace GXPEngine
         {
             LocalEvents.Instance.Raise(new LevelLocalEvent(enemy, drone, _level,
                 LevelLocalEvent.EventType.DRONE_DETECTED_ENEMY));
+        }
+
+        void IDroneBehaviorListener.OnEnemyCollision(DroneGameObject drone, GameObject enemy)
+        {
+            if (enemy is Stork)
+            {
+                if (drone.State != DroneGameObject.DroneState.HIT_ENEMY &&
+                    drone.State != DroneGameObject.DroneState.RETURN_TO_START_POINT_AFTER_HIT &&
+                    drone.State != DroneGameObject.DroneState.ENEMY_DETECTED)
+                {
+                    CoroutineManager.StartCoroutine(DroneHitEnemyRoutine(drone, enemy));
+                }
+            }
+        }
+
+        IEnumerator DroneHitEnemyRoutine(DroneGameObject drone, GameObject enemy)
+        {
+            drone.SetState(DroneGameObject.DroneState.HIT_ENEMY);
+
+            LocalEvents.Instance.Raise(new LevelLocalEvent(enemy, drone, _level,
+                LevelLocalEvent.EventType.DRONE_HIT_ENEMY));
+
+            //Stole pizza animation
+            yield return StolePizzaAnimationRoutine(drone, enemy);
+
+            drone.DroneHitEnemy();
+
+            yield return null;
+        }
+
+        private IEnumerator StolePizzaAnimationRoutine(DroneGameObject drone, GameObject enemy)
+        {
+            CoroutineManager.StopCoroutine(_droneReleasePizzaRoutine);
             
-            
+            var pizza = _level.GetPizzaFromPool();
+
+            pizza.SetScaleXY(1, 1);
+            pizza.SetXY(enemy.x, enemy.y);
+            pizza.alpha = 1;
+            pizza.visible = true;
+
+            int firstAirplaneIndex = _level.FirstAirplaneIndex;
+
+            _level.SetChildIndex(pizza, firstAirplaneIndex - 1);
+
+            // Console.WriteLine("====================");
+            // Console.WriteLine(string.Join(Environment.NewLine, _level.AirPlanes));
+            //
+            // Console.WriteLine($"{firstAirplaneIndex - 1} | pizza.Index: {pizza.Index} | pizza.alpha: {pizza.alpha}");
+
+            //Animate pizza
+
+            float fromX = enemy.x;
+            float fromY = enemy.y;
+
+            float offsetX = 0;
+            float offsetY = -25;
+
+            int time = 0;
+            int duration = 450;
+            while (time < duration && !drone.Destroyed)
+            {
+                pizza.x = Easing.Ease(Easing.Equation.CubicEaseOut, time, fromX, drone.x + offsetX - fromX, duration);
+                pizza.y = Easing.Ease(Easing.Equation.CubicEaseOut, time, fromY, drone.y + offsetY - fromY, duration);
+
+                time += Time.deltaTime;
+                yield return null;
+            }
+
+            pizza.parent = drone;
+            pizza.SetXY(offsetX, offsetY);
+
+            _droneReleasePizzaRoutine = CoroutineManager.StartCoroutine(DroneReleasePizzaRoutine(drone, (Sprite) pizza));
+        }
+
+        IEnumerator DroneReleasePizzaRoutine(DroneGameObject drone, Sprite pizza)
+        {
+            yield return new WaitForMilliSeconds(2000);
+
+            int time = 0;
+            int duration = 1000;
+
+            while (time < duration)
+            {
+                pizza.alpha = Easing.Ease(Easing.Equation.CubicEaseOut, time, 1, 0 - 1, duration);
+
+                time += Time.deltaTime;
+                yield return null;
+            }
+
+            pizza.visible = false;
+            pizza.alpha = 1;
+            pizza.parent = _level;
         }
     }
 }

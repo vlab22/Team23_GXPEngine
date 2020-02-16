@@ -10,8 +10,13 @@ public class MyGame : Game
 {
     public static bool Debug = false;
 
-    public const int SCREEN_WIDTH = 1280; //1920
-    public const int SCREEN_HEIGHT = 720; //1080
+    // public const int SCREEN_WIDTH = 1280; //1920
+    // public const int SCREEN_HEIGHT = 720; //1080
+    // public const bool FULLSCREEN = false;
+
+    public const int SCREEN_WIDTH = 1920;
+    public const int SCREEN_HEIGHT = 1080;
+    public const bool FULLSCREEN = true;
     
     public static int HALF_SCREEN_WIDTH = SCREEN_WIDTH / 2;
     public static int HALF_SCREEN_HEIGHT = SCREEN_HEIGHT / 2;
@@ -31,7 +36,7 @@ public class MyGame : Game
     private LevelManager _levelManager;
     private ParticleManager _particleManager;
 
-    public MyGame() : base(SCREEN_WIDTH, SCREEN_HEIGHT, false) // Create a window that's 800x600 and NOT fullscreen
+    public MyGame() : base(SCREEN_WIDTH, SCREEN_HEIGHT, FULLSCREEN) // Create a window that's 800x600 and NOT fullscreen
     {
         ThisInstance = this;
 

@@ -93,6 +93,7 @@
         <e p="ParticleManager.cs" t="Include" />
         <e p="PizzaGameObject.cs" t="Include" />
         <e p="PlayerInput.cs" t="Include" />
+        <e p="SpriteTweener.cs" t="Include" />
         <e p="StopWatchTool.cs" t="Include" />
         <e p="Stork.cs" t="Include" />
         <e p="StorkDataUpdater.cs" t="Include" />

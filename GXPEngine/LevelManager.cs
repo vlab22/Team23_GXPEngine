@@ -23,17 +23,12 @@ namespace GXPEngine
         {
             while (!_level.Destroyed)
             {
-                yield return new WaitForMilliSeconds(10000);
+                yield return new WaitForMilliSeconds(15000);
                 
                 _level.SpawnAirplanes();
             }
             
             //Add more yields here
-        }
-
-        void Update()
-        {
-            
         }
     }
 }

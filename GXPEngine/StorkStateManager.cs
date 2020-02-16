@@ -20,9 +20,6 @@ namespace GXPEngine
         private bool _inCollisionWithDrone;
         private DroneGameObject _lastDroneCollided;
 
-        private Sprite[] _pizzasPool;
-        private int _pizzaPoolIndex = 0;
-
         private GameObject _lastMarker;
 
         public StorkStateManager(Stork pStork, Level pLevel)
@@ -30,16 +27,6 @@ namespace GXPEngine
             _stork = pStork;
             _level = pLevel;
             _stork.ColliderListener = this;
-
-            _pizzasPool = new Sprite[5];
-            for (int i = 0; i < _pizzasPool.Length; i++)
-            {
-                var pizza = new PizzaGameObject("data/pizza00.png");
-                pizza.visible = false;
-                _level.AddChild(pizza);
-
-                _pizzasPool[i] = pizza;
-            }
 
             _lastMarker = _level.GetChildren(false).Where(o => o is DeliveryPoint).LastOrDefault();
         }
@@ -84,11 +71,6 @@ namespace GXPEngine
 
             LocalEvents.Instance.Raise(new StorkLocalEvent(_stork, StorkLocalEvent.Event.STORK_HIT_BY_PLANE));
 
-            yield return new WaitForMilliSeconds(200);
-
-            //Drop a pizza
-            yield return DropPizzaRoutine(_stork.Pos);
-
             yield return new WaitForMilliSeconds(2500);
 
             //_stork.InputEnabled = true;
@@ -123,9 +105,7 @@ namespace GXPEngine
             Console.WriteLine($"{this}: droppoint: {dropPoint}");
 
             //Get pizza game object
-            var pizza = _pizzasPool[_pizzaPoolIndex];
-            _pizzaPoolIndex++;
-            _pizzaPoolIndex %= _pizzasPool.Length;
+            var pizza = _level.GetPizzaFromPool();
 
             if (pizza == null)
             {
@@ -158,7 +138,6 @@ namespace GXPEngine
             
             while (time < duration)
             {
-                //TODO: parei aqui, apremder os easing
                 pizza.x = Easing.Ease(Easing.Equation.Linear, time, fromX, toX - fromX, duration);
                 pizza.y = Easing.Ease(Easing.Equation.Linear, time, fromY, toY - fromY, duration);
 

@@ -1,5 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using GXPEngine;
 
 /// <summary>
@@ -28,12 +31,13 @@ public static class CoroutineManager
             ie.MoveNext();
             routines.Add(ie);
         }
-
+        
         return ie;
     }
 
     public static void StopCoroutine(IEnumerator ie)
     {
+       
         routinesToRemove.Add(ie);
     }
 
@@ -108,6 +112,9 @@ public static class CoroutineManager
             }
         }
 
+        //Console.WriteLine("=========================");
+        //Console.WriteLine(string.Join(Environment.NewLine, routines.Where(ii => ii.ToString().Contains("Blink"))));
+        
         routines.ExceptWith(routinesToRemove);
         routinesToRemove.Clear();
 

@@ -11,10 +11,12 @@ namespace GXPEngine
     {
         private float _speed;
         private int _lifeTime;
+        
+        private Level _level; //ugly reference, no time!
 
         private CompoundCollider[] _compoundColliders;
 
-        public Airplane(float pX, float pY, float pWidth, float pHeight, float pSpeed = 200,
+        public Airplane(float pX, float pY, float pWidth, float pHeight, Level pLevel, float pSpeed = 200,
             float pRotation = 0, int pLifeTime = 12000) : base(
             "data/Airplane6.png", 1, 1, -1, false, false)
         {
@@ -31,6 +33,8 @@ namespace GXPEngine
                 AddChild(_compoundColliders[i]);
             }
 
+            _level = pLevel;
+            
             _speed = pSpeed;
             _lifeTime = pLifeTime;
 
@@ -93,13 +97,18 @@ namespace GXPEngine
             Destroy();
         }
 
+        protected override void OnDestroy()
+        {
+            _level?.AirPlanes.Remove(this);
+            
+            base.OnDestroy();
+        }
+
         void Update()
         {
             float delta = Time.deltaTime * 0.001f;
 
             Move(_speed * delta, 0);
-
-            //Turn(180 * delta);
         }
     }
 }
