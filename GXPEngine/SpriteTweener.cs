@@ -15,7 +15,7 @@ namespace GXPEngine
                 _routinesMap.Remove(sprite);
             }
 
-            var ie = CoroutineManager.StartCoroutine(TweenAlphaRoutine(sprite, from, to, duration));
+            var ie = CoroutineManager.StartCoroutine(TweenAlphaRoutine(sprite, from, to, duration), null);
             _routinesMap.Add(sprite, ie);
         }
 

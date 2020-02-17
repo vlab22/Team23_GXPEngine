@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Runtime.CompilerServices;
 
 namespace GXPEngine
 {
@@ -17,7 +18,7 @@ namespace GXPEngine
             int delay = 0, ITweener tweener = null)
         {
             CoroutineManager.StartCoroutine(
-                TweenColorAlphaRoutine(hasColor, from, to, duration, easing, delay, tweener));
+                TweenColorAlphaRoutine(hasColor, from, to, duration, easing, delay, tweener), null);
         }
 
         static IEnumerator TweenColorAlphaRoutine(IHasColor hasColor, float from, float to, int duration,
@@ -81,7 +82,7 @@ namespace GXPEngine
         public static void TweenSpriteAlpha(Sprite s, float from, float to, int duration, Easing.Equation easing,
             int delay = 0, ITweener tweener = null)
         {
-            CoroutineManager.StartCoroutine(TweenSpriteAlphaRoutine(s, from, to, duration, easing, delay, tweener));
+            CoroutineManager.StartCoroutine(TweenSpriteAlphaRoutine(s, from, to, duration, easing, delay, tweener), null);
         }
 
         static IEnumerator TweenSpriteAlphaRoutine(Sprite s, float from, float to, int duration, Easing.Equation easing,

@@ -75,7 +75,7 @@ namespace GXPEngine
 
             SpawnAirplanes();
 
-            CoroutineManager.StartCoroutine(SetCamTargetRoutine(_stork));
+            CoroutineManager.StartCoroutine(SetCamTargetRoutine(_stork), this);
 
             _storkStateManager = new StorkStateManager(_stork, this);
 
@@ -88,7 +88,7 @@ namespace GXPEngine
         {
             if (Input.GetKeyDown(Key.D))
             {
-                CoroutineManager.StartCoroutine(_storkStateManager.DropPizzaRoutine(_stork.Pos));
+                CoroutineManager.StartCoroutine(_storkStateManager.DropPizzaRoutine(_stork.Pos), this);
             }
         }
 

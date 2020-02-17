@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 // System contains a lot of default C# libraries 
@@ -99,6 +100,18 @@ public class MyGame : Game
         {
             MyGame.Debug = ! MyGame.Debug;
         }
+        
+        if (Input.GetKeyDown(Key.I))
+        {
+            string s = "Stats:\r\n";
+        }
+    }
+
+    private List<GameObject> TransverseChildren(GameObject root)
+    {
+        var gos = new List<GameObject>();
+        
+        return new List<GameObject>();
     }
 
     static void Main(string[] args) // Main() is the first method that's called when the program is run

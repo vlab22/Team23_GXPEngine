@@ -77,7 +77,7 @@ namespace GXPEngine
                     drone.State != DroneGameObject.DroneState.RETURN_TO_START_POINT_AFTER_HIT &&
                     drone.State != DroneGameObject.DroneState.ENEMY_DETECTED)
                 {
-                    CoroutineManager.StartCoroutine(DroneHitEnemyRoutine(drone, enemy));
+                    CoroutineManager.StartCoroutine(DroneHitEnemyRoutine(drone, enemy), this);
                 }
             }
         }
@@ -139,7 +139,7 @@ namespace GXPEngine
             pizza.parent = drone;
             pizza.SetXY(offsetX, offsetY);
 
-            _droneReleasePizzaRoutine = CoroutineManager.StartCoroutine(DroneReleasePizzaRoutine(drone, (Sprite) pizza));
+            _droneReleasePizzaRoutine = CoroutineManager.StartCoroutine(DroneReleasePizzaRoutine(drone, (Sprite) pizza), this);
         }
 
         IEnumerator DroneReleasePizzaRoutine(DroneGameObject drone, Sprite pizza)

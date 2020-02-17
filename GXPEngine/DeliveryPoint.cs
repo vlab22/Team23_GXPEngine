@@ -27,7 +27,7 @@ namespace GXPEngine
             // easy.Clear(Color.Black);
             // AddChild(easy);
 
-            CoroutineManager.StartCoroutine(ResizeRoutine());
+            CoroutineManager.StartCoroutine(ResizeRoutine(), this);
         }
 
         private IEnumerator ResizeRoutine()
@@ -69,6 +69,8 @@ namespace GXPEngine
 
         void Update()
         {
+            if (!this.Enabled) return;
+            
             var p0 = this.TransformPoint(_customColliderBounds.left, _customColliderBounds.top);
             var p1 = this.TransformPoint(_customColliderBounds.right, _customColliderBounds.top);
             var p2 = this.TransformPoint(_customColliderBounds.right, _customColliderBounds.bottom);

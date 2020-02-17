@@ -102,13 +102,13 @@ namespace GXPEngine
         {
             _alpha = 0;
             DrawableTweener.TweenColorAlpha(this, 0, 255, duration, Easing.Equation.CubicEaseOut);
-            CoroutineManager.StartCoroutine(UpdateFadeIn());
+            CoroutineManager.StartCoroutine(UpdateFadeIn(), this);
         }
 
         public void FadeOut(int duration = 1000)
         {
             DrawableTweener.TweenColorAlpha(this, 255, 0, duration, Easing.Equation.CubicEaseOut);
-            CoroutineManager.StartCoroutine(UpdateFadeOut());
+            CoroutineManager.StartCoroutine(UpdateFadeOut(), this);
         }
 
         private IEnumerator UpdateFadeIn()
@@ -138,7 +138,7 @@ namespace GXPEngine
 
         public void Blink(int duration = 200)
         {
-            CoroutineManager.StartCoroutine(BlinkRoutine(duration));
+            CoroutineManager.StartCoroutine(BlinkRoutine(duration), this);
         }
 
         private IEnumerator BlinkRoutine(int duration)

@@ -49,6 +49,9 @@ namespace GXPEngine
 			collisionLoopActive = SafeCollisionLoop;
 			for (int i=activeColliderList.Count-1; i>= 0; i--) {
 				ColliderInfo info = activeColliderList[i];
+				
+				if (!info.gameObject.Enabled) continue;
+				
 				for (int j=colliderList.Count-1; j>=0; j--) {
 					if (j >= colliderList.Count) continue; //fix for removal in loop
 					GameObject other = colliderList[j];

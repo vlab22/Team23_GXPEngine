@@ -39,7 +39,7 @@ namespace GXPEngine
 
                 //Drop the pizza to the center of the delivery point
                 var dropPoint = new Vector2(other.x, other.y);
-                CoroutineManager.StartCoroutine(DropPizzaRoutine(dropPoint));
+                CoroutineManager.StartCoroutine(DropPizzaRoutine(dropPoint), null);
 
                 _inCollisionWithDeliveryPoint = true;
             }
@@ -50,7 +50,7 @@ namespace GXPEngine
                 _lastAirplaneCollided = parent;
 
                 //Lose Pizza
-                CoroutineManager.StartCoroutine(CollisionWithAirplaneRoutine(parent));
+                CoroutineManager.StartCoroutine(CollisionWithAirplaneRoutine(parent), null);
             }
             else if (!_inCollisionWithDrone && other is DroneGameObject drone && drone != _lastDroneCollided)
             {
@@ -58,7 +58,7 @@ namespace GXPEngine
                 _inCollisionWithDrone = true;
 
                 //Lose Pizza
-                CoroutineManager.StartCoroutine(CollisionWithDroneRoutine(drone));
+                CoroutineManager.StartCoroutine(CollisionWithDroneRoutine(drone), null);
             }
         }
 

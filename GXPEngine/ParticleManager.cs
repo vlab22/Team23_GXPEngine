@@ -30,7 +30,7 @@ namespace GXPEngine
             {
                 case StorkLocalEvent.Event.STORK_HIT_BY_PLANE:
                     //Show smoke
-                    CoroutineManager.StartCoroutine(ShowSmokeOnStork00Routine(e.stork));
+                    CoroutineManager.StartCoroutine(ShowSmokeOnStork00Routine(e.stork), this);
 
                     break;
                 case StorkLocalEvent.Event.STORK_AFTER_HIT_BY_PLANE:
@@ -76,7 +76,7 @@ namespace GXPEngine
 
         public void PlaySmallSmoke(GameObject parentObj, float px = 0, float py = 0, int duration = 500, int depthIndex = -1)
         {
-            CoroutineManager.StartCoroutine(PlaySmallSmokeRoutine(parentObj, px, py, duration, depthIndex));
+            CoroutineManager.StartCoroutine(PlaySmallSmokeRoutine(parentObj, px, py, duration, depthIndex), this);
         }
 
         private IEnumerator PlaySmallSmokeRoutine(GameObject parentObj, float px, float py, int duration, int depthIndex)

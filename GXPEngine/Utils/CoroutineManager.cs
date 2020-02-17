@@ -17,12 +17,17 @@ public static class CoroutineManager
 
     static Dictionary<IEnumerator, IEnumerator> routineWaitMap = new Dictionary<IEnumerator, IEnumerator>();
 
+    static Dictionary<IEnumerator, GameObject> routinesInvokerMap = new Dictionary<IEnumerator, GameObject>();
+
     private static bool _isIterating;
 
-    public static IEnumerator StartCoroutine(IEnumerator ie)
+    public static IEnumerator StartCoroutine(IEnumerator ie, GameObject invoker)
     {
         if (_isIterating)
         {
+            if (invoker != null)
+                routinesInvokerMap.Add(ie, invoker);
+            
             ie.MoveNext();
             routinesToAdd.Add(ie);
         }
@@ -31,14 +36,13 @@ public static class CoroutineManager
             ie.MoveNext();
             routines.Add(ie);
         }
-        
+
         return ie;
     }
 
     public static void StopCoroutine(IEnumerator ie)
     {
-       
-        routinesToRemove.Add(ie);
+        RemoveRoutine(ie);
     }
 
     public static void Tick(int delta)
@@ -53,19 +57,27 @@ public static class CoroutineManager
 
         foreach (var ie in routines)
         {
+            if (routinesInvokerMap.TryGetValue(ie, out var gameObject))
+            {
+                if (!gameObject.Enabled)
+                {
+                    continue;
+                }
+            }
+            
             if (ie.Current == null)
             {
                 if (ie.MoveNext() == false)
                 {
-                    routinesToRemove.Add(ie);
-                    
+                    RemoveRoutine(ie);
+
                     //Happen when a IEnumerator is yield inside another IEnumerator (chained)
                     //if this ie has a parentIe, this ie will be removed from the loop and the parent re-added
                     if (routineWaitMap.TryGetValue(ie, out var parentIe))
                     {
                         if (parentIe.MoveNext() == false)
                         {
-                            routinesToRemove.Add(parentIe);
+                            RemoveRoutine(parentIe);
                         }
                         else
                         {
@@ -85,12 +97,12 @@ public static class CoroutineManager
 
                 if (ie.MoveNext() == false)
                 {
-                    routinesToRemove.Add(ie);
+                    RemoveRoutine(ie);
                     if (routineWaitMap.TryGetValue(ie, out var parentIe))
                     {
                         if (parentIe.MoveNext() == false)
                         {
-                            routinesToRemove.Add(parentIe);
+                            RemoveRoutine(parentIe);
                         }
                         else
                         {
@@ -106,19 +118,29 @@ public static class CoroutineManager
                 //Happen when a IEnumerator is yield inside another IEnumerator (chained)
                 //Saves the parent ie and after the child ie ends, the parentIE is added to the loop
                 IEnumerator childIe = (IEnumerator) ie.Current;
-                StartCoroutine(childIe);
+                StartCoroutine(childIe, routinesInvokerMap.ContainsKey(ie) ? routinesInvokerMap[ie] : null);
                 routineWaitMap.Add(childIe, ie);
-                routinesToRemove.Add(ie);
+                RemoveRoutine(ie);
             }
         }
 
         //Console.WriteLine("=========================");
         //Console.WriteLine(string.Join(Environment.NewLine, routines.Where(ii => ii.ToString().Contains("Blink"))));
-        
+
         routines.ExceptWith(routinesToRemove);
         routinesToRemove.Clear();
 
         _isIterating = false;
+    }
+
+    private static void RemoveRoutine(IEnumerator ie)
+    {
+        if (ie == null) return;
+        
+        routinesToRemove.Add(ie);
+        
+        if (routinesInvokerMap.ContainsKey(ie))
+            routinesInvokerMap.Remove(ie);
     }
 
     public static string GetDiagnostics()

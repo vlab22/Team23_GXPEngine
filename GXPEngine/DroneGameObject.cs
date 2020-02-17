@@ -131,7 +131,7 @@ namespace GXPEngine
             _easyDrawDebug.x = 0;
             _easyDrawDebug.y = -40;
 
-            CoroutineManager.StartCoroutine(WaitForEnemyLoad());
+            CoroutineManager.StartCoroutine(WaitForEnemyLoad(), this);
         }
 
         IEnumerator WaitForEnemyLoad()
@@ -141,7 +141,7 @@ namespace GXPEngine
                 yield return null;
             }
 
-            _searchingRoutine = CoroutineManager.StartCoroutine(SearchingRoutine(DroneState.SEARCHING_ENEMY));
+            _searchingRoutine = CoroutineManager.StartCoroutine(SearchingRoutine(DroneState.SEARCHING_ENEMY), this);
             _iesDebug.Add(_searchingRoutine);
         }
 
@@ -154,14 +154,14 @@ namespace GXPEngine
                 Console.WriteLine($"{this.name} SearchingRoutine | {Time.time}");
 
                 _ledSprite.SetColor(0, 1, 0);
-                _blinkLedRoutine = CoroutineManager.StartCoroutine(BlinkLed());
+                _blinkLedRoutine = CoroutineManager.StartCoroutine(BlinkLed(), this);
             }
 
             var waitingMovementRoutine = WaitingMovementRoutine();
 
             if (_state == DroneState.SEARCHING_ENEMY)
             {
-                CoroutineManager.StartCoroutine(waitingMovementRoutine);
+                CoroutineManager.StartCoroutine(waitingMovementRoutine, this);
                 _iesDebug.Add(waitingMovementRoutine);
             }
 
@@ -179,7 +179,7 @@ namespace GXPEngine
                     _iesDebug.Remove(_returnToStartPointRoutine);
                     _iesDebug.Remove(_goToPointRoutine);
 
-                    _enemyDetectedRoutine = CoroutineManager.StartCoroutine(EnemyDetectedRoutine());
+                    _enemyDetectedRoutine = CoroutineManager.StartCoroutine(EnemyDetectedRoutine(), this);
                     _iesDebug.Add(_enemyDetectedRoutine);
                 }
 
@@ -213,7 +213,7 @@ namespace GXPEngine
 
             _iesDebug.Remove(_enemyDetectedRoutine);
 
-            _chasingRoutine = CoroutineManager.StartCoroutine(ChasingRoutine(_enemy));
+            _chasingRoutine = CoroutineManager.StartCoroutine(ChasingRoutine(_enemy), this);
             _iesDebug.Add(_chasingRoutine);
         }
 
@@ -317,7 +317,7 @@ namespace GXPEngine
         public void DroneHitEnemy()
         {
             _state = DroneState.HIT_ENEMY;
-            _hitEnemyRoutine = CoroutineManager.StartCoroutine(HitEnemyRoutine());
+            _hitEnemyRoutine = CoroutineManager.StartCoroutine(HitEnemyRoutine(), this);
 
             _iesDebug.Add(_hitEnemyRoutine);
         }
@@ -336,9 +336,9 @@ namespace GXPEngine
         private void ReturnToStartPointAfterChasing()
         {
             _state = DroneState.RETURN_TO_START_POINT_AFTER_CHASING_AND_SEARCHING_ENEMY;
-            _returnToStartPointRoutine = CoroutineManager.StartCoroutine(ReturnToStartPointRoutine());
+            _returnToStartPointRoutine = CoroutineManager.StartCoroutine(ReturnToStartPointRoutine(), this);
 
-            _searchingRoutine = CoroutineManager.StartCoroutine(SearchingRoutine(_state));
+            _searchingRoutine = CoroutineManager.StartCoroutine(SearchingRoutine(_state), this);
 
             _iesDebug.Add(_returnToStartPointRoutine);
             _iesDebug.Add(_searchingRoutine);
@@ -347,7 +347,7 @@ namespace GXPEngine
         private void ReturnToStartPoint()
         {
             _state = DroneState.RETURN_TO_START_POINT_AFTER_HIT;
-            _returnToStartPointRoutine = CoroutineManager.StartCoroutine(ReturnToStartPointRoutine());
+            _returnToStartPointRoutine = CoroutineManager.StartCoroutine(ReturnToStartPointRoutine(), this);
 
             _iesDebug.Add(_returnToStartPointRoutine);
         }
@@ -368,12 +368,14 @@ namespace GXPEngine
             CoroutineManager.StopCoroutine(_searchingRoutine);
             _iesDebug.Remove(_searchingRoutine);
 
-            _searchingRoutine = CoroutineManager.StartCoroutine(SearchingRoutine(DroneState.SEARCHING_ENEMY));
+            _searchingRoutine = CoroutineManager.StartCoroutine(SearchingRoutine(DroneState.SEARCHING_ENEMY), this);
             _iesDebug.Add(_searchingRoutine);
         }
 
         void Update()
         {
+            if (!this.Enabled) return;
+
             _pos.x = x;
             _pos.y = y;
 

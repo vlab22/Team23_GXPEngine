@@ -87,7 +87,7 @@ namespace GXPEngine
 
             if (_lifeTime > 0)
             {
-                CoroutineManager.StartCoroutine(DestroyAfterSeconds(_lifeTime));
+                CoroutineManager.StartCoroutine(DestroyAfterSeconds(_lifeTime), this);
             }
         }
 
@@ -106,6 +106,8 @@ namespace GXPEngine
 
         void Update()
         {
+            if (!this.Enabled) return;
+            
             float delta = Time.deltaTime * 0.001f;
 
             Move(_speed * delta, 0);

@@ -51,7 +51,7 @@ namespace GXPEngine
 
         void Update()
         {
-
+            if (!this.Enabled) return;
         }
     }
 

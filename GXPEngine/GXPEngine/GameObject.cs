@@ -18,6 +18,9 @@ namespace GXPEngine
 		public bool visible = true;
 		private bool _destroyed = false;
 
+		private bool _enabled = true;
+		private bool _enabledInHierarchy = true;
+
 		//------------------------------------------------------------------------------------------------------------------------
 		//														GameObject()
 		//------------------------------------------------------------------------------------------------------------------------
@@ -162,6 +165,33 @@ namespace GXPEngine
 		}
 
 		public bool Destroyed => _destroyed;
+
+		/// <summary>
+		/// Set visibility and add/remove Update and OnCollision
+		/// </summary>
+		/// <param name="active"></param>
+		public void SetActive(bool active)
+		{
+			bool lastEnabled = _enabled;
+			_enabled = active;
+			_enabledInHierarchy = active;
+			
+			if (_enabled != lastEnabled)
+			{
+				visible = active;
+				
+				for (int i = 0; i < GetChildren().Count; i++)
+				{
+					var child = GetChildren()[i];
+					child._enabled = active;
+					child.visible = active;
+				}	
+			}
+		}
+
+		public bool Enabled => _enabled;
+
+		public bool EnabledInHierarchy => _enabledInHierarchy;
 
 		//------------------------------------------------------------------------------------------------------------------------
 		//														OnDestroy()

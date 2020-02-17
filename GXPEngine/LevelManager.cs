@@ -16,7 +16,7 @@ namespace GXPEngine
 
             _endLayerIndex = _level.Map.GetLayerIndex("end point layer");
 
-            CoroutineManager.StartCoroutine(SpawnAirplanes());
+            CoroutineManager.StartCoroutine(SpawnAirplanes(), this);
         }
 
         private IEnumerator SpawnAirplanes()
