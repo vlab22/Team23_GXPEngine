@@ -18,6 +18,8 @@ namespace GXPEngine
 		protected float _rotation = 0.0f;
 		protected float _scaleX = 1.0f;
 		protected float _scaleY = 1.0f;
+
+		protected Vector2 _pos;
 		
 		//------------------------------------------------------------------------------------------------------------------------
 		//														Transform()
@@ -56,7 +58,11 @@ namespace GXPEngine
 		/// </value>
 		public float x {
 			get { return _matrix[12]; }
-			set { _matrix[12] = value; }
+			set
+			{
+				_matrix[12] = value;
+				_pos.x = value;
+			}
 		}
 		
 		//------------------------------------------------------------------------------------------------------------------------
@@ -70,7 +76,11 @@ namespace GXPEngine
 		/// </value>
 		public float y {
 			get { return _matrix[13]; }
-			set { _matrix[13] = value; }
+			set
+			{
+				_matrix[13] = value;
+				_pos.y = value;
+			}
 		}
 		
 		//------------------------------------------------------------------------------------------------------------------------
@@ -88,6 +98,9 @@ namespace GXPEngine
 		public void SetXY(float x, float y) {
 			_matrix[12] = x;
 			_matrix[13] = y;
+
+			_pos.x = x;
+			_pos.y = y;
 		}
 
 		//------------------------------------------------------------------------------------------------------------------------
@@ -228,6 +241,9 @@ namespace GXPEngine
 			float sn = Mathf.Sin (r);
 			_matrix[12] = (_matrix[12] + cs * stepX - sn * stepY);
 			_matrix[13] = (_matrix[13] + sn * stepX + cs * stepY);
+			
+			_pos.x = _matrix[12];
+			_pos.y = _matrix[13];
 		}
 		
 		//------------------------------------------------------------------------------------------------------------------------
@@ -245,6 +261,9 @@ namespace GXPEngine
 		public void Translate (float stepX, float stepY) {
 			_matrix[12] += stepX;
 			_matrix[13] += stepY;
+			
+			_pos.x = _matrix[12];
+			_pos.y = _matrix[13];
 		}
 		
 		//------------------------------------------------------------------------------------------------------------------------
@@ -326,6 +345,8 @@ namespace GXPEngine
 				_scaleY = value; 
 			}
 		}
+
+		public Vector2 Pos => _pos;
 
 		/// <summary>
 		/// Returns the inverse matrix transformation, if it exists.

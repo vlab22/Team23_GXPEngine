@@ -116,6 +116,7 @@
     <Compile Include="StorkStateManager.cs" />
     <Compile Include="TiledMapParserExtended.cs" />
     <Compile Include="TmxFilesLoader.cs" />
+    <Compile Include="Utils\ColorTool.cs" />
     <Compile Include="Utils\CoroutineManager.cs" />
   </ItemGroup>
   <ItemGroup />

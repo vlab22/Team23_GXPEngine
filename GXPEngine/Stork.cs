@@ -43,7 +43,6 @@ namespace GXPEngine
         private float _angularPushDelta;
 
         private Vector2 _forward;
-        private Vector2 _pos;
         private Vector2 _lastPos;
 
         private IGridDataUpdater _iUpdater;
@@ -200,9 +199,6 @@ namespace GXPEngine
                 Move(_currentSpeed * delta, 0);
             }
 
-            _pos.x = x;
-            _pos.y = y;
-
             //
             if (_hasIGridDataUpdater)
             {
@@ -329,9 +325,7 @@ namespace GXPEngine
             get => _inputEnabled;
             set => _inputEnabled = value;
         }
-
-        public Vector2 Pos => _pos;
-
+        
         public Vector2 Forward => _forward;
     }
 

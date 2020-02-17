@@ -105,6 +105,7 @@
         <e p="TiledMapParserExtended.cs" t="Include" />
         <e p="TmxFilesLoader.cs" t="Include" />
         <e p="Utils" t="Include">
+          <e p="ColorTool.cs" t="Include" />
           <e p="CoroutineManager.cs" t="Include" />
         </e>
       </e>

@@ -53,13 +53,13 @@ namespace GXPEngine
                 y = _spawnPoint.y,
                 StorkInput = playerInput
             };
+            
+            AddChild(_stork);
 
             _huntersManager = new HuntersManager(this);
             _huntersManager.SpawnHunters();
             _huntersManager.SetHuntersTarget(_stork);
             
-            AddChild(_stork);
-
             _dronesManager = new DroneManager(this);
             _dronesManager.SpawnDrones();
 

@@ -10,26 +10,25 @@ namespace GXPEngine
         private HunterGameObject _hunter;
         private Rectangle _customColliderBounds;
 
+        private uint _startColor;
+        
         private bool _hasCollisionWithEnemy = false;
-
-        private Vector2 _pos;
 
         public HunterCrossHairGameObject(HunterGameObject pHunter) : base("data/Hunter Crosshair00.png", 1, 1)
         {
             _hunter = pHunter;
 
+           color = _startColor = 0x6acedd; //Light blue from stylesheet
+
             SetOrigin(width * 0.5f, height * 0.5f);
 
-            _customColliderBounds = new Rectangle(-88 * 0.5f, -88 * 0.5f, 88, 88);
+            _customColliderBounds = new Rectangle(-44 * 0.5f, -44 * 0.5f, 44, 44);
         }
-
+        
         void Update()
         {
             if (!this.Enabled) return;
-            
-            _pos.x = x;
-            _pos.y = y;
-            
+
             if (MyGame.Debug)
             {
                 DrawBoundBox();
@@ -45,6 +44,12 @@ namespace GXPEngine
 
                 Console.WriteLine($"{this.name} ==> {other}");
             }
+        }
+
+        public void Reset()
+        {
+            SetXY(0, 0);
+            _hasCollisionWithEnemy = false;
         }
 
         public override Vector2[] GetExtents()
@@ -69,7 +74,7 @@ namespace GXPEngine
             CanvasDebugger2.Instance.DrawLine(p2.x, p2.y, p3.x, p3.y, Color.Blue);
             CanvasDebugger2.Instance.DrawLine(p3.x, p3.y, p0.x, p0.y, Color.Blue);
         }
-
-        public Vector2 Pos => _pos;
+        
+        public uint StartColor => _startColor;
     }
 }

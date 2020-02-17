@@ -34,7 +34,6 @@ namespace GXPEngine
         private IEnumerator _searchingRoutine;
 
         private Vector2 _forward;
-        private Vector2 _pos;
 
         private IEnumerator _chasingRoutine;
         private float _detectEnemyRange = 335;
@@ -219,9 +218,6 @@ namespace GXPEngine
 
         private IEnumerator WaitingMovementRoutine()
         {
-            _pos.x = x;
-            _pos.y = y;
-
             //Random small movement
 
             while (_state == DroneState.SEARCHING_ENEMY)
@@ -245,9 +241,6 @@ namespace GXPEngine
 
                     yield return null;
 
-                    _pos.x = x;
-                    _pos.y = y;
-
                     distance = point - _pos;
                     distanceMag = distance.Magnitude;
                 }
@@ -256,9 +249,6 @@ namespace GXPEngine
 
         private IEnumerator ChasingRoutine(GameObject target)
         {
-            _pos.x = x;
-            _pos.y = y;
-
             _state = DroneState.CHASING_ENEMY;
 
             var chasingMoveRoutine = ChasingMovementRoutine(target);
@@ -375,9 +365,6 @@ namespace GXPEngine
         void Update()
         {
             if (!this.Enabled) return;
-
-            _pos.x = x;
-            _pos.y = y;
 
             _easyDrawDebug.visible = MyGame.Debug;
 
@@ -511,8 +498,6 @@ namespace GXPEngine
         }
 
         public uint Id => _id;
-
-        public Vector2 Position => _pos;
     }
 
     internal class DroneFollowRangeCone : Sprite
@@ -533,7 +518,7 @@ namespace GXPEngine
             }
 
             var targetPos = new Vector2(_drone.Enemy.x, _drone.Enemy.y);
-            var direction = targetPos - _drone.Position;
+            var direction = targetPos - _drone.Pos;
             var directionNorm = direction.Normalized;
 
             float angle = Mathf.Atan2(directionNorm.y, directionNorm.x);
