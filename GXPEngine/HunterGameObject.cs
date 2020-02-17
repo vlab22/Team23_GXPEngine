@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Drawing;
 using GXPEngine.Core;
+using MathfExtensions;
 
 namespace GXPEngine
 {
@@ -33,9 +34,17 @@ namespace GXPEngine
         private IEnumerator _scanningForEnemyRoutine;
         private IEnumerator _enemyDetectedRoutine;
         private IEnumerator _lockingCrossHairOnEnemy;
+        private IEnumerator _snapCrosshairOnEnemyRoutine;
+        private IEnumerator _lostLockOnEnemyOutOfRangeRoutine;
+        private IEnumerator _countDownToShootRoutine;
+        private IEnumerator _shootAtEnemyRoutine;
+
+        private Vector2 _aimDistance;
+
+        private HunterFollowRangeCone _hunterFollowRangeCone;
 
         public HunterGameObject(float pX, float pY, float pWidth, float pHeight,
-            float pScanEnemyRange = 400, float pSightSpeed = 300) : base("data/Female Hunter.png", 1, 1,
+            float pScanEnemyRange = 400, float pSightSpeed = 200) : base("data/Female Hunter.png", 1, 1,
             -1, false, false)
         {
             _scanEnemyRange = pScanEnemyRange;
@@ -56,9 +65,14 @@ namespace GXPEngine
             _crossHair.SetXY(0, 0);
             _crossHair.alpha = 0;
 
+            _hunterFollowRangeCone = new HunterFollowRangeCone(this);
+            _hunterFollowRangeCone.SetColor(0.9f, 0.9f, 0);
+            _hunterFollowRangeCone.alpha = 0;
+            AddChild(_hunterFollowRangeCone);
+
             _easyDrawDebug = new EasyDraw(200, 80, false);
             _easyDrawDebug.SetOrigin(0, _easyDrawDebug.height * 0.5f);
-            _easyDrawDebug.Clear(Color.Black);
+            //_easyDrawDebug.Clear(Color.Black);
             AddChild(_easyDrawDebug);
             _easyDrawDebug.TextFont("data/Gaiatype.ttf", 8);
             _easyDrawDebug.x = 0;
@@ -73,7 +87,7 @@ namespace GXPEngine
             {
                 yield return null;
             }
-            
+
             yield return null;
 
             _scanningForEnemyRoutine = CoroutineManager.StartCoroutine(ScanningForEnemy(HunterState.SCANNING), this);
@@ -106,7 +120,7 @@ namespace GXPEngine
             _state = HunterState.ENEMY_DETECTED;
 
             SpriteTweener.TweenAlpha(_crossHair, 0, 1, 400);
-            
+
             yield return new WaitForMilliSeconds(500);
 
             //Start Lock enemy
@@ -120,6 +134,8 @@ namespace GXPEngine
 
             _crossHair.visible = true;
 
+            SpriteTweener.TweenAlpha(_hunterFollowRangeCone, 0, 0.4f, 500);
+
             do
             {
                 var crossHairWorldPos = TransformPoint(_crossHair.Pos.x, _crossHair.Pos.y);
@@ -130,18 +146,22 @@ namespace GXPEngine
 
                 _crossHair.Translate(nextPos.x, nextPos.y);
 
+                _aimDistance = _crossHair.Pos - _pos;
+                
                 yield return null;
             } while (_state == HunterState.LOCKING_CROSSHAIR_ON_ENEMY);
         }
 
         private IEnumerator SnapCrossHairToEnemy(GameObject enemy)
         {
+            _state = HunterState.CROSSHAIR_LOCKED_ON_ENEMY;
+
             int time = 0;
             int duration = 300;
 
             var crossStartPos = TransformPoint(_crossHair.Pos.x, _crossHair.Pos.y);
             Vector2 localPos;
-            
+
             while (time < duration)
             {
                 float pointX = Easing.Ease(Easing.Equation.QuadEaseOut, time, crossStartPos.x,
@@ -153,55 +173,86 @@ namespace GXPEngine
 
                 _crossHair.SetXY(localPos.x, localPos.y);
 
+                _aimDistance = _crossHair.Pos - _pos;
+                
                 time += Time.deltaTime;
                 yield return null;
             }
 
+            SpriteTweener.TweenColor(_crossHair, _crossHair.StartColor, ColorTools.ColorToUInt(Color.Red), 300);
+
             //After Snap, follow target while distance less than range
             //Countdown to Shoot
-            
-            SpriteTweener.TweenColor(_crossHair, _crossHair.StartColor, ColorTools.ColorToUInt(Color.Red), 300);
+            _countDownToShootRoutine = CoroutineManager.StartCoroutine(CountDownToShootRoutine(enemy), this);
 
             do
             {
                 var distance = enemy.Pos - _pos;
                 float distanceMag = distance.Magnitude;
-                
+
                 localPos = InverseTransformPoint(enemy.x, enemy.y);
                 _crossHair.SetXY(localPos.x, localPos.y);
+
+                _aimDistance = _crossHair.Pos - _pos;
                 
                 //Lost lock on enemy, out of range
                 if (distanceMag > _scanEnemyRange)
                 {
-                    CoroutineManager.StartCoroutine(LostLockOnEnemyOutOfRangeRoutine(enemy), this);
+                    _lostLockOnEnemyOutOfRangeRoutine =
+                        CoroutineManager.StartCoroutine(LostLockOnEnemyOutOfRangeRoutine(enemy), this);
                 }
-                
+
                 yield return null;
             } while (_state == HunterState.CROSSHAIR_LOCKED_ON_ENEMY);
+        }
+
+        private IEnumerator CountDownToShootRoutine(GameObject enemy)
+        {
+            yield return new WaitForMilliSeconds(500);
+
+            int counter = 3;
+
+            do
+            {
+                
+                yield return new WaitForMilliSeconds(1000);
+
+                counter--;
+
+            } while (counter > 0 && _state == HunterState.CROSSHAIR_LOCKED_ON_ENEMY);
+
+            //Shoot
+            if (counter == 0 && _state == HunterState.CROSSHAIR_LOCKED_ON_ENEMY) {
+                _shootAtEnemyRoutine = CoroutineManager.StartCoroutine(ShootAtEnemyRoutine(enemy), this);
+            }
+        }
+
+        private IEnumerator ShootAtEnemyRoutine(GameObject enemy)
+        {
+            _state = HunterState.SHOOT;
+            
+            Console.WriteLine($"{this}: SHOOT!!!");
+
+            if (_hasHunterBehaviourListener)
+            {
+                _hunterBehaviorListener.OnShootAtEnemy(this, _aimDistance, enemy);
+            }
+            
+            yield return new WaitForMilliSeconds(1500);
         }
 
         private IEnumerator LostLockOnEnemyOutOfRangeRoutine(GameObject enemy)
         {
             _state = HunterState.LOST_LOCK_ON_ENEMY;
 
+            SpriteTweener.TweenAlpha(_hunterFollowRangeCone, 0.4f, 0, 500);
+
             SpriteTweener.TweenAlpha(_crossHair, 1, 0, 400);
 
-            _crossHair.color = _crossHair.StartColor;
-
             yield return new WaitForMilliSeconds(1000);
-            
+
             //Return to scanning state
             _scanningForEnemyRoutine = CoroutineManager.StartCoroutine(ScanningForEnemy(HunterState.SCANNING), this);
-        }
-
-        public IHunterBehaviorListener HunterBehaviorListener
-        {
-            get => _hunterBehaviorListener;
-            set
-            {
-                _hunterBehaviorListener = value;
-                _hasHunterBehaviourListener = value != null;
-            }
         }
 
         void Update()
@@ -217,7 +268,7 @@ namespace GXPEngine
                 string str = $"state: {_state.ToString()}";
 
                 _easyDrawDebug.Text(str, 4, 30);
-                
+
 
                 CanvasDebugger2.Instance.DrawEllipse(x, y, _scanEnemyRange * 2, _scanEnemyRange * 2, Color.Brown);
             }
@@ -225,20 +276,68 @@ namespace GXPEngine
 
         public void OnCollisionWithEnemy(GameObject enemy)
         {
-            _state = HunterState.CROSSHAIR_LOCKED_ON_ENEMY;
-
             //Snap to enemy
-            CoroutineManager.StartCoroutine(SnapCrossHairToEnemy(enemy), this);
+            _snapCrosshairOnEnemyRoutine = CoroutineManager.StartCoroutine(SnapCrossHairToEnemy(enemy), this);
         }
 
+        public IHunterBehaviorListener HunterBehaviorListener
+        {
+            get => _hunterBehaviorListener;
+            set
+            {
+                _hunterBehaviorListener = value;
+                _hasHunterBehaviourListener = value != null;
+            }
+        }
+        
         public Stork Enemy
         {
             get => _enemy;
             set => _enemy = value;
         }
+
+        public HunterState State
+        {
+            get { return _state; }
+            set { _state = value; }
+        }
+
+        public float ScanEnemyRange => _scanEnemyRange;
+    }
+
+    internal class HunterFollowRangeCone : Sprite
+    {
+        private HunterGameObject _hunter;
+
+        public HunterFollowRangeCone(HunterGameObject pHunter) : base("data/Drone Follow Range Cone.png", false, false)
+        {
+            _hunter = pHunter;
+            SetOrigin(0, height * 0.5f);
+
+            float scaleX = _hunter.ScanEnemyRange / 435f;
+            SetScaleXY(scaleX, 1);
+        }
+
+        void Update()
+        {
+            if (_hunter.State != HunterGameObject.HunterState.LOCKING_CROSSHAIR_ON_ENEMY &&
+                _hunter.State != HunterGameObject.HunterState.CROSSHAIR_LOCKED_ON_ENEMY)
+            {
+                return;
+            }
+
+            var targetPos = new Vector2(_hunter.Enemy.x, _hunter.Enemy.y);
+            var direction = targetPos - _hunter.Pos;
+            var directionNorm = direction.Normalized;
+
+            float angle = Mathf.Atan2(directionNorm.y, directionNorm.x);
+
+            this.rotation = angle.RadToDegree();
+        }
     }
 
     public interface IHunterBehaviorListener
     {
+        void OnShootAtEnemy(HunterGameObject hunter, Vector2 aimDistance, GameObject enemy);
     }
 }

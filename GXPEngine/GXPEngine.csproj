@@ -53,6 +53,7 @@
     <Compile Include="HUD.cs" />
     <Compile Include="HudSlider.cs" />
     <Compile Include="HudTextBoard.cs" />
+    <Compile Include="HunterBullet.cs" />
     <Compile Include="HunterCrossHairGameObject.cs" />
     <Compile Include="HunterGameObject.cs" />
     <Compile Include="HuntersManager.cs" />

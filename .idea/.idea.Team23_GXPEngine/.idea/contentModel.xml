@@ -77,6 +77,7 @@
         <e p="HUD.cs" t="Include" />
         <e p="HudSlider.cs" t="Include" />
         <e p="HudTextBoard.cs" t="Include" />
+        <e p="HunterBullet.cs" t="Include" />
         <e p="HunterCrossHairGameObject.cs" t="Include" />
         <e p="HunterGameObject.cs" t="Include" />
         <e p="HuntersManager.cs" t="Include" />

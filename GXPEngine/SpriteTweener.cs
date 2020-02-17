@@ -30,11 +30,12 @@ namespace GXPEngine
 
             sprite.alpha = from;
 
-            float direction = from > to ? from : 0;
-
+            float fromDir = from > to ? from : 0;
+            float toDir = from > to ? 0 : from;
+            
             while (time < duration)
             {
-                sprite.alpha = Easing.Ease(equation, time, from, to - direction, duration);
+                sprite.alpha = toDir + Easing.Ease(equation, time, fromDir, to - from, duration);
 
                 time += Time.deltaTime;
                 yield return null;
@@ -56,48 +57,43 @@ namespace GXPEngine
             _colorRoutinesMap.Add(sprite, ie);
         }
 
-        private static IEnumerator TweenColorRoutine(Sprite sprite, uint from, uint to, int duration,
+        public static IEnumerator TweenColorRoutine(Sprite sprite, uint from, uint to, int duration,
             Easing.Equation equation)
         {
             int time = 0;
 
             sprite.color = from;
 
-            byte fromA = (byte) (from >> 24);
-            byte fromR = (byte) (from >> 16);
-            byte fromG = (byte) (from >> 8);
-            byte fromB = (byte) (from >> 0);
+            //float fromA = ((byte) (from >> 24)) / 255f;
+            float fromR = ((byte) (from >> 16)) / 255f;
+            float fromG = ((byte) (from >> 8)) / 255f;
+            float fromB = ((byte) (from >> 0)) / 255f;
 
-            byte toA = (byte) (to >> 24);
-            byte toR = (byte) (to >> 16);
-            byte toG = (byte) (to >> 8);
-            byte toB = (byte) (to >> 0);
+            //float toA = ((byte) (to >> 24)) / 255f;
+            float toR = ((byte) (to >> 16)) / 255f;
+            float toG = ((byte) (to >> 8)) / 255f;
+            float toB = ((byte) (to >> 0)) / 255f;
 
-            byte redFromDir = fromR > toR ? fromR : (byte) 0;
-            byte greenFromDir = fromG > toG ? fromG : (byte) 0;
-            byte blueFromDir = fromB > toB ? fromB : (byte) 0;
+            float redFromDir = fromR > toR ? fromR : 0;
+            float greenFromDir = fromG > toG ? fromG : 0;
+            float blueFromDir = fromB > toB ? fromB : 0;
 
-            byte redToDir = fromR > toR ? (byte) 0 : fromR;
-            byte greenToDir = fromG > toG ? (byte) 0 : fromG;
-            byte blueToDir = fromB > toB ? (byte) 0 : fromB;
+            float redToDir = fromR > toR ? 0 : fromR;
+            float greenToDir = fromG > toG ? 0 : fromG;
+            float blueToDir = fromB > toB ? 0 : fromB;
 
             while (time < duration)
             {
-                int deltaRFrom = fromR - redFromDir;
-                int deltaRTo = toR - redFromDir;
+                float r = redToDir + Easing.Ease(equation, time, redFromDir, toR - fromR,
+                    duration);
+                float g = greenToDir +
+                          Easing.Ease(equation, time, greenFromDir, toG - fromG,
+                              duration);
+                float b = blueToDir +
+                          Easing.Ease(equation, time, blueFromDir, toB - fromB,
+                              duration);
 
-                byte r = (byte) (redToDir + Mathf.Round(Easing.Ease(equation, time, redFromDir, toR - fromR,
-                    duration)));
-                byte g = (byte) (greenToDir +
-                                 Mathf.Round(Easing.Ease(equation, time, greenFromDir, toG - fromG,
-                                     duration)));
-                byte b = (byte) (blueToDir +
-                                 Mathf.Round(Easing.Ease(equation, time, blueFromDir, toB - fromB,
-                                     duration)));
-
-                Console.WriteLine($"color: {deltaRFrom:000}|{deltaRTo:000} --- {r:000}|{g:000}|{b:000}");
-
-                sprite.color = ColorTools.ColorToUInt(Color.FromArgb(Mathf.Round(sprite.alpha * 255), r, g, b));
+                sprite.SetColor(r, g, b);
 
                 time += Time.deltaTime;
                 yield return null;

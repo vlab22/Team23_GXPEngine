@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using GXPEngine.Core;
 
 namespace GXPEngine
 {
@@ -8,6 +9,8 @@ namespace GXPEngine
         private Level _level;
         private List<HunterGameObject> _hunters;
 
+        private HunterBullet[] _bulletsPool;
+        
         public HuntersManager(Level pLevel) : base(false)
         {
             _level = pLevel;
@@ -26,7 +29,7 @@ namespace GXPEngine
                 var hunterData = huntersObjects[i];
 
                 float scanRange = hunterData.GetFloatProperty("scan_range", 400);
-                float sightSpeed = hunterData.GetFloatProperty("sight_speed", 300);
+                float sightSpeed = hunterData.GetFloatProperty("sight_speed", 200);
 
                 var hunter = new HunterGameObject(hunterData.X, hunterData.Y, hunterData.Width, hunterData.Height,
                     scanRange, sightSpeed);
@@ -53,6 +56,11 @@ namespace GXPEngine
             {
                 _hunters[i].Enemy = stork;
             }
+        }
+
+        void IHunterBehaviorListener.OnShootAtEnemy(HunterGameObject hunter, Vector2 aimDistance, GameObject enemy)
+        {
+            
         }
     }
 }

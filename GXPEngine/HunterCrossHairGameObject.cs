@@ -50,6 +50,7 @@ namespace GXPEngine
         {
             SetXY(0, 0);
             _hasCollisionWithEnemy = false;
+            color = _startColor;
         }
 
         public override Vector2[] GetExtents()

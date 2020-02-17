@@ -12,13 +12,13 @@ public class MyGame : Game
 {
     public static bool Debug = false;
 
-    public const int SCREEN_WIDTH = 1280; //1920
-    public const int SCREEN_HEIGHT = 720; //1080
-    public const bool FULLSCREEN = false;
+    // public const int SCREEN_WIDTH = 1280; //1920
+    // public const int SCREEN_HEIGHT = 720; //1080
+    // public const bool FULLSCREEN = false;
 
-    // public const int SCREEN_WIDTH = 1920;
-    // public const int SCREEN_HEIGHT = 1080;
-    // public const bool FULLSCREEN = true;
+    public const int SCREEN_WIDTH = 1920;
+    public const int SCREEN_HEIGHT = 1080;
+    public const bool FULLSCREEN = true;
 
     //public const int SCREEN_WIDTH = 1080;
     //public const int SCREEN_HEIGHT = 1080;
