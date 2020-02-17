@@ -92,6 +92,7 @@
         <e p="MRandom.cs" t="Include" />
         <e p="MVector2.cs" t="Include" />
         <e p="MyGame.cs" t="Include" />
+        <e p="MyGameFoo.cs" t="Include" />
         <e p="obj" t="ExcludeRecursive" />
         <e p="ParticleManager.cs" t="Include" />
         <e p="PizzaGameObject.cs" t="Include" />

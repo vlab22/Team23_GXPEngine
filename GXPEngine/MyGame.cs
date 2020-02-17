@@ -19,7 +19,11 @@ public class MyGame : Game
     // public const int SCREEN_WIDTH = 1920;
     // public const int SCREEN_HEIGHT = 1080;
     // public const bool FULLSCREEN = true;
-    
+
+    //public const int SCREEN_WIDTH = 1080;
+    //public const int SCREEN_HEIGHT = 1080;
+    //public const bool FULLSCREEN = true;
+
     public static int HALF_SCREEN_WIDTH = SCREEN_WIDTH / 2;
     public static int HALF_SCREEN_HEIGHT = SCREEN_HEIGHT / 2;
 
@@ -38,7 +42,8 @@ public class MyGame : Game
     private LevelManager _levelManager;
     private ParticleManager _particleManager;
 
-    public MyGame(string[] tmxFileNames, int levelIndex) : base(SCREEN_WIDTH, SCREEN_HEIGHT, FULLSCREEN) // Create a window that's 800x600 and NOT fullscreen
+    public MyGame(string[] tmxFileNames, int levelIndex) :
+        base(SCREEN_WIDTH, SCREEN_HEIGHT, FULLSCREEN) // Create a window that's 800x600 and NOT fullscreen
     {
         ThisInstance = this;
 
@@ -46,30 +51,34 @@ public class MyGame : Game
 
         if (_levelFiles.Length == 0)
         {
-            throw new ApplicationException($"_levelFiles.Length == 0, no tmx files found in {AppDomain.CurrentDomain.DynamicDirectory}");
+            throw new ApplicationException(
+                $"_levelFiles.Length == 0, no tmx files found in {AppDomain.CurrentDomain.DynamicDirectory}");
         }
 
         _mapData = TiledMapParserExtended.MapParser.ReadMap(_levelFiles[levelIndex]);
-        
+
         _map = new MapGameObject(_mapData);
-        
+
         _camera = new FollowCamera(0, 0, width, height);
 
         _canvasDebugger = new CanvasDebugger2(width, height);
-        
+
         ResetLevel(0);
     }
 
     public void ResetLevel(int levelId)
     {
         CoroutineManager.ClearAllRoutines();
-        
+
         if (_currentLevel != null)
         {
             RemoveChild(_canvasDebugger);
             RemoveChild(_currentLevel);
             RemoveChild(_levelManager);
             RemoveChild(_particleManager);
+
+            _particleManager.Reset();
+            
             _levelManager.Destroy();
             _currentLevel.RemoveChild(_camera);
             _currentLevel.RemoveChild(_map);
@@ -78,13 +87,19 @@ public class MyGame : Game
 
         _currentLevel = new Level(_camera, _map);
         AddChild(_currentLevel);
-        
+
         _levelManager = new LevelManager(_currentLevel);
         AddChild(_levelManager);
+
+        if (_particleManager == null)
+            _particleManager = new ParticleManager();
+        else
+        {
+            
+        }
         
-        _particleManager = new ParticleManager();
         AddChild(_particleManager);
-        
+
         AddChild(_canvasDebugger);
     }
 
@@ -96,11 +111,12 @@ public class MyGame : Game
         {
             ResetLevel(0);
         }
+
         if (Input.GetKeyDown(Key.O))
         {
-            MyGame.Debug = ! MyGame.Debug;
+            MyGame.Debug = !MyGame.Debug;
         }
-        
+
         if (Input.GetKeyDown(Key.I))
         {
             string s = "Stats:\r\n";
@@ -110,24 +126,25 @@ public class MyGame : Game
     private List<GameObject> TransverseChildren(GameObject root)
     {
         var gos = new List<GameObject>();
-        
+
         return new List<GameObject>();
     }
 
     static void Main(string[] args) // Main() is the first method that's called when the program is run
     {
         Console.WriteLine($"main args: {string.Join(Environment.NewLine, args.Select(arg => $"'{arg}'"))}");
-        
+
         var tmxFileNames = TmxFilesLoader.GetTmxFileNames();
 
         int levelIndex = 0;
         if (args.Length > 0 && !string.IsNullOrWhiteSpace(args[0]))
         {
-            levelIndex = Array.FindIndex(tmxFileNames, t => t.Equals(args[0], StringComparison.InvariantCultureIgnoreCase));
+            levelIndex = Array.FindIndex(tmxFileNames,
+                t => t.Equals(args[0], StringComparison.InvariantCultureIgnoreCase));
         }
 
         levelIndex = (levelIndex == -1) ? 0 : levelIndex;
-        
+
         var myGame = new MyGame(tmxFileNames, levelIndex);
 
         myGame.Start();

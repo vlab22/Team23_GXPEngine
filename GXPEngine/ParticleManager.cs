@@ -119,5 +119,11 @@ namespace GXPEngine
             _smallBlackSmoke00.visible = false;
             parentObj?.RemoveChild(_smallBlackSmoke00);
         }
+
+        public void Reset()
+        {
+            _smoke00.parent?.RemoveChild(_smoke00);
+            _smallBlackSmoke00.parent?.RemoveChild(_smallBlackSmoke00);
+        }
     }
 }

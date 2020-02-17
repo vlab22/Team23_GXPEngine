@@ -22,7 +22,7 @@ namespace GXPEngine
 
         private DroneManager _dronesManager;
 
-        private readonly Sprite[] _pizzasPool = new Sprite[10];
+        private readonly Sprite[] _pizzasPool = new Sprite[20];
         private int _pizzaPoolIndex = 0;
         private HuntersManager _huntersManager;
 
@@ -56,7 +56,8 @@ namespace GXPEngine
 
             _huntersManager = new HuntersManager(this);
             _huntersManager.SpawnHunters();
-
+            _huntersManager.SetHuntersTarget(_stork);
+            
             AddChild(_stork);
 
             _dronesManager = new DroneManager(this);

@@ -7,12 +7,14 @@ namespace GXPEngine
     {
         private Level _level;
         private List<HunterGameObject> _hunters;
-        
+
         public HuntersManager(Level pLevel) : base(false)
         {
             _level = pLevel;
             _hunters = new List<HunterGameObject>();
         }
+
+        public List<HunterGameObject> Hunters => _hunters;
 
         public void SpawnHunters()
         {
@@ -26,7 +28,8 @@ namespace GXPEngine
                 float scanRange = hunterData.GetFloatProperty("scan_range", 400);
                 float sightSpeed = hunterData.GetFloatProperty("sight_speed", 300);
 
-                var hunter = new HunterGameObject(hunterData.X, hunterData.Y, hunterData.Width, hunterData.Height, scanRange, sightSpeed);
+                var hunter = new HunterGameObject(hunterData.X, hunterData.Y, hunterData.Width, hunterData.Height,
+                    scanRange, sightSpeed);
 
                 hunter.HunterBehaviorListener = this;
 
@@ -41,6 +44,14 @@ namespace GXPEngine
                 {
                     _hunters.RemoveAt(i);
                 }
+            }
+        }
+
+        public void SetHuntersTarget(Stork stork)
+        {
+            for (int i = 0; i < _hunters.Count; i++)
+            {
+                _hunters[i].Enemy = stork;
             }
         }
     }

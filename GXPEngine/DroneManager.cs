@@ -17,6 +17,20 @@ namespace GXPEngine
         {
             _level = pLevel;
             _drones = new List<DroneGameObject>();
+
+            CoroutineManager.StartCoroutine(Foo(), this);
+        }
+
+        private IEnumerator Foo()
+        {
+            yield return new WaitForMilliSeconds(6000);
+
+            var drone = _drones.FirstOrDefault();
+            drone?.SetActive(false);
+            
+            yield return new WaitForMilliSeconds(3000);
+
+            drone?.SetActive(true);
         }
 
         public void SpawnDrones()
@@ -111,11 +125,6 @@ namespace GXPEngine
             int firstAirplaneIndex = _level.FirstAirplaneIndex;
 
             _level.SetChildIndex(pizza, firstAirplaneIndex - 1);
-
-            // Console.WriteLine("====================");
-            // Console.WriteLine(string.Join(Environment.NewLine, _level.AirPlanes));
-            //
-            // Console.WriteLine($"{firstAirplaneIndex - 1} | pizza.Index: {pizza.Index} | pizza.alpha: {pizza.alpha}");
 
             //Animate pizza
 

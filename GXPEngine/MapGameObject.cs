@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -107,7 +108,7 @@ namespace GXPEngine
 
             var drawWatch = StopwatchTool.StartWatch();
 
-            DrawBackgroundLayer();
+            DrawBackgroundLayers();
 
             StopwatchTool.StopWatch(drawWatch, "DrawBackgroundLayer: ");
 
@@ -118,21 +119,41 @@ namespace GXPEngine
             StopwatchTool.StopWatch(drawWatch, "DrawLayers: ");
         }
 
-        private void DrawBackgroundLayer()
+        private void DrawBackgroundLayers()
         {
-            var backGroundImageLayer = _mapData.ImageLayers.FirstOrDefault(l => l.Name == "background image");
-            var bitmap = new Bitmap(backGroundImageLayer.Image.FileName);
-            ImageAttributes imageAtt = new ImageAttributes();
+            var backGroundImageLayer = _mapData.ImageLayers.Where(l => l.Name.StartsWith("background image") && l.visible == true);
 
-            graphics.DrawImage(bitmap,
-                new Rectangle(0, 0, bitmap.Width,
-                    bitmap.Height), //_mapData.TileWidth, _mapData.TileHeight), // destination rectangle
-                0, // source rectangle x 
-                0, // source rectangle y
-                bitmap.Width, //_mapData.TileWidth, // source rectangle width
-                bitmap.Height, //_mapData.TileHeight, // source rectangle height
-                GraphicsUnit.Pixel,
-                imageAtt);
+            var bitMapReuse = new Dictionary<string, Bitmap>();
+            
+            foreach (var bgLayer in backGroundImageLayer)
+            {
+                Bitmap bitmap;
+                
+                if (!bitMapReuse.ContainsKey(bgLayer.Image.FileName))
+                {
+                    bitmap = new Bitmap(bgLayer.Image.FileName);
+                    bitMapReuse.Add(bgLayer.Image.FileName, bitmap);
+                }
+                else
+                {
+                    bitmap = bitMapReuse[bgLayer.Image.FileName];
+                }
+
+                ImageAttributes imageAtt = new ImageAttributes();
+
+                int offsetX = Mathf.Round(bgLayer.offsetX);
+                int offsetY = Mathf.Round(bgLayer.offsetY);
+                
+                graphics.DrawImage(bitmap,
+                    new Rectangle(offsetX, offsetY, bitmap.Width,
+                        bitmap.Height), //_mapData.TileWidth, _mapData.TileHeight), // destination rectangle
+                    0, // source rectangle x 
+                    0, // source rectangle y
+                    bitmap.Width, //_mapData.TileWidth, // source rectangle width
+                    bitmap.Height, //_mapData.TileHeight, // source rectangle height
+                    GraphicsUnit.Pixel,
+                    imageAtt);
+            }
         }
 
 

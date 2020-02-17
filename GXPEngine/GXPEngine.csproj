@@ -105,6 +105,7 @@
     <Compile Include="GXPEngine\FMOD\FMODSoundSystem.cs" />
     <Compile Include="GXPEngine\SoLoud\Soloud.cs" />
     <Compile Include="GXPEngine\SoLoud\SoloudSoundSystem.cs" />
+    <Compile Include="MyGameFoo.cs" />
     <Compile Include="ParticleManager.cs" />
     <Compile Include="PizzaGameObject.cs" />
     <Compile Include="PlayerInput.cs" />

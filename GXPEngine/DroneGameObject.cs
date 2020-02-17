@@ -123,7 +123,7 @@ namespace GXPEngine
             _droneFollowRangeCone.alpha = 0;
             AddChild(_droneFollowRangeCone);
 
-            _easyDrawDebug = new EasyDraw(200, 80);
+            _easyDrawDebug = new EasyDraw(200, 80, false);
             _easyDrawDebug.SetOrigin(0, _easyDrawDebug.height * 0.5f);
             _easyDrawDebug.Clear(Color.Black);
             AddChild(_easyDrawDebug);

@@ -135,8 +135,9 @@ public static class CoroutineManager
 
     private static void RemoveRoutine(IEnumerator ie)
     {
-        if (ie == null) return;
-        
+        if (ie == null)
+            return;
+   
         routinesToRemove.Add(ie);
         
         if (routinesInvokerMap.ContainsKey(ie))

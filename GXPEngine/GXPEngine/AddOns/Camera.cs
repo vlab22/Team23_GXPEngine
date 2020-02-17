@@ -17,7 +17,7 @@ namespace GXPEngine {
 		/// <param name="windowY">Top y coordinate of the render window.</param>
 		/// <param name="windowWidth">Width of the render window.</param>
 		/// <param name="windowHeight">Height of the render window.</param>
-		public Camera(int windowX, int windowY, int windowWidth, int windowHeight) {
+		public Camera(int windowX, int windowY, int windowWidth, int windowHeight) : base(false) {
 			_renderTarget = new Window (windowX, windowY, windowWidth, windowHeight, this);
 			game.OnAfterRender += _renderTarget.RenderWindow;
 		}

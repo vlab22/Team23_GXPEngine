@@ -255,6 +255,7 @@ namespace TiledMapParserExtended
         [XmlElement("image")] public Image Image;
         [XmlAttribute("offsetx")] public float offsetX = 0;
         [XmlAttribute("offsety")] public float offsetY = 0;
+        [XmlAttribute("visible")] public bool visible = true;
 
         override public string ToString()
         {
