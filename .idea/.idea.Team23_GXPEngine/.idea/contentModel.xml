@@ -78,6 +78,7 @@
         <e p="HudSlider.cs" t="Include" />
         <e p="HudTextBoard.cs" t="Include" />
         <e p="HunterBullet.cs" t="Include" />
+        <e p="HunterBulletManager.cs" t="Include" />
         <e p="HunterCrossHairGameObject.cs" t="Include" />
         <e p="HunterGameObject.cs" t="Include" />
         <e p="HuntersManager.cs" t="Include" />
@@ -102,7 +103,7 @@
         <e p="StopWatchTool.cs" t="Include" />
         <e p="Stork.cs" t="Include" />
         <e p="StorkDataUpdater.cs" t="Include" />
-        <e p="StorkStateManager.cs" t="Include" />
+        <e p="StorkManager.cs" t="Include" />
         <e p="TiledMapParserExtended.cs" t="Include" />
         <e p="TmxFilesLoader.cs" t="Include" />
         <e p="Utils" t="Include">

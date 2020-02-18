@@ -9,11 +9,12 @@ namespace GXPEngine
         private Level _level;
         private List<HunterGameObject> _hunters;
 
-        private HunterBullet[] _bulletsPool;
+        private HunterBulletManager _bulletManager;
         
-        public HuntersManager(Level pLevel) : base(false)
+        public HuntersManager(Level pLevel, HunterBulletManager pHunterBulletManager) : base(false)
         {
             _level = pLevel;
+            _bulletManager = pHunterBulletManager;
             _hunters = new List<HunterGameObject>();
         }
 
@@ -34,7 +35,8 @@ namespace GXPEngine
                 var hunter = new HunterGameObject(hunterData.X, hunterData.Y, hunterData.Width, hunterData.Height,
                     scanRange, sightSpeed);
 
-                hunter.HunterBehaviorListener = this;
+                hunter.HunterBehaviorListeners =
+                    hunter.HunterBehaviorListeners.Concat(new IHunterBehaviorListener[] {this}).ToArray();
 
                 _hunters.Add(hunter);
 
@@ -60,7 +62,7 @@ namespace GXPEngine
 
         void IHunterBehaviorListener.OnShootAtEnemy(HunterGameObject hunter, Vector2 aimDistance, GameObject enemy)
         {
-            
+            _bulletManager.SpawnBullet(hunter.x, hunter.y, aimDistance, hunter);
         }
     }
 }

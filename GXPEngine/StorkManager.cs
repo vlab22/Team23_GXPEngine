@@ -6,7 +6,7 @@ using GXPEngine.GameLocalEvents;
 
 namespace GXPEngine
 {
-    public class StorkStateManager : IColliderListener
+    public class StorkManager : IColliderListener
     {
         private Stork _stork;
 
@@ -22,7 +22,9 @@ namespace GXPEngine
 
         private GameObject _lastMarker;
 
-        public StorkStateManager(Stork pStork, Level pLevel)
+        private bool _inCollisionWithBullet;
+
+        public StorkManager(Stork pStork, Level pLevel)
         {
             _stork = pStork;
             _level = pLevel;
@@ -52,7 +54,8 @@ namespace GXPEngine
                 //Lose Pizza
                 CoroutineManager.StartCoroutine(CollisionWithAirplaneRoutine(parent), null);
             }
-            else if (!_inCollisionWithDrone && other is DroneGameObject drone && drone != _lastDroneCollided)
+            
+            if (!_inCollisionWithDrone && other is DroneGameObject drone && drone != _lastDroneCollided)
             {
                 _lastDroneCollided = drone;
                 _inCollisionWithDrone = true;
@@ -60,6 +63,20 @@ namespace GXPEngine
                 //Lose Pizza
                 CoroutineManager.StartCoroutine(CollisionWithDroneRoutine(drone), null);
             }
+
+            if (!_inCollisionWithBullet && other is HunterBullet)
+            {
+                _inCollisionWithBullet = true;
+                
+                CoroutineManager.StartCoroutine(CollisionWithHunterBulletRoutine(other), null);
+            }
+        }
+
+        private IEnumerator CollisionWithHunterBulletRoutine(GameObject other)
+        {
+            
+            
+            yield return null;
         }
 
         private IEnumerator CollisionWithDroneRoutine(DroneGameObject drone)
@@ -69,7 +86,7 @@ namespace GXPEngine
             //Shake Camera
             MyGame.ThisInstance.Camera.shakeDuration = 500;
 
-            LocalEvents.Instance.Raise(new StorkLocalEvent(_stork, StorkLocalEvent.Event.STORK_HIT_BY_PLANE));
+            LocalEvents.Instance.Raise(new StorkLocalEvent(_stork, StorkLocalEvent.Event.STORK_HIT_BY_DRONE));
 
             yield return new WaitForMilliSeconds(2500);
 

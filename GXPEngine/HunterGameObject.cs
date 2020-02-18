@@ -21,8 +21,7 @@ namespace GXPEngine
 
         private HunterState _state;
 
-        private IHunterBehaviorListener _hunterBehaviorListener;
-        private bool _hasHunterBehaviourListener;
+        private IHunterBehaviorListener[] _hunterBehaviorListeners;
 
         private float _scanEnemyRange;
         private float _sightSpeed;
@@ -50,8 +49,7 @@ namespace GXPEngine
             _scanEnemyRange = pScanEnemyRange;
             _sightSpeed = pSightSpeed;
 
-            float originalWidth = width;
-            float originalHeight = height;
+            _hunterBehaviorListeners = new IHunterBehaviorListener[0];
 
             SetOrigin(0, height);
 
@@ -90,14 +88,14 @@ namespace GXPEngine
 
             yield return null;
 
-            _scanningForEnemyRoutine = CoroutineManager.StartCoroutine(ScanningForEnemy(HunterState.SCANNING), this);
+            _scanningForEnemyRoutine = CoroutineManager.StartCoroutine(ScanningForEnemy(HunterState.SCANNING, true), this);
         }
 
-        IEnumerator ScanningForEnemy(HunterState pState)
+        IEnumerator ScanningForEnemy(HunterState pState, bool resetCrossHairPosition)
         {
             _state = pState;
 
-            _crossHair.Reset();
+           _crossHair.Reset(resetCrossHairPosition);
 
             float distanceMag = float.MaxValue;
             do
@@ -136,18 +134,27 @@ namespace GXPEngine
 
             SpriteTweener.TweenAlpha(_hunterFollowRangeCone, 0, 0.4f, 500);
 
+            //Seeking target
             do
             {
                 var crossHairWorldPos = TransformPoint(_crossHair.Pos.x, _crossHair.Pos.y);
                 var distance = _enemy.Pos - crossHairWorldPos;
                 var distanceNorm = distance.Normalized;
 
+                var distanceFromEnemy = _enemy.Pos - _pos;
+                float distanceFromEnemyMag = distanceFromEnemy.Magnitude;
+
                 var nextPos = distanceNorm * _sightSpeed * Time.delta;
 
                 _crossHair.Translate(nextPos.x, nextPos.y);
 
-                _aimDistance = _crossHair.Pos - _pos;
-                
+                if (distanceFromEnemyMag > _scanEnemyRange)
+                {
+                    _lostLockOnEnemyOutOfRangeRoutine =
+                        _lostLockOnEnemyOutOfRangeRoutine =
+                            CoroutineManager.StartCoroutine(LostLockOnEnemyOutOfRangeRoutine(_enemy), this);
+                }
+
                 yield return null;
             } while (_state == HunterState.LOCKING_CROSSHAIR_ON_ENEMY);
         }
@@ -173,8 +180,6 @@ namespace GXPEngine
 
                 _crossHair.SetXY(localPos.x, localPos.y);
 
-                _aimDistance = _crossHair.Pos - _pos;
-                
                 time += Time.deltaTime;
                 yield return null;
             }
@@ -193,11 +198,11 @@ namespace GXPEngine
                 localPos = InverseTransformPoint(enemy.x, enemy.y);
                 _crossHair.SetXY(localPos.x, localPos.y);
 
-                _aimDistance = _crossHair.Pos - _pos;
-                
                 //Lost lock on enemy, out of range
                 if (distanceMag > _scanEnemyRange)
                 {
+                    CoroutineManager.StopCoroutine(_countDownToShootRoutine);
+
                     _lostLockOnEnemyOutOfRangeRoutine =
                         CoroutineManager.StartCoroutine(LostLockOnEnemyOutOfRangeRoutine(enemy), this);
                 }
@@ -214,15 +219,14 @@ namespace GXPEngine
 
             do
             {
-                
                 yield return new WaitForMilliSeconds(1000);
 
                 counter--;
-
             } while (counter > 0 && _state == HunterState.CROSSHAIR_LOCKED_ON_ENEMY);
 
             //Shoot
-            if (counter == 0 && _state == HunterState.CROSSHAIR_LOCKED_ON_ENEMY) {
+            if (counter == 0 && _state == HunterState.CROSSHAIR_LOCKED_ON_ENEMY)
+            {
                 _shootAtEnemyRoutine = CoroutineManager.StartCoroutine(ShootAtEnemyRoutine(enemy), this);
             }
         }
@@ -230,15 +234,19 @@ namespace GXPEngine
         private IEnumerator ShootAtEnemyRoutine(GameObject enemy)
         {
             _state = HunterState.SHOOT;
-            
+
             Console.WriteLine($"{this}: SHOOT!!!");
 
-            if (_hasHunterBehaviourListener)
+            for (int i = 0; i < _hunterBehaviorListeners.Length; i++)
             {
-                _hunterBehaviorListener.OnShootAtEnemy(this, _aimDistance, enemy);
+                _hunterBehaviorListeners[i].OnShootAtEnemy(this, _aimDistance, enemy);
             }
-            
+
+            //Cooldown
+            _state = HunterState.RECOVER_FROM_SHOOT;
             yield return new WaitForMilliSeconds(1500);
+
+            _scanningForEnemyRoutine = CoroutineManager.StartCoroutine(ScanningForEnemy(HunterState.SCANNING, false), this);
         }
 
         private IEnumerator LostLockOnEnemyOutOfRangeRoutine(GameObject enemy)
@@ -252,13 +260,17 @@ namespace GXPEngine
             yield return new WaitForMilliSeconds(1000);
 
             //Return to scanning state
-            _scanningForEnemyRoutine = CoroutineManager.StartCoroutine(ScanningForEnemy(HunterState.SCANNING), this);
+            _scanningForEnemyRoutine = CoroutineManager.StartCoroutine(ScanningForEnemy(HunterState.SCANNING, true), this);
         }
 
         void Update()
         {
             if (!this.Enabled) return;
 
+            _aimDistance = TransformPoint(_crossHair.Pos.x, _crossHair.Pos.y) - _pos;
+
+            _easyDrawDebug.SetActive(MyGame.Debug);
+            
             if (MyGame.Debug)
             {
                 _easyDrawDebug.Clear(Color.FromArgb(200, 1, 1, 1));
@@ -280,16 +292,12 @@ namespace GXPEngine
             _snapCrosshairOnEnemyRoutine = CoroutineManager.StartCoroutine(SnapCrossHairToEnemy(enemy), this);
         }
 
-        public IHunterBehaviorListener HunterBehaviorListener
+        public IHunterBehaviorListener[] HunterBehaviorListeners
         {
-            get => _hunterBehaviorListener;
-            set
-            {
-                _hunterBehaviorListener = value;
-                _hasHunterBehaviourListener = value != null;
-            }
+            get => _hunterBehaviorListeners;
+            set { _hunterBehaviorListeners = value; }
         }
-        
+
         public Stork Enemy
         {
             get => _enemy;

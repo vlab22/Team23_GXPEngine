@@ -5,8 +5,10 @@
         public enum Event
         {
             STORK_HIT_BY_PLANE,
+            STORK_AFTER_HIT_BY_DRONE,
             STORK_AFTER_HIT_BY_PLANE,
-            STORK_LOSE_PIZZA
+            STORK_LOSE_PIZZA,
+            STORK_HIT_BY_DRONE
         }
         
         public Stork stork;

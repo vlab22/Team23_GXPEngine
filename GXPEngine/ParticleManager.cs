@@ -37,6 +37,12 @@ namespace GXPEngine
                     break;
                 case StorkLocalEvent.Event.STORK_LOSE_PIZZA:
                     break;
+                case StorkLocalEvent.Event.STORK_AFTER_HIT_BY_DRONE:
+                    break;
+                case StorkLocalEvent.Event.STORK_HIT_BY_DRONE:
+                    //Show smoke
+                    CoroutineManager.StartCoroutine(ShowSmokeOnStork00Routine(e.stork), this);
+                    break;
                 default:
                     break;
             }
@@ -54,12 +60,12 @@ namespace GXPEngine
             _smoke00.SetXY(0, 0);
             _smoke00.alpha = 1f;
 
+            SpriteTweener.TweenAlpha(_smoke00, 1, 0, duration - 500, 500);
+
             while (time < duration)
             {
                 float fFrame = Mathf.Map(time, 0, duration, 0, _smoke00.frameCount - 1);
                 int frame = Mathf.Round(fFrame) % _smoke00.frameCount;
-
-                _smoke00.alpha = 1 - Easing.Ease(Easing.Equation.CubicEaseIn, time, 0, 1, duration);
 
                 _smoke00.SetFrame(frame);
 
@@ -74,12 +80,14 @@ namespace GXPEngine
             _smoke00.visible = false;
         }
 
-        public void PlaySmallSmoke(GameObject parentObj, float px = 0, float py = 0, int duration = 500, int depthIndex = -1)
+        public void PlaySmallSmoke(GameObject parentObj, float px = 0, float py = 0, int duration = 500,
+            int depthIndex = -1)
         {
             CoroutineManager.StartCoroutine(PlaySmallSmokeRoutine(parentObj, px, py, duration, depthIndex), this);
         }
 
-        private IEnumerator PlaySmallSmokeRoutine(GameObject parentObj, float px, float py, int duration, int depthIndex)
+        private IEnumerator PlaySmallSmokeRoutine(GameObject parentObj, float px, float py, int duration,
+            int depthIndex)
         {
             if (depthIndex < 0)
             {
@@ -96,7 +104,7 @@ namespace GXPEngine
             {
                 Console.WriteLine($"\t{childs[i]}");
             }
-            
+
             _smallBlackSmoke00.visible = true;
             _smallBlackSmoke00.SetXY(px, py);
 
@@ -115,7 +123,7 @@ namespace GXPEngine
                 time += Time.deltaTime;
                 yield return null;
             }
-            
+
             _smallBlackSmoke00.visible = false;
             parentObj?.RemoveChild(_smallBlackSmoke00);
         }

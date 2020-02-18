@@ -46,9 +46,11 @@ namespace GXPEngine
             }
         }
 
-        public void Reset()
+        public void Reset(bool resetCrossHairPosition)
         {
-            SetXY(0, 0);
+            if (resetCrossHairPosition)
+                SetXY(0, 0);
+            
             _hasCollisionWithEnemy = false;
             color = _startColor;
         }

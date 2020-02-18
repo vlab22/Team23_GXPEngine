@@ -17,7 +17,7 @@ namespace GXPEngine
 
         private List<Airplane> _airplanes;
 
-        private StorkStateManager _storkStateManager;
+        private StorkManager _storkManager;
         private Stork _stork;
 
         private DroneManager _dronesManager;
@@ -55,8 +55,11 @@ namespace GXPEngine
             };
             
             AddChild(_stork);
-
-            _huntersManager = new HuntersManager(this);
+            
+            var hunterBulletManager = new HunterBulletManager(this);
+            AddChild(hunterBulletManager);
+            
+            _huntersManager = new HuntersManager(this, hunterBulletManager);
             _huntersManager.SpawnHunters();
             _huntersManager.SetHuntersTarget(_stork);
             
@@ -78,7 +81,7 @@ namespace GXPEngine
 
             CoroutineManager.StartCoroutine(SetCamTargetRoutine(_stork), this);
 
-            _storkStateManager = new StorkStateManager(_stork, this);
+            _storkManager = new StorkManager(_stork, this);
 
             AddChild(_cam);
 
@@ -89,7 +92,7 @@ namespace GXPEngine
         {
             if (Input.GetKeyDown(Key.D))
             {
-                CoroutineManager.StartCoroutine(_storkStateManager.DropPizzaRoutine(_stork.Pos), this);
+                CoroutineManager.StartCoroutine(_storkManager.DropPizzaRoutine(_stork.Pos), this);
             }
         }
 
@@ -157,5 +160,7 @@ namespace GXPEngine
         public List<Airplane> AirPlanes => _airplanes;
 
         public int FirstAirplaneIndex => _airplanes.Count > 0 ? _airplanes[0].Index : GetChildren().Count;
+
+        public IHasSpeed PlayerHasSpeed => _stork;
     }
 }

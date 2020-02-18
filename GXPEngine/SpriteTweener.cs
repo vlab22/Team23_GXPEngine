@@ -11,7 +11,7 @@ namespace GXPEngine
         static Dictionary<Sprite, IEnumerator> _colorRoutinesMap = new Dictionary<Sprite, IEnumerator>();
 
 
-        public static void TweenAlpha(Sprite sprite, float from, float to, int duration)
+        public static void TweenAlpha(Sprite sprite, float from, float to, int duration, int delay = 0, Easing.Equation equation = Easing.Equation.QuadEaseOut)
         {
             if (_alphaRoutinesMap.ContainsKey(sprite))
             {
@@ -19,20 +19,24 @@ namespace GXPEngine
                 _alphaRoutinesMap.Remove(sprite);
             }
 
-            var ie = CoroutineManager.StartCoroutine(TweenAlphaRoutine(sprite, from, to, duration), null);
+            var ie = CoroutineManager.StartCoroutine(TweenAlphaRoutine(sprite, from, to, duration, delay, equation), null);
             _alphaRoutinesMap.Add(sprite, ie);
         }
 
-        private static IEnumerator TweenAlphaRoutine(Sprite sprite, float from, float to, int duration,
-            Easing.Equation equation = Easing.Equation.QuadEaseOut)
+        private static IEnumerator TweenAlphaRoutine(Sprite sprite, float from, float to, int duration, int delay,
+            Easing.Equation equation)
         {
+            //TODO: remove this call to WaitForMilliSeconds and implement it in the while loop to prevent another instantiation of a yield
+            if (delay > 0)
+                yield return new WaitForMilliSeconds(delay);
+
             int time = 0;
 
             sprite.alpha = from;
 
             float fromDir = from > to ? from : 0;
             float toDir = from > to ? 0 : from;
-            
+
             while (time < duration)
             {
                 sprite.alpha = toDir + Easing.Ease(equation, time, fromDir, to - from, duration);
