@@ -43,10 +43,10 @@ namespace GXPEngine
         private HunterFollowRangeCone _hunterFollowRangeCone;
 
         public HunterGameObject(float pX, float pY, float pWidth, float pHeight,
-            float pScanEnemyRange = 400, float pSightSpeed = 200) : base("data/Female Hunter.png", 1, 1,
+            float pSightSpeed = 200) : base("data/Female Hunter.png", 1, 1,
             -1, false, false)
         {
-            _scanEnemyRange = pScanEnemyRange;
+            _scanEnemyRange = pWidth;
             _sightSpeed = pSightSpeed;
 
             _hunterBehaviorListeners = new IHunterBehaviorListener[0];
@@ -88,14 +88,15 @@ namespace GXPEngine
 
             yield return null;
 
-            _scanningForEnemyRoutine = CoroutineManager.StartCoroutine(ScanningForEnemy(HunterState.SCANNING, true), this);
+            _scanningForEnemyRoutine =
+                CoroutineManager.StartCoroutine(ScanningForEnemy(HunterState.SCANNING, true), this);
         }
 
         IEnumerator ScanningForEnemy(HunterState pState, bool resetCrossHairPosition)
         {
             _state = pState;
 
-           _crossHair.Reset(resetCrossHairPosition);
+            _crossHair.Reset(resetCrossHairPosition);
 
             float distanceMag = float.MaxValue;
             do
@@ -141,14 +142,11 @@ namespace GXPEngine
                 var distance = _enemy.Pos - crossHairWorldPos;
                 var distanceNorm = distance.Normalized;
 
-                var distanceFromEnemy = _enemy.Pos - _pos;
-                float distanceFromEnemyMag = distanceFromEnemy.Magnitude;
-
                 var nextPos = distanceNorm * _sightSpeed * Time.delta;
 
                 _crossHair.Translate(nextPos.x, nextPos.y);
 
-                if (distanceFromEnemyMag > _scanEnemyRange)
+                if (!IsEnemyInRange())
                 {
                     _lostLockOnEnemyOutOfRangeRoutine =
                         _lostLockOnEnemyOutOfRangeRoutine =
@@ -246,7 +244,16 @@ namespace GXPEngine
             _state = HunterState.RECOVER_FROM_SHOOT;
             yield return new WaitForMilliSeconds(1500);
 
-            _scanningForEnemyRoutine = CoroutineManager.StartCoroutine(ScanningForEnemy(HunterState.SCANNING, false), this);
+            if (IsEnemyInRange())
+            {
+                _scanningForEnemyRoutine =
+                    CoroutineManager.StartCoroutine(ScanningForEnemy(HunterState.SCANNING, false), this);
+            }
+            else
+            {
+                _lostLockOnEnemyOutOfRangeRoutine =
+                    CoroutineManager.StartCoroutine(LostLockOnEnemyOutOfRangeRoutine(enemy), this);
+            }
         }
 
         private IEnumerator LostLockOnEnemyOutOfRangeRoutine(GameObject enemy)
@@ -260,7 +267,8 @@ namespace GXPEngine
             yield return new WaitForMilliSeconds(1000);
 
             //Return to scanning state
-            _scanningForEnemyRoutine = CoroutineManager.StartCoroutine(ScanningForEnemy(HunterState.SCANNING, true), this);
+            _scanningForEnemyRoutine =
+                CoroutineManager.StartCoroutine(ScanningForEnemy(HunterState.SCANNING, true), this);
         }
 
         void Update()
@@ -270,7 +278,7 @@ namespace GXPEngine
             _aimDistance = TransformPoint(_crossHair.Pos.x, _crossHair.Pos.y) - _pos;
 
             _easyDrawDebug.SetActive(MyGame.Debug);
-            
+
             if (MyGame.Debug)
             {
                 _easyDrawDebug.Clear(Color.FromArgb(200, 1, 1, 1));
@@ -290,6 +298,11 @@ namespace GXPEngine
         {
             //Snap to enemy
             _snapCrosshairOnEnemyRoutine = CoroutineManager.StartCoroutine(SnapCrossHairToEnemy(enemy), this);
+        }
+
+        bool IsEnemyInRange()
+        {
+            return DistanceTo(_enemy) <= _scanEnemyRange;
         }
 
         public IHunterBehaviorListener[] HunterBehaviorListeners

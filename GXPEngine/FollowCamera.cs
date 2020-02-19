@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Drawing;
 using GXPEngine.Core;
 using MathfExtensions;
@@ -15,8 +16,6 @@ namespace GXPEngine
         public Vector2 Offset;
         private Vector2 _targetPos;
 
-        public Vector2 pos;
-
         private bool _hasSpeedListener;
         private IHasSpeed _iHasSpeed;
 
@@ -28,21 +27,38 @@ namespace GXPEngine
         // Amplitude of the shake. A larger value shakes the camera harder.
         public float shakeAmount = 1.7f;
         public float decreaseFactor = 1.0f;
+        private MapGameObject _map;
 
-        public FollowCamera(int windowX, int windowY, int windowWidth, int windowHeight) : base(windowX, windowY,
+        public FollowCamera(int windowX, int windowY, int windowWidth, int windowHeight, MapGameObject pMap = null) : base(windowX, windowY,
             windowWidth, windowHeight)
         {
-            _targetPos.x = this.x;
-            _targetPos.y = this.y;
+            _map = pMap;
+
+            CoroutineManager.StartCoroutine(WaitForMapSet(), this);
         }
+
+        private IEnumerator WaitForMapSet()
+        {
+            while (_map == null)
+            {
+                yield return null;
+            }
+        }
+
+        public void Start()
+        {
+            _targetPos = _pos;
+        }
+
 
         void Update()
         {
-            float delta = Time.deltaTime * 0.001f;
-
+            if (!Enabled) return;
+            
+            Vector2 pos = new Vector2(this.x, this.y);
+            
             if (_followEnabled && _target != null)
             {
-                Vector2 pos = new Vector2(this.x, this.y);
                 Vector2 targetP = new Vector2(_target.x, _target.y);
 
                 if (_hasSpeedListener)
@@ -64,7 +80,20 @@ namespace GXPEngine
                 {
                     interpVelocity = directionMag * speed;
 
-                    _targetPos = pos + (targetDirection.Normalized * interpVelocity * delta);
+                    float lastX = _targetPos.x;
+                    float lastY = _targetPos.y;
+                    
+                    _targetPos = pos + (targetDirection.Normalized * interpVelocity * Time.delta);
+
+                    if (_targetPos.x - MyGame.HALF_SCREEN_WIDTH < 0 || _targetPos.x + MyGame.HALF_SCREEN_WIDTH > _map.MapWidthInPixels)
+                    {
+                        _targetPos.x = lastX;
+                    }
+
+                    if (_targetPos.y - MyGame.HALF_SCREEN_HEIGHT < 0 || _targetPos.y + MyGame.HALF_SCREEN_HEIGHT > _map.MapHeightInPixels)
+                    {
+                        _targetPos.y = lastY;
+                    }
 
                     //var nextPos = Vector2.Lerp(pos, targetPos + offset, 0.25f);
                     // float nextX = Easing.Ease(Easing.Equation.CubicEaseOut, 1, pos.x, _targetPos.x, 4);
@@ -97,11 +126,11 @@ namespace GXPEngine
             float lScale = scale;
             if (Input.GetKey(Key.W))
             {
-                lScale -= 5 * delta;
+                lScale -= 5 * Time.delta;
             }
             else if (Input.GetKey(Key.S))
             {
-                lScale += 5 * delta;
+                lScale += 5 * Time.delta;
             }
             else if (Input.GetKey(Key.X))
             {
@@ -135,6 +164,12 @@ namespace GXPEngine
         {
             get => _followEnabled;
             set => _followEnabled = value;
+        }
+
+        public MapGameObject Map
+        {
+            get => _map;
+            set => _map = value;
         }
     }
 }

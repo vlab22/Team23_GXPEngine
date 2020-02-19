@@ -106,8 +106,6 @@ namespace GXPEngine
 
         void Update()
         {
-            float delta = Time.deltaTime * 0.001f;
-
             var rotationRad = _rotation.DegToRad();
             _forward.x = Mathf.Cos(rotationRad);
             _forward.y = Mathf.Sin(rotationRad);
@@ -163,12 +161,12 @@ namespace GXPEngine
 
             if (!hasPressure && _currentSpeed > _minSpeed)
             {
-                _currentSpeed += _dampSpeed * delta;
+                _currentSpeed += _dampSpeed * Time.delta;
             }
             else if (hasPressure &&
                      (_leftWingTime > _wingAnimationSpeed * 2 || _rightWingTime > _wingAnimationSpeed * 2))
             {
-                _currentSpeed += _dampSpeed * delta;
+                _currentSpeed += _dampSpeed * Time.delta;
             }
             else
             {
@@ -178,25 +176,30 @@ namespace GXPEngine
                 {
                     //Each wing add a "push" to the speed
                     float left = _leftPush * pushForce;
-                    _currentSpeed += left * delta;
+                    _currentSpeed += left * Time.delta;
 
                     float right = _rightPush * pushForce;
-                    _currentSpeed += right * delta;
+                    _currentSpeed += right * Time.delta;
                 }
                 else
                 {
-                    _currentSpeed += _dampSpeed * delta;
+                    _currentSpeed += _dampSpeed * Time.delta;
                 }
             }
             
-            TurnStork(delta);
+            TurnStork(Time.delta);
 
             _currentSpeed = Mathf.Clamp(_currentSpeed, _minSpeed, _maxSpeed);
 
-            if (_currentSpeed > 0)
+            if (_hasIGridDataUpdater)
+            {
+                _iUpdater.NextPosition(_pos, _pos + _forward * _currentSpeed * Time.delta);
+            }
+            
+            if (_currentSpeed > 0 && IsMoveAllowed) //AllowMove will be calculated by a _iUpdater
             {
                 //var nextPos = _pos + _forward * _currentSpeed * Time.deltaTime * 0.001f;
-                Move(_currentSpeed * delta, 0);
+                Move(_currentSpeed * Time.delta, 0);
             }
 
             //
@@ -300,6 +303,11 @@ namespace GXPEngine
 
         GameObject IHasSpeed.gameObject => this;
 
+        public bool IsMoveAllowed { get; set; }
+        public bool IsToCorrectPosition { get; set; }
+
+        public Vector2 PositionCorrection { get; set; }
+
         public IGridDataUpdater IUpdater
         {
             get => _iUpdater;
@@ -327,6 +335,8 @@ namespace GXPEngine
         }
         
         public Vector2 Forward => _forward;
+
+        public float CurrentSpeed => _currentSpeed;
     }
 
     public interface IColliderListener

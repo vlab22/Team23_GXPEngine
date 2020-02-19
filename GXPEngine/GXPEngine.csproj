@@ -39,12 +39,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Airplane.cs" />
+    <Compile Include="AirplanesManager.cs" />
     <Compile Include="CanvasDebugger2.cs" />
     <Compile Include="CompoundCollider.cs" />
     <Compile Include="DeliveryPoint.cs" />
     <Compile Include="DrawableTweener.cs" />
     <Compile Include="DroneGameObject.cs" />
-    <Compile Include="DroneManager.cs" />
+    <Compile Include="DronesManager.cs" />
     <Compile Include="Easing.cs" />
     <Compile Include="FollowCamera.cs" />
     <Compile Include="GameLocalEvents\GameLocalEvent.cs" />
@@ -114,7 +115,6 @@
     <Compile Include="SpriteTweener.cs" />
     <Compile Include="StopWatchTool.cs" />
     <Compile Include="Stork.cs" />
-    <Compile Include="StorkDataUpdater.cs" />
     <Compile Include="StorkManager.cs" />
     <Compile Include="TiledMapParserExtended.cs" />
     <Compile Include="TmxFilesLoader.cs" />

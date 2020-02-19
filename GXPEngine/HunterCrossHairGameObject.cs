@@ -37,7 +37,7 @@ namespace GXPEngine
 
         void OnCollision(GameObject other)
         {
-            if (!_hasCollisionWithEnemy && other is Stork)
+            if (!_hasCollisionWithEnemy && _hunter.State == HunterGameObject.HunterState.LOCKING_CROSSHAIR_ON_ENEMY && other is Stork)
             {
                 _hasCollisionWithEnemy = true;
                 _hunter.OnCollisionWithEnemy(other);

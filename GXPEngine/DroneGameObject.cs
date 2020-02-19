@@ -353,7 +353,7 @@ namespace GXPEngine
             _iesDebug.Remove(_goToPointRoutine);
             _iesDebug.Remove(_returnToStartPointRoutine);
 
-            yield return new WaitForMilliSeconds(3000);
+            yield return new WaitForMilliSeconds(1000);
 
             CoroutineManager.StopCoroutine(_searchingRoutine);
             _iesDebug.Remove(_searchingRoutine);

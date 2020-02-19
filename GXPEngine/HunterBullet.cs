@@ -14,6 +14,10 @@ namespace GXPEngine
 
         private GameObject _shooter;
 
+        private bool _isBulletFalling; //doesn't hit player
+
+        private bool _isCollisionEnabled = true;
+
         private Rectangle _customColliderBounds;
 
 
@@ -36,14 +40,16 @@ namespace GXPEngine
             if (_lifeTimeCounter > _lifeTime)
             {
                 //Fall bullet
+                
+                _isCollisionEnabled = false;
+
                 float scale = 0.001f + Easing.Ease(Easing.Equation.QuadEaseIn, _lifeTimeCounter - _lifeTime, 0.999f, 0 - 0.999f, 400);
                 SetScaleXY(scale, scale);
                 
-                Console.WriteLine($"{this.name}: lifeTimeCounter: {_lifeTimeCounter} | lifeTime: {_lifeTime} | scale {scale}");
-
                 if (_lifeTimeCounter > _lifeTime + 400)
                 {
                     this.SetActive(false);
+                    _isCollisionEnabled = true;
                 }
             }
             _lifeTimeCounter += Time.deltaTime;
@@ -110,5 +116,7 @@ namespace GXPEngine
             get => _lifeTimeCounter;
             set => _lifeTimeCounter = value;
         }
+
+        public bool IsCollisionEnabled => _isCollisionEnabled;
     }
 }

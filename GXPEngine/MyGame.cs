@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 // System contains a lot of default C# libraries 
 using GXPEngine;
+using GXPEngine.OpenGL;
 using TiledMapParserExtended;
 
 // GXPEngine contains the engine
@@ -45,6 +46,8 @@ public class MyGame : Game
     public MyGame(string[] tmxFileNames, int levelIndex) :
         base(SCREEN_WIDTH, SCREEN_HEIGHT, FULLSCREEN) // Create a window that's 800x600 and NOT fullscreen
     {
+        GL.ClearColor(1f,1f,1f , 1f);
+        
         ThisInstance = this;
 
         _levelFiles = tmxFileNames;
@@ -153,4 +156,9 @@ public class MyGame : Game
     public FollowCamera Camera => _camera;
 
     public Level CurrentLevel => _currentLevel;
+
+    public void Close()
+    {
+        _glContext.Close();
+    }
 }

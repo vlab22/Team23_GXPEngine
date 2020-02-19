@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Net;
 using GXPEngine.Assets.Scripts.Tools;
 using GXPEngine.Core;
 using TiledMapParserExtended;
@@ -12,12 +13,14 @@ using Rectangle = System.Drawing.Rectangle;
 
 namespace GXPEngine
 {
-    public class MapGameObject : Canvas
+    public class MapGameObject : GameObject
     {
         /// <summary>
         /// MapData object parsed using TiledMapParserExtended
         /// </summary>
         private Map _mapData;
+
+        private Sprite[,] _bgCanvases;
 
         /// <summary>
         /// Tileset images loaded from Tmx
@@ -36,24 +39,116 @@ namespace GXPEngine
         /// </summary>
         private short[][,] _tileArrays;
 
-        /// <summary>
-        /// Id of the layers, used across to make checks
-        /// </summary>
-        private int _bgLayer = -1;
-
         private ObjectGroup _objectGroup;
 
-        public MapGameObject(Map mapData) : base(mapData.Width * mapData.TileWidth, mapData.Height * mapData.TileHeight, false)
+        //private int _totalPixelsWidth;
+        //private int _totalPixelsHeight;
+        //private int _tilesPerSquare;
+
+        private ImageLayer[] _backGroundImages;
+
+        private Dictionary<string, int> _tilesetIndexMap;
+
+        private int _boundariesLayerIndex;
+        
+        //private int _gridWidth;
+        //private int _gridHeight;
+        //private int _gridsToDraw;
+        //private int _gridsToDrawStep;
+
+        //private int _currentRow;
+        //private int _currentColumn;
+
+        private Dictionary<string, Bitmap> _bitMapReuse;
+
+        //private const int SIZE = 1280;
+
+        public MapGameObject(Map mapData) : base(false)
         {
             _mapData = mapData;
 
-            //Get the layers Index
-            _bgLayer = GetLayerIndex("background image");
-           
-            
+            _boundariesLayerIndex = GetLayerIndex("boundaries");
+
+            //_totalPixelsWidth = mapData.Width * mapData.TileWidth;
+            //_totalPixelsHeight = mapData.Height * mapData.TileHeight;
+
+
+            //Divide in a full HD width squares
+            //_gridWidth = Mathf.Ceiling(_totalPixelsWidth / (float) SIZE);
+            //_gridHeight = Mathf.Ceiling(_totalPixelsHeight / (float) SIZE);
+
+            //_tilesPerSquare = SIZE / 32;
+
+            //Determine how much to draw based on screen width
+            // _gridsToDraw = 2 + Mathf.Ceiling((float) Game.main.width / SIZE);
+            // _gridsToDraw = (_gridsToDraw % 2 == 0) ? _gridsToDraw + 1 : _gridsToDraw;
+            // _gridsToDrawStep = Mathf.Floor(_gridsToDraw * 0.5f);
+            //
+            // _bgCanvases = new Sprite[_gridsToDraw, _gridsToDraw];
+
+            _bitMapReuse = new Dictionary<string, Bitmap>();
+
+            var backGroundImages = _mapData.ImageLayers.GroupBy(g => g.Image.FileName);
+
+            foreach (var groupImage in backGroundImages)
+            {
+                var bitmap = new Bitmap(groupImage.Key);
+                _bitMapReuse.Add(groupImage.Key, bitmap);
+            }
+
+            // foreach (var kv in _bitMapReuse)
+            // {
+            //     _bgSpritesMap.Add(kv.Key, new Sprite(kv.Value, false));
+            // }
+            //
+            // //var bitmap = new Bitmap(bgLayer.Image.FileName);
+            //
+            // for (int i = 0; i < _bgCanvases.GetLength(0); i++)
+            // {
+            //     for (int j = 0; j < _bgCanvases.GetLength(1); j++)
+            //     {
+            //         _bgCanvases[i, j] = _bgSpritesMap.Values.FirstOrDefault();
+            //         AddChild(_bgCanvases[i, j]);
+            //     }
+            // }
+
+            _bitMapReuse = new Dictionary<string, Bitmap>();
+
+            //int canvasPixelsSum = 0;
+            //int canvasCounter = 0;
+
+            // for (int i = 0; i < _canvases.GetLength(0); i++)
+            // {
+            //     for (int j = 0; j < _canvases.GetLength(1); j++)
+            //     {
+            //         Canvas canvas;
+            //         
+            //         try
+            //         {
+            //             canvas = new Canvas(SIZE, SIZE, false);
+            //             canvasPixelsSum += SIZE * SIZE;
+            //             
+            //             AddChild(canvas);
+            //
+            //             canvas.x = i * SIZE;
+            //             canvas.y = j * SIZE;
+            //
+            //             _canvases[i, j] = canvas;
+            //
+            //             canvasCounter++;
+            //         }
+            //         catch (System.ArgumentException e)
+            //         {
+            //             Console.WriteLine($"{this}: pixelsSum: {canvasPixelsSum} | {canvasCounter} | {i:000},{j:000} | {int.MaxValue}");
+            //             Console.WriteLine(e.Message);
+            //             MyGame.ThisInstance.Close();
+            //         }
+            //     }
+            // }
+
             //Load Object Group
             _objectGroup = _mapData.ObjectGroups[0];
-            
+
             //Section to create the tiles Image and data to be drawn
             //The TilesSet Images are loaded and than used to draw each layer according with the layer data
 
@@ -61,12 +156,16 @@ namespace GXPEngine
             _tileSetImages = new Bitmap[_mapData.TileSets.Length];
             _tileSetSpritesData = new SpriteTileSetData[totalTiles];
             int tileCounter = 0;
-            
+
+            _tilesetIndexMap = new Dictionary<string, int>();
+
             for (int i = 0; i < _mapData.TileSets.Length; i++)
             {
                 var watch = StopwatchTool.StartWatch();
 
                 var tileSet = _mapData.TileSets[i];
+
+                _tilesetIndexMap.Add(tileSet.Name, i);
 
                 if (tileSet.TileCount > 0)
                 {
@@ -86,7 +185,7 @@ namespace GXPEngine
 
                         Rectangle cloneRect = new Rectangle(column * tileWidth + margin + spacing * (column),
                             row * tileHeight + margin + spacing * (row), tileWidth, tileHeight);
-                        
+
                         //Create a data the keeps the ID and the rectangle where the sprite is in tileset
                         _tileSetSpritesData[tileCounter] = new SpriteTileSetData(i, cloneRect);
                         tileCounter++;
@@ -99,12 +198,6 @@ namespace GXPEngine
                 }
             }
 
-            //Set the the layers data in a multidimensional array
-            _tileArrays = new short[_mapData.Layers.Length][,];
-            for (int i = 0; i < mapData.Layers.Length; i++)
-            {
-                _tileArrays[i] = _mapData.Layers[i].GetTileArray();
-            }
 
             var drawWatch = StopwatchTool.StartWatch();
 
@@ -112,23 +205,34 @@ namespace GXPEngine
 
             StopwatchTool.StopWatch(drawWatch, "DrawBackgroundLayer: ");
 
-            drawWatch = StopwatchTool.StartWatch();
-            
-            DrawLayers();
-            
-            StopwatchTool.StopWatch(drawWatch, "DrawLayers: ");
+            if (_mapData.Layers != null)
+            {
+                //Set the the layers data in a multidimensional array
+                _tileArrays = new short[_mapData.Layers.Length][,];
+                for (int i = 0; i < mapData.Layers.Length; i++)
+                {
+                    _tileArrays[i] = _mapData.Layers[i].GetTileArray();
+                }
+
+                drawWatch = StopwatchTool.StartWatch();
+
+                DrawLayers();
+
+                StopwatchTool.StopWatch(drawWatch, "DrawLayers: ");
+            }
         }
 
         private void DrawBackgroundLayers()
         {
-            var backGroundImageLayer = _mapData.ImageLayers.Where(l => l.Name.StartsWith("background image") && l.visible == true);
+            var backGroundImageLayer =
+                _mapData.ImageLayers.Where(l => l.Name.StartsWith("background image") && l.visible == true);
 
             var bitMapReuse = new Dictionary<string, Bitmap>();
-            
+
             foreach (var bgLayer in backGroundImageLayer)
             {
                 Bitmap bitmap;
-                
+
                 if (!bitMapReuse.ContainsKey(bgLayer.Image.FileName))
                 {
                     bitmap = new Bitmap(bgLayer.Image.FileName);
@@ -141,18 +245,16 @@ namespace GXPEngine
 
                 ImageAttributes imageAtt = new ImageAttributes();
 
-                int offsetX = Mathf.Round(bgLayer.offsetX);
-                int offsetY = Mathf.Round(bgLayer.offsetY);
-                
-                graphics.DrawImage(bitmap,
-                    new Rectangle(offsetX, offsetY, bitmap.Width,
-                        bitmap.Height), //_mapData.TileWidth, _mapData.TileHeight), // destination rectangle
-                    0, // source rectangle x 
-                    0, // source rectangle y
-                    bitmap.Width, //_mapData.TileWidth, // source rectangle width
-                    bitmap.Height, //_mapData.TileHeight, // source rectangle height
-                    GraphicsUnit.Pixel,
-                    imageAtt);
+                // int offsetX = SIZE * Mathf.Round(bgLayer.offsetX) / 1920;
+                // int offsetY = SIZE * Mathf.Round(bgLayer.offsetY) / 1920;
+                //
+                // //Get Canvas
+                // int canvasRow = offsetY / SIZE;
+                // int canvasColumn = offsetX / SIZE;
+
+                var canvas = new Sprite(bitmap, false);
+                AddChild(canvas);
+                canvas.SetXY(bgLayer.offsetX, bgLayer.offsetY);
             }
         }
 
@@ -175,7 +277,8 @@ namespace GXPEngine
         /// <param name="index"></param>
         public void DrawLayer(int index)
         {
-            int tileSize = _mapData.Layers[index].GetIntProperty("tilesize", 32);
+            int tileWidth = _mapData.TileWidth;
+            int tileHeight = _mapData.TileHeight;
             int tileOrigin = _mapData.Layers[index].GetIntProperty("tileorigin", 0);
 
             // To draw mapData layer with opacity
@@ -215,18 +318,162 @@ namespace GXPEngine
 
                     var pt = new Point(i * _mapData.TileHeight, j * _mapData.TileWidth - tileOrigin);
 
-                    graphics.DrawImage(_tileSetImages[spriteData.tileSetId],
-                        new Rectangle(pt.X, pt.Y, tileSize,
-                            tileSize), // destination rectangle
+                    var canvas = new Canvas(_mapData.TileWidth, _mapData.TileHeight, false);
+
+                    canvas.graphics.DrawImage(_tileSetImages[spriteData.tileSetId],
+                        new Rectangle(0, 0, tileWidth,
+                            tileHeight), // destination rectangle
                         sourceRect.X, // source rectangle x 
                         sourceRect.Y, // source rectangle y
-                        tileSize, // source rectangle width
-                        tileSize, // source rectangle height
+                        tileWidth, // source rectangle width
+                        tileHeight, // source rectangle height
                         GraphicsUnit.Pixel,
                         imageAtt);
+
+                    AddChild(canvas);
+                    canvas.SetXY(pt.X, pt.Y);
                 }
             }
         }
+
+        public void DrawBorders(GameObject parent, float alpha = 1f)
+        {
+            var borderCloudesTileSet = _mapData.TileSets.FirstOrDefault(ts => ts.Name == "Clouds Border");
+
+            var topCloudsRects = new Rectangle[]
+            {
+                new Rectangle(0, 128 * 0, 512, 128),
+                new Rectangle(0, 128 * 1, 512, 128),
+                new Rectangle(0, 128 * 2, 512, 128),
+            };
+
+            var bottomCloudsRects = new Rectangle[]
+            {
+                new Rectangle(0, 128 * 3, 512, 128),
+                new Rectangle(0, 128 * 4, 512, 128),
+                new Rectangle(0, 128 * 5, 512, 128),
+            };
+
+            var rightCloudsRects = new Rectangle[]
+            {
+                new Rectangle(512 + 128 * 0, 0, 128, 512),
+                new Rectangle(512 + 128 * 1, 0, 128, 512),
+                new Rectangle(512 + 128 * 2, 0, 128, 512),
+            };
+
+            var leftCloudsRects = new Rectangle[]
+            {
+                new Rectangle(512 + 128 * 3, 0, 128, 512),
+                new Rectangle(512 + 128 * 0, 512, 128, 512),
+                new Rectangle(512 + 128 * 1, 512, 128, 512),
+            };
+
+            int tilsetIndex = _tilesetIndexMap["Clouds Borders"];
+            var tilesetImage = _tileSetImages[tilsetIndex];
+
+            int widthSteps = Mathf.Ceiling((float) _mapData.Width * _mapData.TileWidth / topCloudsRects[0].Width);
+
+            //Draw top border
+            int canvasW = topCloudsRects[0].Width;
+            int canvasH = topCloudsRects[0].Height;
+
+            for (int i = 0; i < widthSteps; i++)
+            {
+                int randRect = MRandom.Range(0, topCloudsRects.Length);
+
+                var canvas = new Canvas(canvasW, canvasH, false);
+
+                canvas.graphics.DrawImage(tilesetImage,
+                    new Rectangle(0, 0, canvasW, canvasH),
+                    topCloudsRects[randRect], GraphicsUnit.Pixel
+                );
+
+                parent.AddChild(canvas);
+
+                canvas.x = i * canvasW;
+                canvas.y = 0;
+
+                canvas.alpha = alpha;
+            }
+
+            //Draw bottom border
+            canvasW = bottomCloudsRects[0].Width;
+            canvasH = bottomCloudsRects[0].Height;
+
+            int yHeight = (_mapData.Height - 1) * _mapData.TileHeight;
+
+            for (int i = 0; i < widthSteps; i++)
+            {
+                int randRect = MRandom.Range(0, bottomCloudsRects.Length);
+
+                var canvas = new Canvas(canvasW, canvasH, false);
+
+                canvas.graphics.DrawImage(tilesetImage,
+                    new Rectangle(0, 0, canvasW, canvasH),
+                    bottomCloudsRects[randRect], GraphicsUnit.Pixel
+                );
+
+                parent.AddChild(canvas);
+
+                canvas.x = i * canvasW;
+                canvas.y = yHeight;
+
+                canvas.alpha = alpha;
+            }
+
+            int heightSteps = Mathf.Ceiling((float) _mapData.Height * _mapData.TileHeight / leftCloudsRects[0].Width);
+
+            //Draw left border
+            canvasW = leftCloudsRects[0].Width;
+            canvasH = leftCloudsRects[0].Height;
+
+            int xWidth = 0;
+
+            for (int i = 0; i < heightSteps; i++)
+            {
+                int randRect = MRandom.Range(0, leftCloudsRects.Length);
+
+                var canvas = new Canvas(canvasW, canvasH, false);
+
+                canvas.graphics.DrawImage(tilesetImage,
+                    new Rectangle(0, 0, canvasW, canvasH),
+                    leftCloudsRects[randRect], GraphicsUnit.Pixel
+                );
+
+                parent.AddChild(canvas);
+
+                canvas.x = xWidth;
+                canvas.y = i * canvasH;
+
+                canvas.alpha = alpha;
+            }
+
+            //Draw right border
+            canvasW = rightCloudsRects[0].Width;
+            canvasH = rightCloudsRects[0].Height;
+
+            xWidth = (_mapData.Width - 1) * _mapData.TileWidth;
+
+            for (int i = 0; i < heightSteps; i++)
+            {
+                int randRect = MRandom.Range(0, rightCloudsRects.Length);
+
+                var canvas = new Canvas(canvasW, canvasH, false);
+
+                canvas.graphics.DrawImage(tilesetImage,
+                    new Rectangle(0, 0, canvasW, canvasH),
+                    rightCloudsRects[randRect], GraphicsUnit.Pixel
+                );
+
+                parent.AddChild(canvas);
+
+                canvas.x = xWidth;
+                canvas.y = i * canvasH;
+
+                canvas.alpha = alpha;
+            }
+        }
+
         public Vector2 WorldToTilePoint(float x, float y)
         {
             int row = Mathf.Floor((y) / _mapData.TileHeight);
@@ -292,11 +539,11 @@ namespace GXPEngine
             return _tileArrays[layer][column, row];
         }
 
-       public Map MapData => _mapData;
+        public Map MapData => _mapData;
 
         public int GetLayerIndex(string pName)
         {
-            for (int i = 0; i < _mapData.Layers.Length; i++)
+            for (int i = 0; i < _mapData.Layers?.Length; i++)
             {
                 if (_mapData.Layers[i].Name == pName)
                 {
@@ -307,9 +554,15 @@ namespace GXPEngine
             return -1;
         }
 
-        public int BgLayer => _bgLayer;
-
+        public int GetBoundariesTileId(Vector2 pos)
+        {
+            return GetTileIdFromWorld(_boundariesLayerIndex, pos.x, pos.y);
+        } 
+        
         public ObjectGroup ObjectGroup => _objectGroup;
+
+        public int MapWidthInPixels => _mapData.Width * _mapData.TileWidth;
+        public int MapHeightInPixels => _mapData.Height * _mapData.TileHeight;
     }
 
     /// <summary>

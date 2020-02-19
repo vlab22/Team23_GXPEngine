@@ -6,13 +6,14 @@
     <e p="C:\Users\vlab22\gamedev\gxpengine\Team23_gxpengine" t="IncludeFlat">
       <e p="gxpengine" t="IncludeRecursive">
         <e p="Airplane.cs" t="Include" />
+        <e p="AirplanesManager.cs" t="Include" />
         <e p="bin" t="ExcludeRecursive" />
         <e p="CanvasDebugger2.cs" t="Include" />
         <e p="CompoundCollider.cs" t="Include" />
         <e p="DeliveryPoint.cs" t="Include" />
         <e p="DrawableTweener.cs" t="Include" />
         <e p="DroneGameObject.cs" t="Include" />
-        <e p="DroneManager.cs" t="Include" />
+        <e p="DronesManager.cs" t="Include" />
         <e p="Easing.cs" t="Include" />
         <e p="FollowCamera.cs" t="Include" />
         <e p="GameLocalEvents" t="Include">
@@ -102,7 +103,6 @@
         <e p="SpriteTweener.cs" t="Include" />
         <e p="StopWatchTool.cs" t="Include" />
         <e p="Stork.cs" t="Include" />
-        <e p="StorkDataUpdater.cs" t="Include" />
         <e p="StorkManager.cs" t="Include" />
         <e p="TiledMapParserExtended.cs" t="Include" />
         <e p="TmxFilesLoader.cs" t="Include" />

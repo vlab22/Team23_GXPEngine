@@ -43,6 +43,10 @@ namespace GXPEngine
                     //Show smoke
                     CoroutineManager.StartCoroutine(ShowSmokeOnStork00Routine(e.stork), this);
                     break;
+                case StorkLocalEvent.Event.STORK_HIT_BY_HUNTER:
+                    //Show smoke
+                    CoroutineManager.StartCoroutine(ShowSmokeOnStork00Routine(e.stork), this);
+                    break;
                 default:
                     break;
             }
@@ -96,13 +100,6 @@ namespace GXPEngine
             else
             {
                 parentObj.AddChildAt(_smallBlackSmoke00, depthIndex);
-            }
-
-            var childs = parentObj.GetChildren();
-            Console.WriteLine($"{this}: smoke: {_smallBlackSmoke00}");
-            for (int i = 0; i < childs.Count; i++)
-            {
-                Console.WriteLine($"\t{childs[i]}");
             }
 
             _smallBlackSmoke00.visible = true;

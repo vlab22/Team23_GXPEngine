@@ -10,7 +10,7 @@ namespace GXPEngine
         private List<HunterGameObject> _hunters;
 
         private HunterBulletManager _bulletManager;
-        
+
         public HuntersManager(Level pLevel, HunterBulletManager pHunterBulletManager) : base(false)
         {
             _level = pLevel;
@@ -29,11 +29,10 @@ namespace GXPEngine
             {
                 var hunterData = huntersObjects[i];
 
-                float scanRange = hunterData.GetFloatProperty("scan_range", 400);
                 float sightSpeed = hunterData.GetFloatProperty("sight_speed", 200);
 
                 var hunter = new HunterGameObject(hunterData.X, hunterData.Y, hunterData.Width, hunterData.Height,
-                    scanRange, sightSpeed);
+                    sightSpeed);
 
                 hunter.HunterBehaviorListeners =
                     hunter.HunterBehaviorListeners.Concat(new IHunterBehaviorListener[] {this}).ToArray();

@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections;
+using System.Drawing;
 using System.Linq;
 using GXPEngine.Core;
 using GXPEngine.GameLocalEvents;
 
 namespace GXPEngine
 {
-    public class StorkManager : IColliderListener
+    public class StorkManager : GameObject, IColliderListener, IGridDataUpdater
     {
         private Stork _stork;
 
         private Level _level;
+        private MapGameObject _map;
 
         private bool _inCollisionWithDeliveryPoint;
 
@@ -23,14 +25,48 @@ namespace GXPEngine
         private GameObject _lastMarker;
 
         private bool _inCollisionWithBullet;
+        private HunterBullet _lastBulletCollided;
 
-        public StorkManager(Stork pStork, Level pLevel)
+        private EasyDraw _storkOutOfMapCover;
+
+        public StorkManager(Stork pStork, Level pLevel) : base(false)
         {
             _stork = pStork;
             _level = pLevel;
+            _map = _level.Map;
             _stork.ColliderListener = this;
 
             _lastMarker = _level.GetChildren(false).Where(o => o is DeliveryPoint).LastOrDefault();
+            
+            _storkOutOfMapCover = new EasyDraw(_stork.width, _stork.height, false);
+            _storkOutOfMapCover.SetOrigin(_stork.width * 0.5f, _stork.height * 0.5f);
+            _storkOutOfMapCover.Clear(Color.White);
+            _storkOutOfMapCover.SetActive(false);
+            AddChild(_storkOutOfMapCover);
+        }
+
+        void Update()
+        {
+            if (!Enabled) return;
+            
+            
+            // var posForward = _stork.Pos + _stork.Forward * _stork.width * 0.5f;
+            // var posBack = _stork.Pos - _stork.Forward * _stork.width * 0.5f;
+            //
+            // int tileIndexForward = _map.GetTileIdFromWorld(0, posForward.x, posForward.y);
+            // int tileIndexBack= _map.GetTileIdFromWorld(0, posBack.x, posBack.y);
+            // Vector2 pF = _map.WorldToTilePoint(posForward.x, posForward.y);
+            // Vector2 pB = _map.WorldToTilePoint(posBack.x, posBack.y);
+            //
+            //
+            // //If stork is out of map, draw a white canvas over ir
+            // if (tileIndexForward == -1 || tileIndexBack == -1)
+            // {
+            //     _storkOutOfMapCover.SetActive(true);
+            //     _storkOutOfMapCover.SetXY(_stork.x, _stork.y);
+            // }
+            
+            //Console.WriteLine($"{this}: tileIndex: {tileIndexForward} | pF: {pF} | tileBack: {tileIndexBack} | pB: {pB}");
         }
 
         void IColliderListener.OnCollisionWith(GameObject go, GameObject other)
@@ -41,7 +77,7 @@ namespace GXPEngine
 
                 //Drop the pizza to the center of the delivery point
                 var dropPoint = new Vector2(other.x, other.y);
-                CoroutineManager.StartCoroutine(DropPizzaRoutine(dropPoint), null);
+                CoroutineManager.StartCoroutine(DropPizzaRoutine(dropPoint), this);
 
                 _inCollisionWithDeliveryPoint = true;
             }
@@ -52,31 +88,52 @@ namespace GXPEngine
                 _lastAirplaneCollided = parent;
 
                 //Lose Pizza
-                CoroutineManager.StartCoroutine(CollisionWithAirplaneRoutine(parent), null);
+                CoroutineManager.StartCoroutine(CollisionWithAirplaneRoutine(parent), this);
             }
-            
-            if (!_inCollisionWithDrone && other is DroneGameObject drone && drone != _lastDroneCollided)
+
+            if (!_inCollisionWithDrone && other is DroneGameObject drone && drone != _lastDroneCollided &&
+                drone.State != DroneGameObject.DroneState.RETURN_TO_START_POINT_AFTER_HIT)
             {
                 _lastDroneCollided = drone;
                 _inCollisionWithDrone = true;
 
                 //Lose Pizza
-                CoroutineManager.StartCoroutine(CollisionWithDroneRoutine(drone), null);
+                CoroutineManager.StartCoroutine(CollisionWithDroneRoutine(drone), this);
             }
 
-            if (!_inCollisionWithBullet && other is HunterBullet)
+            if (!_inCollisionWithBullet && other is HunterBullet bullet && bullet != _lastBulletCollided)
             {
                 _inCollisionWithBullet = true;
-                
-                CoroutineManager.StartCoroutine(CollisionWithHunterBulletRoutine(other), null);
+
+                if (bullet.IsCollisionEnabled) //When bullet is falling, ignore collision
+                {
+                    _lastBulletCollided = bullet;
+                    
+                    CoroutineManager.StartCoroutine(CollisionWithHunterBulletRoutine(bullet), this);
+                }
             }
         }
 
-        private IEnumerator CollisionWithHunterBulletRoutine(GameObject other)
+        private IEnumerator CollisionWithHunterBulletRoutine(HunterBullet bullet)
         {
+            //Shake Camera
+            MyGame.ThisInstance.Camera.shakeDuration = 500;
             
+            LocalEvents.Instance.Raise(new StorkLocalEvent(_stork, bullet.Shooter, StorkLocalEvent.Event.STORK_HIT_BY_HUNTER));
+
+            //Drop a pizza
+            CoroutineManager.StartCoroutine(DropPizzaRoutine(_stork.Pos - _stork.Forward * 40f, -1), this);
             
-            yield return null;
+            yield return new WaitForMilliSeconds(1000);
+            
+            _inCollisionWithBullet = false;
+
+            while (bullet.Enabled)
+            {
+                yield return null;
+            }
+
+            _lastBulletCollided = null;
         }
 
         private IEnumerator CollisionWithDroneRoutine(DroneGameObject drone)
@@ -107,7 +164,7 @@ namespace GXPEngine
             yield return new WaitForMilliSeconds(500);
 
             //Drop a pizza
-            yield return DropPizzaRoutine(_stork.Pos);
+            CoroutineManager.StartCoroutine(DropPizzaRoutine(_stork.Pos - _stork.Forward * 40f), this);
 
             yield return new WaitForMilliSeconds(1500);
 
@@ -115,9 +172,10 @@ namespace GXPEngine
             _inCollisionWithAirplane = false;
         }
 
-        public IEnumerator DropPizzaRoutine(Vector2 dropPoint)
+        public IEnumerator DropPizzaRoutine(Vector2 dropPoint, int delay = 400)
         {
-            yield return new WaitForMilliSeconds(400);
+            if (delay > 0)
+                yield return new WaitForMilliSeconds(delay);
 
             Console.WriteLine($"{this}: droppoint: {dropPoint}");
 
@@ -152,14 +210,11 @@ namespace GXPEngine
             int scaleTime = 0;
 
             bool hasChangedDepthFlag = false;
-            
+
             while (time < duration)
             {
                 pizza.x = Easing.Ease(Easing.Equation.Linear, time, fromX, toX - fromX, duration);
                 pizza.y = Easing.Ease(Easing.Equation.Linear, time, fromY, toY - fromY, duration);
-
-                // Console.WriteLine(
-                //     $"{this} : time: {time} | fromX: {fromX:0.00} | fromY: {fromY:0.00} | pizza.x: {pizza.x} | pizza.y: {pizza.y}");
 
                 float scaleX = 0;
                 float scaleY = 0;
@@ -175,11 +230,11 @@ namespace GXPEngine
                 {
                     scaleX = Easing.Ease(Easing.Equation.CubicEaseIn, scaleTime - 400, 1.5f, 0f - 1.5f, duration - 400);
                     scaleY = Easing.Ease(Easing.Equation.CubicEaseIn, scaleTime - 400, 1.5f, 0f - 1.5f, duration - 400);
-                 
+
                     if (!hasChangedDepthFlag && scaleX < 1)
                     {
                         hasChangedDepthFlag = true;
-                        pizza.parent.SetChildIndex(pizza, _lastMarker.Index+1);
+                        pizza.parent.SetChildIndex(pizza, _lastMarker.Index + 1);
                     }
                 }
 
@@ -190,7 +245,32 @@ namespace GXPEngine
                 yield return null;
             }
 
-            ParticleManager.Instance.PlaySmallSmoke(_level, toX, toY, 1500, _lastMarker.Index+1);
+            ParticleManager.Instance.PlaySmallSmoke(_level, toX, toY, 1500, _lastMarker.Index + 1);
+        }
+
+        void IGridDataUpdater.OnMove(Vector2 pos, Vector2 lastPos)
+        {
+            
+        }
+
+        void IGridDataUpdater.NextPosition(Vector2 pos, Vector2 nextPos)
+        {
+            //TODO: parei aqui, move along limits
+            
+            int nextTileIndex = _map.GetBoundariesTileId(nextPos);
+            
+            if (nextTileIndex == -1)
+            {
+                _stork.IsMoveAllowed = false;
+                
+                //Correct position
+                
+            }
+            else
+            {
+                _stork.IsMoveAllowed = true;
+                
+            }
         }
     }
 }

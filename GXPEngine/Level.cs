@@ -20,7 +20,7 @@ namespace GXPEngine
         private StorkManager _storkManager;
         private Stork _stork;
 
-        private DroneManager _dronesManager;
+        private DronesManager _dronesesManager;
 
         private readonly Sprite[] _pizzasPool = new Sprite[20];
         private int _pizzaPoolIndex = 0;
@@ -53,8 +53,12 @@ namespace GXPEngine
                 y = _spawnPoint.y,
                 StorkInput = playerInput
             };
-            
             AddChild(_stork);
+            
+            _storkManager = new StorkManager(_stork, this);
+            AddChild(_storkManager);
+
+            _stork.IUpdater = _storkManager;
             
             var hunterBulletManager = new HunterBulletManager(this);
             AddChild(hunterBulletManager);
@@ -63,10 +67,10 @@ namespace GXPEngine
             _huntersManager.SpawnHunters();
             _huntersManager.SetHuntersTarget(_stork);
             
-            _dronesManager = new DroneManager(this);
-            _dronesManager.SpawnDrones();
+            _dronesesManager = new DronesManager(this);
+            _dronesesManager.SpawnDrones();
 
-            _dronesManager.SetDronesTarget(_stork);
+            _dronesesManager.SetDronesTarget(_stork);
 
             for (int i = 0; i < _pizzasPool.Length; i++)
             {
@@ -79,11 +83,14 @@ namespace GXPEngine
 
             SpawnAirplanes();
 
+            _map.DrawBorders(this, 0.5f);
+            
             CoroutineManager.StartCoroutine(SetCamTargetRoutine(_stork), this);
 
-            _storkManager = new StorkManager(_stork, this);
-
             AddChild(_cam);
+            _cam.Map = _map;
+            _cam.SetXY(_map.MapWidthInPixels * 0.5f, _map.MapHeightInPixels * 0.5f);
+            _cam.Start();
 
             var hud = new HUD(_cam);
         }
