@@ -55,6 +55,9 @@ namespace GXPEngine
 				for (int j=colliderList.Count-1; j>=0; j--) {
 					if (j >= colliderList.Count) continue; //fix for removal in loop
 					GameObject other = colliderList[j];
+					
+					if (!other.Enabled) continue;
+					
 					if (info.gameObject != other) {
 						if (info.gameObject.HitTest(other)) {
 							if (info.onCollision != null) {

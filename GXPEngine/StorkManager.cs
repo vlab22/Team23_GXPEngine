@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using GXPEngine.Core;
 using GXPEngine.GameLocalEvents;
+using MathfExtensions;
 
 namespace GXPEngine
 {
@@ -37,7 +38,7 @@ namespace GXPEngine
             _stork.ColliderListener = this;
 
             _lastMarker = _level.GetChildren(false).Where(o => o is DeliveryPoint).LastOrDefault();
-            
+
             _storkOutOfMapCover = new EasyDraw(_stork.width, _stork.height, false);
             _storkOutOfMapCover.SetOrigin(_stork.width * 0.5f, _stork.height * 0.5f);
             _storkOutOfMapCover.Clear(Color.White);
@@ -48,8 +49,8 @@ namespace GXPEngine
         void Update()
         {
             if (!Enabled) return;
-            
-            
+
+
             // var posForward = _stork.Pos + _stork.Forward * _stork.width * 0.5f;
             // var posBack = _stork.Pos - _stork.Forward * _stork.width * 0.5f;
             //
@@ -65,7 +66,7 @@ namespace GXPEngine
             //     _storkOutOfMapCover.SetActive(true);
             //     _storkOutOfMapCover.SetXY(_stork.x, _stork.y);
             // }
-            
+
             //Console.WriteLine($"{this}: tileIndex: {tileIndexForward} | pF: {pF} | tileBack: {tileIndexBack} | pB: {pB}");
         }
 
@@ -108,7 +109,7 @@ namespace GXPEngine
                 if (bullet.IsCollisionEnabled) //When bullet is falling, ignore collision
                 {
                     _lastBulletCollided = bullet;
-                    
+
                     CoroutineManager.StartCoroutine(CollisionWithHunterBulletRoutine(bullet), this);
                 }
             }
@@ -118,14 +119,15 @@ namespace GXPEngine
         {
             //Shake Camera
             MyGame.ThisInstance.Camera.shakeDuration = 500;
-            
-            LocalEvents.Instance.Raise(new StorkLocalEvent(_stork, bullet.Shooter, StorkLocalEvent.Event.STORK_HIT_BY_HUNTER));
+
+            LocalEvents.Instance.Raise(new StorkLocalEvent(_stork, bullet.Shooter,
+                StorkLocalEvent.Event.STORK_HIT_BY_HUNTER));
 
             //Drop a pizza
             CoroutineManager.StartCoroutine(DropPizzaRoutine(_stork.Pos - _stork.Forward * 40f, -1), this);
-            
+
             yield return new WaitForMilliSeconds(1000);
-            
+
             _inCollisionWithBullet = false;
 
             while (bullet.Enabled)
@@ -250,26 +252,45 @@ namespace GXPEngine
 
         void IGridDataUpdater.OnMove(Vector2 pos, Vector2 lastPos)
         {
-            
         }
 
         void IGridDataUpdater.NextPosition(Vector2 pos, Vector2 nextPos)
         {
-            //TODO: parei aqui, move along limits
-            
             int nextTileIndex = _map.GetBoundariesTileId(nextPos);
-            
+
             if (nextTileIndex == -1)
             {
                 _stork.IsMoveAllowed = false;
-                
-                //Correct position
-                
+
+                bool isOutOfHorLimits = nextPos.x < 0 || nextPos.x > _map.MapWidthInPixels;
+                bool isOutOfVerLimits = nextPos.y < 0 || nextPos.y > _map.MapHeightInPixels;
+
+                if (isOutOfHorLimits && isOutOfVerLimits)
+                {
+                    //Do nothing, keeps stopped in the edges
+                }
+                else if (isOutOfHorLimits) //Correct vertical position
+
+                {
+                    float verticalSpeed = Mathf.Sin(_stork.rotation.DegToRad()) * ((IHasSpeed) _stork).Speed;
+
+                    var perpVerticalVec = Vector2.up * verticalSpeed * Time.delta;
+
+                    _stork.Translate(perpVerticalVec.x, perpVerticalVec.y);
+                }
+                else if (isOutOfVerLimits) //Correct horizontal position
+
+                {
+                    float horizontalSpeed = Mathf.Cos(_stork.rotation.DegToRad()) * ((IHasSpeed) _stork).Speed;
+
+                    var perpHorizontalVec = Vector2.right * horizontalSpeed * Time.delta;
+
+                    _stork.Translate(perpHorizontalVec.x, perpHorizontalVec.y);
+                }
             }
             else
             {
                 _stork.IsMoveAllowed = true;
-                
             }
         }
     }

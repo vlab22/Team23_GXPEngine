@@ -55,13 +55,15 @@ namespace GXPEngine
 
         private bool _inputEnabled;
 
-        public Stork() : base("data/Stork Background.png")
+        public Stork(float pMaxSpeed = 200) : base("data/Stork Background.png")
         {
             // easy = new EasyDraw(85, 85, false);
             // easy.SetOrigin(85f / 2, 85f / 2);
             // easy.Clear(Color.Black);
             // AddChild(easy);
 
+            _maxSpeed = pMaxSpeed;
+            
             _inputEnabled = true;
 
             SetOrigin(85f / 2, 85f / 2);
@@ -209,7 +211,7 @@ namespace GXPEngine
             }
 
             GL.glfwSetWindowTitle(
-                $"speed: {_currentSpeed:0.00} | left: {_leftPush:0.00} | right: {_rightPush:0.00} | angularPushDelta: {_angularPushDelta:0.00} | angularPush: {_angularPush:0.00} | leftPress: {_leftWingPressure:0.00}");
+                $"speed: {_currentSpeed:0.00} | left: {_leftPush:0.00} | right: {_rightPush:0.00} | angularPushDelta: {_angularPushDelta:0.00} | angularPush: {_angularPush:0.00} | leftPress: {_leftWingPressure:0.00} | pos: {_pos}");
 
             DrawBoundBox();
         }

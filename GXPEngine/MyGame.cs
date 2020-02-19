@@ -42,7 +42,10 @@ public class MyGame : Game
     private CanvasDebugger2 _canvasDebugger;
     private LevelManager _levelManager;
     private ParticleManager _particleManager;
-
+    
+    private bool _debugCreateLag;
+    private int _lagLoopSteps = 10;
+    
     public MyGame(string[] tmxFileNames, int levelIndex) :
         base(SCREEN_WIDTH, SCREEN_HEIGHT, FULLSCREEN) // Create a window that's 800x600 and NOT fullscreen
     {
@@ -124,6 +127,30 @@ public class MyGame : Game
         {
             string s = "Stats:\r\n";
         }
+        
+        if (Input.GetKeyDown(Key.L))
+        {
+            _debugCreateLag = !_debugCreateLag;
+
+            _lagLoopSteps = 0;
+        }
+
+        if (_debugCreateLag)
+        {
+            float fps = 1000f / Time.deltaTime;
+            if (fps > 20)
+            {
+                _lagLoopSteps += 100000;
+            }
+
+            for (int i = 0; i < _lagLoopSteps; i++)
+            {
+                //Loop through nothing, but auses lag
+            }
+            
+            Console.WriteLine($"Lag will reach 20 fps: fps {fps:00.00} | _lagLoopSteps: {_lagLoopSteps} | Press \"L\" to disable lag");
+        }
+        
     }
 
     private List<GameObject> TransverseChildren(GameObject root)

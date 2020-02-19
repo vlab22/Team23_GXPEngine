@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.1" orientation="orthogonal" renderorder="right-up" compressionlevel="0" width="48" height="32" tilewidth="128" tileheight="128" infinite="0" nextlayerid="14" nextobjectid="107">
+<map version="1.2" tiledversion="1.3.1" orientation="orthogonal" renderorder="right-up" compressionlevel="0" width="48" height="48" tilewidth="128" tileheight="128" infinite="0" nextlayerid="16" nextobjectid="107">
  <tileset firstgid="1" name="TilesetTest" tilewidth="32" tileheight="32" spacing="1" margin="1" tilecount="667" columns="23">
   <image source="data/32x32_map_tile v3.1.png" width="760" height="958"/>
  </tileset>
@@ -36,8 +36,18 @@
  <imagelayer id="9" name="background image 5" opacity="0.49" offsetx="4096" offsety="2048">
   <image source="data/map-top-view-rooftops-city-streets-trees-highways-61413117.png" width="2048" height="2048"/>
  </imagelayer>
+ <imagelayer id="14" name="background image 6" opacity="0.49" offsetx="0" offsety="4096">
+  <image source="data/map-top-view-rooftops-city-streets-trees-highways-61413117.png" width="2048" height="2048"/>
+ </imagelayer>
+ <imagelayer id="15" name="background image 7" opacity="0.49" offsetx="2048" offsety="4096">
+  <image source="data/map-top-view-rooftops-city-streets-trees-highways-61413117.png" width="2048" height="2048"/>
+ </imagelayer>
  <objectgroup id="3" name="Object Layer 1">
-  <object id="3" name="spawn point" gid="3" x="324.979" y="1251.88" width="64" height="64"/>
+  <object id="3" name="spawn point" gid="3" x="324.979" y="1251.88" width="64" height="64">
+   <properties>
+    <property name="speed" type="float" value="400"/>
+   </properties>
+  </object>
   <object id="6" name="delivery point" gid="668" x="3113.7" y="716.606" width="512" height="512"/>
   <object id="8" name="airplane 0" gid="669" x="1824.64" y="-389.977" width="665.333" height="665.333" rotation="47.3953">
    <properties>
@@ -46,15 +56,31 @@
     <property name="speed" type="float" value="200"/>
    </properties>
   </object>
-  <object id="13" name="drone" gid="670" x="1592.34" y="1439.86" width="260.758" height="260.758"/>
+  <object id="13" name="drone" gid="670" x="1592.34" y="1439.86" width="335" height="335"/>
   <object id="101" name="drone" gid="670" x="1436.28" y="842.348" width="335" height="335"/>
-  <object id="102" name="drone" gid="670" x="1878.71" y="733.261" width="260.758" height="260.758"/>
+  <object id="102" name="drone" gid="670" x="1878.71" y="733.261" width="335" height="335"/>
   <object id="104" name="hunter" gid="671" x="960.606" y="1384.85" width="400" height="400"/>
   <object id="105" name="hunter" gid="671" x="903.03" y="996.97" width="400" height="400"/>
-  <object id="106" name="drone" gid="670" x="2090.83" y="1157.5" width="260.758" height="260.758"/>
+  <object id="106" name="drone" gid="670" x="2090.83" y="1157.5" width="335" height="335"/>
  </objectgroup>
- <layer id="12" name="boundaries" width="48" height="32">
+ <layer id="12" name="boundaries" width="48" height="48">
   <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

@@ -47,11 +47,13 @@ namespace GXPEngine
             var playerInput = new PlayerInput();
             AddChild(playerInput);
 
-            _stork = new Stork
+            float storkMaxSpeed = spawnPointObject.GetFloatProperty("speed", 200);
+            
+            _stork = new Stork(storkMaxSpeed)
             {
                 x = _spawnPoint.x,
                 y = _spawnPoint.y,
-                StorkInput = playerInput
+                StorkInput = playerInput,
             };
             AddChild(_stork);
             
