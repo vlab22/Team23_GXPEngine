@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using GXPEngine.Core;
+using GXPEngine.GameLocalEvents;
 using MathfExtensions;
 using Rectangle = GXPEngine.Core.Rectangle;
 
@@ -62,6 +63,8 @@ namespace GXPEngine
         private DroneFollowRangeCone _droneFollowRangeCone;
 
         private IEnumerator _blinkLedRoutine;
+        
+        private int _returnToStartAfterChasing = 0;
 
         public DroneGameObject(float pX, float pY, float pWidth, float pHeight, float pSpeed = 200,
             float pRotation = 0) : base(
@@ -327,6 +330,14 @@ namespace GXPEngine
         {
             _state = DroneState.RETURN_TO_START_POINT_AFTER_CHASING_AND_SEARCHING_ENEMY;
             _returnToStartPointRoutine = CoroutineManager.StartCoroutine(ReturnToStartPointRoutine(), this);
+
+            _returnToStartAfterChasing++;
+
+            if (_returnToStartAfterChasing == 1)
+            {
+                LocalEvents.Instance.Raise(new LevelLocalEvent(_enemy, (GameObject) this, null,
+                    LevelLocalEvent.EventType.STORK_GET_POINTS_EVADE_DRONE));
+            }
 
             _searchingRoutine = CoroutineManager.StartCoroutine(SearchingRoutine(_state), this);
 

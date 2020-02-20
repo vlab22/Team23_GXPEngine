@@ -11,6 +11,8 @@ namespace GXPEngine
 {
     public class HUD : GameObject
     {
+        public static HUD Instance;
+        
         private Camera _camera;
 
         private HudTextBoard _centerTextBoard;
@@ -39,6 +41,8 @@ namespace GXPEngine
 
         public HUD(Camera camera)
         {
+            Instance = this;
+            
             _mapData = TiledMapParserExtended.MapParser.ReadMap("HUD.tmx");
 
             var objectsDepth0 = _mapData.ObjectGroups.FirstOrDefault(og => og.Name == "Depth 0");
@@ -143,49 +147,11 @@ Turn is weird flapping one wing while the other is static";
             AddChild(_hudThermometer);
 
             _hudThermometer.SetXY(game.width - (1920 - 1794), 28);
-
-            LocalEvents.Instance.AddListener<LevelLocalEvent>(LevelLocalEventHandler);
-            LocalEvents.Instance.AddListener<StorkLocalEvent>(StorkLocalEventHandler);
         }
 
-        private void StorkLocalEventHandler(StorkLocalEvent e)
+        public void UpdateLevelScore(uint newLevelScore)
         {
-            switch (e.evt)
-            {
-                case StorkLocalEvent.Event.STORK_HIT_BY_PLANE:
-                    break;
-                case StorkLocalEvent.Event.STORK_AFTER_HIT_BY_DRONE:
-                    break;
-                case StorkLocalEvent.Event.STORK_AFTER_HIT_BY_PLANE:
-                    break;
-                case StorkLocalEvent.Event.STORK_LOSE_PIZZA:
-                    break;
-                case StorkLocalEvent.Event.STORK_HIT_BY_DRONE:
-                    break;
-                case StorkLocalEvent.Event.STORK_HIT_BY_HUNTER:
-                    break;
-                case StorkLocalEvent.Event.STORK_GET_POINTS:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        private void LevelLocalEventHandler(LevelLocalEvent e)
-        {
-            switch (e.evt)
-            {
-                case LevelLocalEvent.EventType.LEVEL_START_COUNTER_START:
-                    break;
-                case LevelLocalEvent.EventType.LEVEL_START_COUNTER_END:
-                    break;
-                case LevelLocalEvent.EventType.DRONE_DETECTED_ENEMY:
-                    break;
-                case LevelLocalEvent.EventType.DRONE_HIT_ENEMY:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            _hudScore.UpdateScore(newLevelScore);
         }
 
         private void ChangeDroneDetectRange(float val)
@@ -219,8 +185,6 @@ Turn is weird flapping one wing while the other is static";
 
         public override void Destroy()
         {
-            LocalEvents.Instance.RemoveListener<LevelLocalEvent>(LevelLocalEventHandler);
-            LocalEvents.Instance.RemoveListener<StorkLocalEvent > (StorkLocalEventHandler);
             base.Destroy();
         }
 

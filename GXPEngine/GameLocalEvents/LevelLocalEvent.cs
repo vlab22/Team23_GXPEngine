@@ -7,19 +7,21 @@ namespace GXPEngine.GameLocalEvents
     {
         public enum EventType
         {
+            NONE,
             LEVEL_START_COUNTER_START,
             LEVEL_START_COUNTER_END,
             DRONE_DETECTED_ENEMY,
-            DRONE_HIT_ENEMY
-            
+            DRONE_HIT_ENEMY,
+            STORK_GET_POINTS_EVADE_DRONE
         }
 
         public Level level;
         public Stork stork;
         public DroneGameObject drone;
+        public GameObject gameObj;
         public int index;
         public Color color;
-        public EventType evt;
+        public EventType evt = EventType.NONE;
 
         public LevelLocalEvent(Level pLevel, EventType pEvt)
         {
@@ -38,6 +40,12 @@ namespace GXPEngine.GameLocalEvents
         {
             stork = player as Stork;
             drone = pDrone;
+        }
+        
+        public LevelLocalEvent(GameObject player, GameObject pGObj, Level pLevel, EventType pEvt) : this(pLevel, pEvt)
+        {
+            stork = player as Stork;
+            gameObj = pGObj;
         }
     }
 }

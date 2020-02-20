@@ -25,14 +25,11 @@ namespace GXPEngine
             _scoreLabelEasyDraw.Text($"{_score:00000000000000}", 0, 0); //"00000000000000" 14 digits
         }
 
-        void Update()
+        public void UpdateScore(uint score)
         {
-            if (Input.GetKeyDown(Key.T))
-            {
-                IntegerTweener.TweenInteger(this, (int)Score, (int)(Score + 1000));
-            }
+            IntegerTweener.TweenInteger(this, (int)Score, (int)score);
         }
-        
+
         public uint Score
         {
             get => _score;

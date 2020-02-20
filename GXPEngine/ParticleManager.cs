@@ -11,6 +11,9 @@ namespace GXPEngine
         private AnimationSprite _smoke00;
         private AnimationSprite _smallBlackSmoke00;
 
+        private AnimationSprite _cartoonCoinsExplosion;
+        private IEnumerator _cartoonCoinsExplosionRoutine;
+
         public ParticleManager()
         {
             Instance = this;
@@ -21,7 +24,24 @@ namespace GXPEngine
             _smallBlackSmoke00 = new AnimationSprite("data/Small Black Smokes00.png", 5, 5, 10, true, false);
             _smallBlackSmoke00.SetOrigin(_smallBlackSmoke00.width / 2f, _smallBlackSmoke00.height / 2f);
 
+            _cartoonCoinsExplosion = new AnimationSprite("data/cartoon coin explosion_image.png", 8, 4, -1, false, false);
+            _cartoonCoinsExplosion.SetOrigin(_cartoonCoinsExplosion.width / 2f, _cartoonCoinsExplosion.height / 2f);
+            _cartoonCoinsExplosion.SetActive(false);
+            
             LocalEvents.Instance.AddListener<StorkLocalEvent>(StorkLocalEventHandler);
+            LocalEvents.Instance.AddListener<LevelLocalEvent>(LevelLocalEventHandler);
+        }
+
+        private void LevelLocalEventHandler(LevelLocalEvent e)
+        {
+            switch (e.evt)
+            {
+                case LevelLocalEvent.EventType.STORK_GET_POINTS_EVADE_DRONE:
+                    PlayCoinsExplosion(e.stork);
+                    break;
+                default:
+                   break;
+            }
         }
 
         private void StorkLocalEventHandler(StorkLocalEvent e)
@@ -125,10 +145,50 @@ namespace GXPEngine
             parentObj?.RemoveChild(_smallBlackSmoke00);
         }
 
+        public void PlayCoinsExplosion(Stork stork)
+        {
+            CoroutineManager.StopCoroutine(_cartoonCoinsExplosionRoutine);
+            
+            _cartoonCoinsExplosionRoutine = CoroutineManager.StartCoroutine(PlayCoinsExplosionRoutine(stork), this);
+        }
+
+        private IEnumerator PlayCoinsExplosionRoutine(Stork stork)
+        {
+            int time = 0;
+            int duration = 1200;
+
+            yield return null;
+
+            _cartoonCoinsExplosion.SetActive(true);
+            stork.AddChild(_cartoonCoinsExplosion);
+            _cartoonCoinsExplosion.SetXY(0, 0);
+            _cartoonCoinsExplosion.alpha = 1f;
+
+            SpriteTweener.TweenAlpha(_cartoonCoinsExplosion, 1, 0, duration - 500, 500);
+
+            while (time < duration)
+            {
+                float fFrame = Mathf.Map(time, 0, duration, 0, _cartoonCoinsExplosion.frameCount - 1);
+                int frame = Mathf.Round(fFrame) % _cartoonCoinsExplosion.frameCount;
+
+                _cartoonCoinsExplosion.SetFrame(frame);
+
+                time += Time.deltaTime;
+
+                yield return null;
+            }
+
+            yield return new WaitForMilliSeconds(200);
+
+            stork.RemoveChild(_cartoonCoinsExplosion);
+            _cartoonCoinsExplosion.SetActive(false);
+        }
+
         public void Reset()
         {
             _smoke00.parent?.RemoveChild(_smoke00);
             _smallBlackSmoke00.parent?.RemoveChild(_smallBlackSmoke00);
+            _cartoonCoinsExplosion.parent?.RemoveChild(_cartoonCoinsExplosion);
         }
     }
 }
