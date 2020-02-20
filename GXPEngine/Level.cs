@@ -15,8 +15,6 @@ namespace GXPEngine
 
         private Vector2 _spawnPoint;
 
-        private List<Airplane> _airplanes;
-
         private StorkManager _storkManager;
         private Stork _stork;
 
@@ -26,12 +24,12 @@ namespace GXPEngine
         private int _pizzaPoolIndex = 0;
         private HuntersManager _huntersManager;
 
+        private AirplanesManager _airplanesManager;
+
         public Level(FollowCamera pCam, MapGameObject pMap)
         {
             _cam = pCam;
             _map = pMap;
-
-            _airplanes = new List<Airplane>();
 
             var spawnPointObject = _map.ObjectGroup.Objects.FirstOrDefault(o => o.Name == "spawn point");
             _spawnPoint = new Vector2(spawnPointObject.X, spawnPointObject.Y);
@@ -48,7 +46,7 @@ namespace GXPEngine
             AddChild(playerInput);
 
             float storkMaxSpeed = spawnPointObject.GetFloatProperty("speed", 200);
-            
+
             _stork = new Stork(storkMaxSpeed)
             {
                 x = _spawnPoint.x,
@@ -56,19 +54,19 @@ namespace GXPEngine
                 StorkInput = playerInput,
             };
             AddChild(_stork);
-            
+
             _storkManager = new StorkManager(_stork, this);
             AddChild(_storkManager);
 
             _stork.IUpdater = _storkManager;
-            
+
             var hunterBulletManager = new HunterBulletManager(this);
             AddChild(hunterBulletManager);
-            
+
             _huntersManager = new HuntersManager(this, hunterBulletManager);
             _huntersManager.SpawnHunters();
             _huntersManager.SetHuntersTarget(_stork);
-            
+
             _dronesesManager = new DronesManager(this);
             _dronesesManager.SpawnDrones();
 
@@ -83,10 +81,13 @@ namespace GXPEngine
                 _pizzasPool[i] = pizza;
             }
 
-            SpawnAirplanes();
+            _airplanesManager = new AirplanesManager(this);
+            _airplanesManager.SpawnAirplanes();
 
-            _map.DrawBorders(this, 0.5f);
+            AddChild(_airplanesManager);
             
+            _map.DrawBorders(this, 0.5f);
+
             CoroutineManager.StartCoroutine(SetCamTargetRoutine(_stork), this);
 
             AddChild(_cam);
@@ -102,44 +103,6 @@ namespace GXPEngine
             if (Input.GetKeyDown(Key.D))
             {
                 CoroutineManager.StartCoroutine(_storkManager.DropPizzaRoutine(_stork.Pos), this);
-            }
-        }
-
-        public void SpawnAirplanes()
-        {
-            //Load Airplanes
-            var airPlanesObjects = _map.ObjectGroup.Objects.Where(o => o.Name.StartsWith("airplane ")).ToArray();
-
-            for (int i = 0; i < airPlanesObjects.Length; i++)
-            {
-                var airData = airPlanesObjects[i];
-
-                float airSpeed = airData.GetFloatProperty("speed", 200);
-                int lifeTime = (int) (airData.GetFloatProperty("life_time", 12) * 1000);
-
-                var airplane = new Airplane(airData.X, airData.Y, airData.Width, airData.Height, this, airSpeed,
-                    airData.rotation, lifeTime);
-
-                _airplanes.Add(airplane);
-
-                AddChild(airplane);
-            }
-
-            for (int i = _airplanes.Count() - 1; i > -1; i--)
-            {
-                if (_airplanes[i].Destroyed)
-                {
-                    _airplanes.RemoveAt(i);
-                }
-            }
-        }
-
-        public void RemoveAndDestroyAirplane(Airplane plane)
-        {
-            if (_airplanes.Contains(plane))
-            {
-                _airplanes.Remove(plane);
-                plane.Destroy();
             }
         }
 
@@ -166,9 +129,7 @@ namespace GXPEngine
 
         public MapGameObject Map => _map;
 
-        public List<Airplane> AirPlanes => _airplanes;
-
-        public int FirstAirplaneIndex => _airplanes.Count > 0 ? _airplanes[0].Index : GetChildren().Count;
+        public int FirstAirplaneIndex => _airplanesManager.FirstAirplaneIndex;
 
         public IHasSpeed PlayerHasSpeed => _stork;
     }

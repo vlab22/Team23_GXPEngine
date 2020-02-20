@@ -164,7 +164,7 @@ public class MyGame : Game
     {
         Console.WriteLine($"main args: {string.Join(Environment.NewLine, args.Select(arg => $"'{arg}'"))}");
 
-        var tmxFileNames = TmxFilesLoader.GetTmxFileNames();
+        var tmxFileNames = TmxFilesLoader.GetTmxFileNames().Where(tmx => !tmx.EndsWith("HUD.tmx")).ToArray();
 
         int levelIndex = 0;
         if (args.Length > 0 && !string.IsNullOrWhiteSpace(args[0]))

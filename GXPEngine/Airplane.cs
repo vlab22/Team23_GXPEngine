@@ -11,13 +11,10 @@ namespace GXPEngine
     {
         private float _speed;
         private int _lifeTime;
-        
-        private Level _level; //ugly reference, no time!
 
         private CompoundCollider[] _compoundColliders;
 
-        public Airplane(float pX, float pY, float pWidth, float pHeight, Level pLevel, float pSpeed = 200,
-            float pRotation = 0, int pLifeTime = 12000) : base(
+        public Airplane() : base(
             "data/Airplane6.png", 1, 1, -1, false, false)
         {
             _compoundColliders = new CompoundCollider[4];
@@ -32,9 +29,11 @@ namespace GXPEngine
                 _compoundColliders[i].name = $"{this.name}_CompoundCollider_{i}";
                 AddChild(_compoundColliders[i]);
             }
+        }
 
-            _level = pLevel;
-            
+        public void LoadStartupData(float pX, float pY, float pWidth, float pHeight, Level pLevel, float pSpeed = 200,
+            float pRotation = 0, int pLifeTime = 12000)
+        {
             _speed = pSpeed;
             _lifeTime = pLifeTime;
 
@@ -67,47 +66,12 @@ namespace GXPEngine
 
             x += pos.x;
             y += pos.y;
-
-            //x += originalWidth;
-            //y -= originalHeight / 2;
-
-            // var easy = new EasyDraw(200, 100);
-            // easy.Clear(Color.Black);
-            // // // //easy.NoFill();
-            // // // easy.Fill(Color.FromArgb(100, Color.Aqua));
-            // // // easy.Stroke(Color.Aqua);
-            // // // easy.StrokeWeight(2);
-            // // // easy.Rect(0, 0, width, height);
-            // AddChild(easy);
-
-            // easy.x = -width / 2f;
-            // easy.y = -height / 2f;
-
-            //Add Compound collider
-
-            if (_lifeTime > 0)
-            {
-                CoroutineManager.StartCoroutine(DestroyAfterSeconds(_lifeTime), this);
-            }
-        }
-
-        private IEnumerator DestroyAfterSeconds(int lifeTime)
-        {
-            yield return new WaitForMilliSeconds(lifeTime);
-            Destroy();
-        }
-
-        protected override void OnDestroy()
-        {
-            _level?.AirPlanes.Remove(this);
-            
-            base.OnDestroy();
         }
 
         void Update()
         {
             if (!this.Enabled) return;
-            
+
             float delta = Time.deltaTime * 0.001f;
 
             Move(_speed * delta, 0);

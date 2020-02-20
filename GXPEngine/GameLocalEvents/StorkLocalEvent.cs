@@ -9,7 +9,8 @@
             STORK_AFTER_HIT_BY_PLANE,
             STORK_LOSE_PIZZA,
             STORK_HIT_BY_DRONE,
-            STORK_HIT_BY_HUNTER
+            STORK_HIT_BY_HUNTER,
+            STORK_GET_POINTS,
         }
         
         public Stork stork;

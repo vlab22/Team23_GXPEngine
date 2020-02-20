@@ -76,8 +76,10 @@
         </e>
         <e p="GXPEngine.csproj" t="IncludeRecursive" />
         <e p="HUD.cs" t="Include" />
+        <e p="HudScore.cs" t="Include" />
         <e p="HudSlider.cs" t="Include" />
         <e p="HudTextBoard.cs" t="Include" />
+        <e p="HudThermometer.cs" t="Include" />
         <e p="HunterBullet.cs" t="Include" />
         <e p="HunterBulletManager.cs" t="Include" />
         <e p="HunterCrossHairGameObject.cs" t="Include" />
@@ -85,6 +87,7 @@
         <e p="HuntersManager.cs" t="Include" />
         <e p="IGridDataUpdater.cs" t="Include" />
         <e p="IHasSpeed.cs" t="Include" />
+        <e p="IntegerTweener.cs" t="Include" />
         <e p="IStorkInput.cs" t="Include" />
         <e p="Level.cs" t="Include" />
         <e p="LevelManager.cs" t="Include" />

@@ -266,7 +266,7 @@ namespace GXPEngine.Core {
 			GL.VertexPointer( 2, GL.FLOAT, 0, vertices);
 			GL.DrawArrays(GL.QUADS, 0, 4);
 			GL.DisableClientState(GL.VERTEX_ARRAY);
-			GL.DisableClientState(GL.TEXTURE_COORD_ARRAY);			
+			GL.DisableClientState(GL.TEXTURE_COORD_ARRAY);
 		}
 		
 		//------------------------------------------------------------------------------------------------------------------------

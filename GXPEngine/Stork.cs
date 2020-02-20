@@ -57,11 +57,6 @@ namespace GXPEngine
 
         public Stork(float pMaxSpeed = 200) : base("data/Stork Background.png")
         {
-            // easy = new EasyDraw(85, 85, false);
-            // easy.SetOrigin(85f / 2, 85f / 2);
-            // easy.Clear(Color.Black);
-            // AddChild(easy);
-
             _maxSpeed = pMaxSpeed;
             
             _inputEnabled = true;
@@ -78,14 +73,8 @@ namespace GXPEngine
             _leftWing = new AnimationSprite("data/Stork_Left_Wing.png", 3, 1, -1, false, false);
             _rightWing = new AnimationSprite("data/Stork_Right_Wing.png", 3, 1, -1, false, false);
 
-            //_leftWing.x = _leftWing.y = 85 * 0.5f;
-            //_rightWing.x = _rightWing.y = 85 * 0.5f;
-
             _leftWing.SetOrigin(85f / 2, 85f / 2);
             _rightWing.SetOrigin(85f / 2, 85f / 2);
-
-            // _leftWing.Turn(90);
-            // _rightWing.Turn(90);
 
             AddChild(_leftWing);
             AddChild(_rightWing);

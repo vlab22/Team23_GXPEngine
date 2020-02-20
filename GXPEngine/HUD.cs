@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using GXPEngine.GameLocalEvents;
+using TiledMapParserExtended;
 
 namespace GXPEngine
 {
@@ -14,6 +16,14 @@ namespace GXPEngine
         private HudTextBoard _centerTextBoard;
 
         private HashSet<int> _vehiclesEndRacePosition;
+
+        private HudScore _hudScore;
+
+        private HudThermometer _hudThermometer;
+
+        private Sprite[] _pizzaLifes;
+
+        public Map _mapData;
 
         public static Color[] CarsColors = new Color[]
         {
@@ -26,8 +36,73 @@ namespace GXPEngine
         private HudSlider _slider00;
         private HudSlider _slider01;
 
+
         public HUD(Camera camera)
         {
+            _mapData = TiledMapParserExtended.MapParser.ReadMap("HUD.tmx");
+
+            var objectsDepth0 = _mapData.ObjectGroups.FirstOrDefault(og => og.Name == "Depth 0");
+
+            //Hud Score set
+            var hudData = objectsDepth0.Objects.FirstOrDefault(o => o.Name == "Score Bg");
+            var hudScoreImage = _mapData.TileSets.FirstOrDefault(ts => ts.FirstGId == hudData.GID).Image.FileName;
+
+            _hudScore = new HudScore(hudScoreImage);
+            AddChild(_hudScore);
+
+            _hudScore.SetScaleXY(hudData.Width / _hudScore.width, hudData.Height / _hudScore.height);
+            _hudScore.SetXY(hudData.X, hudData.Y - hudData.Height);
+
+            //Pizza life set
+            var pizzasHudData = objectsDepth0.Objects.Where(o => o.Name.Trim().StartsWith("Hud Pizza"))
+                .OrderBy(o => o.Name)
+                .ToArray();
+
+            var pizzaHudBitmapMap = new Dictionary<string, Bitmap>();
+
+            var pizzaLostImageFileName = _mapData.TileSets.FirstOrDefault(ts => ts.Name == "Pizza Lost").Image.FileName;
+
+            pizzaHudBitmapMap.Add(pizzaLostImageFileName, new Bitmap(pizzaLostImageFileName));
+
+            _pizzaLifes = new Sprite[pizzasHudData.Length];
+
+            for (int i = 0; i < pizzasHudData.Length; i++)
+            {
+                var pizzaHudData = pizzasHudData[i];
+
+                var imageFile = _mapData.TileSets.FirstOrDefault(ts => ts.FirstGId == pizzaHudData.GID).Image.FileName;
+
+                Bitmap bitMap;
+
+                if (!pizzaHudBitmapMap.ContainsKey(imageFile))
+                {
+                    bitMap = new Bitmap(imageFile);
+                    pizzaHudBitmapMap.Add(imageFile, bitMap);
+                }
+                else
+                {
+                    bitMap = pizzaHudBitmapMap[imageFile];
+                }
+
+                var pizzaHud = new Sprite(bitMap, false);
+                AddChild(pizzaHud);
+
+                int pizzaHudOriginalW = pizzaHud.width;
+                int pizzaHudOriginalH = pizzaHud.height;
+
+                pizzaHud.SetScaleXY(pizzaHudData.Width / pizzaHudOriginalW, pizzaHudData.Height / pizzaHudOriginalH);
+                pizzaHud.SetXY(pizzaHudData.X, pizzaHudData.Y - pizzaHudData.Height);
+
+                var pizzaLostHud = new Sprite(pizzaHudBitmapMap[pizzaLostImageFileName], false);
+                AddChild(pizzaLostHud);
+
+                pizzaLostHud.SetScaleXY(pizzaHudData.Width / pizzaHudOriginalW,
+                    pizzaHudData.Height / pizzaHudOriginalH);
+                pizzaLostHud.SetXY(pizzaHudData.X, pizzaHudData.Y - pizzaHudData.Height);
+
+                pizzaLostHud.SetActive(false);
+            }
+
             _camera = camera;
             _camera.AddChild(this);
 
@@ -45,6 +120,7 @@ Turn is weird flapping one wing while the other is static";
 
             AddChild(_centerTextBoard);
 
+
             _slider00 = new HudSlider(200, 22);
             AddChild(_slider00);
 
@@ -60,6 +136,56 @@ Turn is weird flapping one wing while the other is static";
             _slider01.y = 50 + 34;
 
             _slider01.OnValueChanged += ChangeDroneDetectRange;
+
+            _slider01.OnValueChanged += DebugChangeThermometerValue;
+
+            _hudThermometer = new HudThermometer();
+            AddChild(_hudThermometer);
+
+            _hudThermometer.SetXY(game.width - (1920 - 1794), 28);
+
+            LocalEvents.Instance.AddListener<LevelLocalEvent>(LevelLocalEventHandler);
+            LocalEvents.Instance.AddListener<StorkLocalEvent>(StorkLocalEventHandler);
+        }
+
+        private void StorkLocalEventHandler(StorkLocalEvent e)
+        {
+            switch (e.evt)
+            {
+                case StorkLocalEvent.Event.STORK_HIT_BY_PLANE:
+                    break;
+                case StorkLocalEvent.Event.STORK_AFTER_HIT_BY_DRONE:
+                    break;
+                case StorkLocalEvent.Event.STORK_AFTER_HIT_BY_PLANE:
+                    break;
+                case StorkLocalEvent.Event.STORK_LOSE_PIZZA:
+                    break;
+                case StorkLocalEvent.Event.STORK_HIT_BY_DRONE:
+                    break;
+                case StorkLocalEvent.Event.STORK_HIT_BY_HUNTER:
+                    break;
+                case StorkLocalEvent.Event.STORK_GET_POINTS:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private void LevelLocalEventHandler(LevelLocalEvent e)
+        {
+            switch (e.evt)
+            {
+                case LevelLocalEvent.EventType.LEVEL_START_COUNTER_START:
+                    break;
+                case LevelLocalEvent.EventType.LEVEL_START_COUNTER_END:
+                    break;
+                case LevelLocalEvent.EventType.DRONE_DETECTED_ENEMY:
+                    break;
+                case LevelLocalEvent.EventType.DRONE_HIT_ENEMY:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         private void ChangeDroneDetectRange(float val)
@@ -86,11 +212,15 @@ Turn is weird flapping one wing while the other is static";
             }
         }
 
+        private void DebugChangeThermometerValue(float val)
+        {
+            _hudThermometer.Value = val;
+        }
+
         public override void Destroy()
         {
-            // LocalEvents.Instance.RemoveListener<LevelLocalEvent>(LevelLocalEventsHandler);
-            // LocalEvents.Instance.RemoveListener<VehicleLocalEvent>(VehicleLocalEventHandler);
-
+            LocalEvents.Instance.RemoveListener<LevelLocalEvent>(LevelLocalEventHandler);
+            LocalEvents.Instance.RemoveListener<StorkLocalEvent > (StorkLocalEventHandler);
             base.Destroy();
         }
 

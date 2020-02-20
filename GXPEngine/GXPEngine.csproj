@@ -52,8 +52,10 @@
     <Compile Include="GameLocalEvents\LevelLocalEvent.cs" />
     <Compile Include="GameLocalEvents\StorkLocalEvent.cs" />
     <Compile Include="HUD.cs" />
+    <Compile Include="HudScore.cs" />
     <Compile Include="HudSlider.cs" />
     <Compile Include="HudTextBoard.cs" />
+    <Compile Include="HudThermometer.cs" />
     <Compile Include="HunterBullet.cs" />
     <Compile Include="HunterBulletManager.cs" />
     <Compile Include="HunterCrossHairGameObject.cs" />
@@ -61,6 +63,7 @@
     <Compile Include="HuntersManager.cs" />
     <Compile Include="IGridDataUpdater.cs" />
     <Compile Include="IHasSpeed.cs" />
+    <Compile Include="IntegerTweener.cs" />
     <Compile Include="IStorkInput.cs" />
     <Compile Include="Level.cs" />
     <Compile Include="LevelManager.cs" />
