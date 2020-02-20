@@ -19,7 +19,8 @@ namespace GXPEngine
             STOP_CHASING_ENEMY,
             RETURN_TO_START_POINT_AFTER_HIT,
             RETURN_TO_START_POINT_AFTER_CHASING_AND_SEARCHING_ENEMY,
-            HIT_ENEMY
+            HIT_ENEMY,
+            END_LEVEL,
         }
 
         private DroneState _state;
@@ -65,6 +66,8 @@ namespace GXPEngine
         private IEnumerator _blinkLedRoutine;
         
         private int _returnToStartAfterChasing = 0;
+
+        private IEnumerator _endLevelRoutine;
 
         public DroneGameObject(float pX, float pY, float pWidth, float pHeight, float pSpeed = 200,
             float pRotation = 0) : base(
@@ -151,18 +154,15 @@ namespace GXPEngine
         {
             _state = pState;
 
+            var waitingMovementRoutine = WaitingMovementRoutine();
+
             if (_state == DroneState.SEARCHING_ENEMY)
             {
                 Console.WriteLine($"{this.name} SearchingRoutine | {Time.time}");
 
                 _ledSprite.SetColor(0, 1, 0);
                 _blinkLedRoutine = CoroutineManager.StartCoroutine(BlinkLed(), this);
-            }
-
-            var waitingMovementRoutine = WaitingMovementRoutine();
-
-            if (_state == DroneState.SEARCHING_ENEMY)
-            {
+                
                 CoroutineManager.StartCoroutine(waitingMovementRoutine, this);
                 _iesDebug.Add(waitingMovementRoutine);
             }
@@ -373,6 +373,17 @@ namespace GXPEngine
             _iesDebug.Add(_searchingRoutine);
         }
 
+        public void EndLevel()
+        {
+            _state = DroneState.END_LEVEL;
+
+            DroneBehaviorListener = null;
+
+            CoroutineManager.StopAllCoroutines(this);
+
+            CoroutineManager.StartCoroutine(GoToPoint(_startPosition), this);
+        }
+        
         void Update()
         {
             if (!this.Enabled) return;

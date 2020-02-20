@@ -11,8 +11,9 @@ namespace GXPEngine.GameLocalEvents
             LEVEL_START_COUNTER_START,
             LEVEL_START_COUNTER_END,
             DRONE_DETECTED_ENEMY,
-            DRONE_HIT_ENEMY,
-            STORK_GET_POINTS_EVADE_DRONE
+            DRONE_HIT_PLAYER,
+            STORK_GET_POINTS_EVADE_DRONE,
+            HUNTER_HIT_PLAYER
         }
 
         public Level level;

@@ -132,5 +132,11 @@ namespace GXPEngine
         public int FirstAirplaneIndex => _airplanesManager.FirstAirplaneIndex;
 
         public IHasSpeed PlayerHasSpeed => _stork;
+
+        public DronesManager DronesesManager => _dronesesManager;
+
+        public HuntersManager HuntersManager => _huntersManager;
+
+        public AirplanesManager AirplanesManager => _airplanesManager;
     }
 }

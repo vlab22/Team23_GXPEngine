@@ -78,6 +78,8 @@ public class MyGame : Game
 
         if (_currentLevel != null)
         {
+            HUD.Instance.Reset();
+            
             RemoveChild(_canvasDebugger);
             RemoveChild(_currentLevel);
             RemoveChild(_levelManager);
@@ -86,6 +88,7 @@ public class MyGame : Game
             _particleManager.Reset();
             
             _levelManager.Destroy();
+            
             _currentLevel.RemoveChild(_camera);
             _currentLevel.RemoveChild(_map);
             _currentLevel.Destroy();

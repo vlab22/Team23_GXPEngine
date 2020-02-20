@@ -120,8 +120,10 @@ namespace GXPEngine
             //Shake Camera
             MyGame.ThisInstance.Camera.shakeDuration = 500;
 
-            LocalEvents.Instance.Raise(new StorkLocalEvent(_stork, bullet.Shooter,
-                StorkLocalEvent.Event.STORK_HIT_BY_HUNTER));
+            LocalEvents.Instance.Raise(new LevelLocalEvent(_stork, bullet.Shooter, _level,
+                LevelLocalEvent.EventType.HUNTER_HIT_PLAYER));
+            
+            LocalEvents.Instance.Raise(new StorkLocalEvent(_stork, bullet.Shooter, StorkLocalEvent.Event.STORK_HIT_BY_HUNTER));
 
             //Drop a pizza
             CoroutineManager.StartCoroutine(DropPizzaRoutine(_stork.Pos - _stork.Forward * 40f, -1), this);

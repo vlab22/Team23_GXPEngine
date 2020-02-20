@@ -18,6 +18,7 @@ public static class CoroutineManager
     static Dictionary<IEnumerator, IEnumerator> routineWaitMap = new Dictionary<IEnumerator, IEnumerator>();
 
     static Dictionary<IEnumerator, GameObject> routinesInvokerMap = new Dictionary<IEnumerator, GameObject>();
+    static Dictionary<GameObject, HashSet<IEnumerator>> invokersMap = new Dictionary<GameObject, HashSet<IEnumerator>>();
 
     private static bool _isIterating;
 
@@ -26,8 +27,23 @@ public static class CoroutineManager
         if (_isIterating)
         {
             if (invoker != null)
+            {
                 routinesInvokerMap.Add(ie, invoker);
-            
+
+                if (invokersMap.ContainsKey(invoker))
+                {
+                    invokersMap[invoker].Add(ie);
+                }
+                else
+                {
+                    var ieList = new HashSet<IEnumerator>(5)
+                    {
+                        ie
+                    };
+                    invokersMap.Add(invoker, ieList);
+                }
+            }
+
             ie.MoveNext();
             routinesToAdd.Add(ie);
         }
@@ -43,6 +59,20 @@ public static class CoroutineManager
     public static void StopCoroutine(IEnumerator ie)
     {
         RemoveRoutine(ie);
+    }
+
+    public static void StopAllCoroutines(GameObject invoker)
+    {
+        if (invokersMap.TryGetValue(invoker, out var ieList))
+        {
+            foreach (var ie in ieList)
+            {
+                RemoveRoutine(ie, true);
+            }
+            
+            ieList.Clear();
+            invokersMap.Remove(invoker);
+        }
     }
 
     public static void Tick(int delta)
@@ -133,15 +163,31 @@ public static class CoroutineManager
         _isIterating = false;
     }
 
-    private static void RemoveRoutine(IEnumerator ie)
+    private static void RemoveRoutine(IEnumerator ie, bool locked = false)
     {
         if (ie == null)
             return;
    
         routinesToRemove.Add(ie);
-        
+
         if (routinesInvokerMap.ContainsKey(ie))
+        {
+            var invoker = routinesInvokerMap[ie];
+            if (invokersMap.TryGetValue(invoker, out var ieList))
+            {
+                if (locked == false)
+                {
+                    ieList.Remove(ie);
+                    if (ieList.Count == 0)
+                    {
+                        invokersMap.Remove(invoker);
+                    }
+                }
+            }
+            
             routinesInvokerMap.Remove(ie);
+        }
+
     }
 
     public static string GetDiagnostics()

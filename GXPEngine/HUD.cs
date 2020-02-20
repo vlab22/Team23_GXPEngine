@@ -12,7 +12,7 @@ namespace GXPEngine
     public class HUD : GameObject
     {
         public static HUD Instance;
-        
+
         private Camera _camera;
 
         private HudTextBoard _centerTextBoard;
@@ -23,7 +23,8 @@ namespace GXPEngine
 
         private HudThermometer _hudThermometer;
 
-        private Sprite[] _pizzaLifes;
+        private Sprite[] _pizzaLives;
+        private Sprite[] _pizzaLostLives;
 
         public Map _mapData;
 
@@ -42,7 +43,7 @@ namespace GXPEngine
         public HUD(Camera camera)
         {
             Instance = this;
-            
+
             _mapData = TiledMapParserExtended.MapParser.ReadMap("HUD.tmx");
 
             var objectsDepth0 = _mapData.ObjectGroups.FirstOrDefault(og => og.Name == "Depth 0");
@@ -68,7 +69,8 @@ namespace GXPEngine
 
             pizzaHudBitmapMap.Add(pizzaLostImageFileName, new Bitmap(pizzaLostImageFileName));
 
-            _pizzaLifes = new Sprite[pizzasHudData.Length];
+            _pizzaLives = new Sprite[pizzasHudData.Length];
+            _pizzaLostLives = new Sprite[pizzasHudData.Length];
 
             for (int i = 0; i < pizzasHudData.Length; i++)
             {
@@ -97,6 +99,8 @@ namespace GXPEngine
                 pizzaHud.SetScaleXY(pizzaHudData.Width / pizzaHudOriginalW, pizzaHudData.Height / pizzaHudOriginalH);
                 pizzaHud.SetXY(pizzaHudData.X, pizzaHudData.Y - pizzaHudData.Height);
 
+                _pizzaLives[i] = pizzaHud;
+
                 var pizzaLostHud = new Sprite(pizzaHudBitmapMap[pizzaLostImageFileName], false);
                 AddChild(pizzaLostHud);
 
@@ -105,6 +109,8 @@ namespace GXPEngine
                 pizzaLostHud.SetXY(pizzaHudData.X, pizzaHudData.Y - pizzaHudData.Height);
 
                 pizzaLostHud.SetActive(false);
+
+                _pizzaLostLives[i] = pizzaLostHud;
             }
 
             _camera = camera;
@@ -154,6 +160,32 @@ Turn is weird flapping one wing while the other is static";
             _hudScore.UpdateScore(newLevelScore);
         }
 
+        public void UpdatePizzaLives(int lives)
+        {
+            lives = Mathf.Round(Mathf.Clamp(lives, 0, 3));
+
+            for (int i = 0; i < lives; i++)
+            {
+                _pizzaLives[i].SetActive(true);
+                _pizzaLostLives[i].SetActive(false);
+            }
+
+            for (int i = lives; i < _pizzaLives.Length; i++)
+            {
+                _pizzaLostLives[i].SetActive(true);
+                _pizzaLives[i].SetActive(false);
+            }
+        }
+
+        public void Reset()
+        {
+            for (int i = 0; i < _pizzaLives.Length; i++)
+            {
+                _pizzaLives[i].SetActive(false);
+                _pizzaLostLives[i].SetActive(false);
+            }
+        }
+        
         private void ChangeDroneDetectRange(float val)
         {
             var allDrones = MyGame.ThisInstance.CurrentLevel.GetChildren(true)

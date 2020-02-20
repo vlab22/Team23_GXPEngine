@@ -27,7 +27,7 @@ namespace GXPEngine
 
             var drone = _drones.FirstOrDefault();
             drone?.SetActive(false);
-            
+
             yield return new WaitForMilliSeconds(3000);
 
             drone?.SetActive(true);
@@ -77,6 +77,18 @@ namespace GXPEngine
             }
         }
 
+        public void EndLevelAllDrones()
+        {
+            for (int i = 0; i < _drones.Count; i++)
+            {
+                var drone = _drones[i];
+
+                if (!drone.Enabled) continue;
+
+                drone.EndLevel();
+            }
+        }
+
         void IDroneBehaviorListener.OnEnemyDetected(DroneGameObject drone, GameObject enemy)
         {
             LocalEvents.Instance.Raise(new LevelLocalEvent(enemy, drone, _level,
@@ -101,12 +113,13 @@ namespace GXPEngine
             drone.SetState(DroneGameObject.DroneState.HIT_ENEMY);
 
             LocalEvents.Instance.Raise(new LevelLocalEvent(enemy, drone, _level,
-                LevelLocalEvent.EventType.DRONE_HIT_ENEMY));
+                LevelLocalEvent.EventType.DRONE_HIT_PLAYER));
 
             //Stole pizza animation
             yield return StolePizzaAnimationRoutine(drone, enemy);
 
-            drone.DroneHitEnemy();
+            if (drone.State != DroneGameObject.DroneState.END_LEVEL)
+                drone.DroneHitEnemy();
 
             yield return null;
         }
@@ -114,7 +127,7 @@ namespace GXPEngine
         private IEnumerator StolePizzaAnimationRoutine(DroneGameObject drone, GameObject enemy)
         {
             CoroutineManager.StopCoroutine(_droneReleasePizzaRoutine);
-            
+
             var pizza = _level.GetPizzaFromPool();
 
             pizza.SetScaleXY(1, 1);
@@ -148,20 +161,22 @@ namespace GXPEngine
             pizza.parent = drone;
             pizza.SetXY(offsetX, offsetY);
 
-            _droneReleasePizzaRoutine = CoroutineManager.StartCoroutine(DroneReleasePizzaRoutine(drone, (Sprite) pizza), this);
+            _droneReleasePizzaRoutine =
+                CoroutineManager.StartCoroutine(DroneReleasePizzaRoutine(drone, (Sprite) pizza), this);
         }
 
         IEnumerator DroneReleasePizzaRoutine(DroneGameObject drone, Sprite pizza)
         {
-            while (drone.State == DroneGameObject.DroneState.HIT_ENEMY || drone.State == DroneGameObject.DroneState.RETURN_TO_START_POINT_AFTER_HIT)
+            while (drone.State == DroneGameObject.DroneState.HIT_ENEMY ||
+                   drone.State == DroneGameObject.DroneState.RETURN_TO_START_POINT_AFTER_HIT)
             {
                 yield return null;
             }
-            
+
             int duration = 1000;
 
             SpriteTweener.TweenAlpha(pizza, 1, 0, duration);
-            
+
             yield return new WaitForMilliSeconds(duration);
 
             pizza.visible = false;

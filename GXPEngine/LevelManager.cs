@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using GXPEngine.GameLocalEvents;
+using GXPEngine.Managers;
 using TiledMapParserExtended;
 
 namespace GXPEngine
@@ -15,6 +16,10 @@ namespace GXPEngine
         private uint _totalScore;
         private uint _levelScore;
 
+        private int _pizzaLives;
+
+        private bool _isLevelEndingByLost;
+
         private Dictionary<LevelLocalEvent.EventType, uint> _scoreValuesMap;
 
         public LevelManager(Level pLevel)
@@ -24,19 +29,51 @@ namespace GXPEngine
             LoadScoresValuesMap();
 
             LocalEvents.Instance.AddListener<LevelLocalEvent>(LevelLocalEventHandler);
+
+            CoroutineManager.StartCoroutine(WaitForHUDInstance(), this);
+        }
+
+        public int PizzaLives
+        {
+            get { return _pizzaLives; }
+            private set
+            {
+                _pizzaLives = value;
+                HUD.Instance.UpdatePizzaLives(_pizzaLives);
+
+                if (_pizzaLives <= 0 && _isLevelEndingByLost == false)
+                {
+                    _isLevelEndingByLost = true;
+                    EndLevelByLost();
+                }
+            }
+        }
+
+        private IEnumerator WaitForHUDInstance()
+        {
+            while (HUD.Instance == null)
+            {
+                yield return null;
+            }
+
+            this.PizzaLives = 1;
         }
 
         private void LevelLocalEventHandler(LevelLocalEvent e)
         {
             switch (e.evt)
             {
+                case LevelLocalEvent.EventType.NONE:
+                    break;
                 case LevelLocalEvent.EventType.LEVEL_START_COUNTER_START:
                     break;
                 case LevelLocalEvent.EventType.LEVEL_START_COUNTER_END:
                     break;
                 case LevelLocalEvent.EventType.DRONE_DETECTED_ENEMY:
                     break;
-                case LevelLocalEvent.EventType.DRONE_HIT_ENEMY:
+                case LevelLocalEvent.EventType.DRONE_HIT_PLAYER:
+                    PizzaLives--;
+                    
                     break;
                 case LevelLocalEvent.EventType.STORK_GET_POINTS_EVADE_DRONE:
                     if (_scoreValuesMap.TryGetValue(LevelLocalEvent.EventType.STORK_GET_POINTS_EVADE_DRONE,
@@ -48,9 +85,19 @@ namespace GXPEngine
                     }
 
                     break;
+                case LevelLocalEvent.EventType.HUNTER_HIT_PLAYER:
+                    PizzaLives--;
+                    break;
                 default:
                     break;
             }
+        }
+
+        private void EndLevelByLost()
+        {
+            //Send all drones away
+            _level.DronesesManager.EndLevelAllDrones();
+
         }
 
         protected override void OnDestroy()
