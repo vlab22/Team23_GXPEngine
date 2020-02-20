@@ -31,9 +31,9 @@
 </data>
  </layer>
  <objectgroup id="2" name="Depth 0">
-  <object id="19" name="Score Bg" gid="1" x="46" y="155.73" width="342.908" height="85.727"/>
-  <object id="21" name="Hud Pizza 0" gid="2" x="49" y="237" width="78" height="78"/>
-  <object id="22" name="Hud Pizza 1" gid="2" x="138" y="237" width="78" height="78"/>
-  <object id="23" name="Hud Pizza 2" gid="2" x="226" y="237" width="78" height="78"/>
+  <object id="19" name="Score Bg" gid="1" x="46" y="100.73" width="342.908" height="85.727"/>
+  <object id="21" name="Hud Pizza 0" gid="2" x="49" y="182" width="78" height="78"/>
+  <object id="22" name="Hud Pizza 1" gid="2" x="138" y="182" width="78" height="78"/>
+  <object id="23" name="Hud Pizza 2" gid="2" x="226" y="182" width="78" height="78"/>
  </objectgroup>
 </map>

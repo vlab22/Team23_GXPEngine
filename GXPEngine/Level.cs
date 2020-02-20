@@ -25,6 +25,10 @@ namespace GXPEngine
         private HuntersManager _huntersManager;
 
         private AirplanesManager _airplanesManager;
+        private bool _isLevelEndingByLost;
+
+        private DeliveryPoint[] _deliveryPoints;
+        private int _currentDeliveryPoint;
 
         public Level(FollowCamera pCam, MapGameObject pMap)
         {
@@ -36,11 +40,26 @@ namespace GXPEngine
 
             AddChild(_map);
 
-            //Create delivery point
-            var deliveryPointObject = _map.ObjectGroup.Objects.FirstOrDefault(o => o.Name == "delivery point");
-            var deliveryPoint = new DeliveryPoint(deliveryPointObject.X, deliveryPointObject.Y,
-                deliveryPointObject.Width, deliveryPointObject.Height);
-            AddChild(deliveryPoint);
+            //Create delivery points
+            var deliveryPointObjects = _map.ObjectGroup.Objects.Where(o => o.Name.StartsWith("delivery point"))
+                .OrderBy(o => o.Name);
+            _deliveryPoints = new DeliveryPoint[deliveryPointObjects.Count()];
+
+            int dCounter = 0;
+            foreach (var deliveryPointObj in deliveryPointObjects)
+            {
+                var deliveryPoint = new DeliveryPoint(deliveryPointObj.X, deliveryPointObj.Y,
+                    deliveryPointObj.Width, deliveryPointObj.Height);
+                AddChild(deliveryPoint);
+
+                deliveryPoint.SetActive(false);
+
+                _deliveryPoints[dCounter] = deliveryPoint;
+                dCounter++;
+            }
+
+            //Enable the first delivery point
+            _deliveryPoints[0].SetActive(true);
 
             var playerInput = new PlayerInput();
             AddChild(playerInput);
@@ -85,7 +104,7 @@ namespace GXPEngine
             _airplanesManager.SpawnAirplanes();
 
             AddChild(_airplanesManager);
-            
+
             _map.DrawBorders(this, 0.5f);
 
             CoroutineManager.StartCoroutine(SetCamTargetRoutine(_stork), this);
@@ -96,6 +115,30 @@ namespace GXPEngine
             _cam.Start();
 
             var hud = new HUD(_cam);
+        }
+
+        public bool ActivateNextDeliveryPoint()
+        {
+            var lastDeliveryPoint = _deliveryPoints[_currentDeliveryPoint];
+            
+            SpriteTweener.TweenAlpha(lastDeliveryPoint, 1, 0, 600, go =>
+            {
+                go.SetActive(false);
+            });
+            
+            if (_currentDeliveryPoint >= _deliveryPoints.Length - 1)
+            {
+                return false;
+            }
+            
+            _currentDeliveryPoint++;
+            
+            var nextDeliveryPoint = _deliveryPoints[_currentDeliveryPoint];
+
+            nextDeliveryPoint.SetActive(true);
+            SpriteTweener.TweenAlpha(nextDeliveryPoint,  0, 1, 600);
+
+            return true;
         }
 
         void Update()
@@ -138,5 +181,15 @@ namespace GXPEngine
         public HuntersManager HuntersManager => _huntersManager;
 
         public AirplanesManager AirplanesManager => _airplanesManager;
+
+        public bool IsLevelEnding => _isLevelEndingByLost;
+
+        public bool IsLevelEndingByLost
+        {
+            get { return _isLevelEndingByLost; }
+            set { _isLevelEndingByLost = value; }
+        }
+
+        public DeliveryPoint[] DeliveryPoints => _deliveryPoints;
     }
 }

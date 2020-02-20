@@ -10,8 +10,9 @@ namespace GXPEngine
         static Dictionary<Sprite, IEnumerator> _alphaRoutinesMap = new Dictionary<Sprite, IEnumerator>();
         static Dictionary<Sprite, IEnumerator> _colorRoutinesMap = new Dictionary<Sprite, IEnumerator>();
 
-
-        public static void TweenAlpha(Sprite sprite, float from, float to, int duration, int delay = 0, Easing.Equation equation = Easing.Equation.QuadEaseOut)
+        public delegate void OnTweenComplete(GameObject g);
+        
+        public static void TweenAlpha(Sprite sprite, float from, float to, int duration, OnTweenComplete onComplete = null, int delay = 0, Easing.Equation equation = Easing.Equation.QuadEaseOut)
         {
             if (_alphaRoutinesMap.ContainsKey(sprite))
             {
@@ -19,11 +20,11 @@ namespace GXPEngine
                 _alphaRoutinesMap.Remove(sprite);
             }
 
-            var ie = CoroutineManager.StartCoroutine(TweenAlphaRoutine(sprite, from, to, duration, delay, equation), null);
+            var ie = CoroutineManager.StartCoroutine(TweenAlphaRoutine(sprite, from, to, duration, delay, onComplete, equation), null);
             _alphaRoutinesMap.Add(sprite, ie);
         }
 
-        private static IEnumerator TweenAlphaRoutine(Sprite sprite, float from, float to, int duration, int delay,
+        private static IEnumerator TweenAlphaRoutine(Sprite sprite, float from, float to, int duration, int delay, OnTweenComplete onComplete,
             Easing.Equation equation)
         {
             //TODO: remove this call to WaitForMilliSeconds and implement it in the while loop to prevent another instantiation of a yield
@@ -46,6 +47,11 @@ namespace GXPEngine
             }
 
             sprite.alpha = to;
+
+            if (onComplete != null)
+            {
+                onComplete.Invoke(sprite);
+            }
         }
 
         public static void TweenColor(Sprite sprite, uint from, uint to, int duration = 400,

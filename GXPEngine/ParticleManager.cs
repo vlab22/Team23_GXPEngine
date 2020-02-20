@@ -84,7 +84,7 @@ namespace GXPEngine
             _smoke00.SetXY(0, 0);
             _smoke00.alpha = 1f;
 
-            SpriteTweener.TweenAlpha(_smoke00, 1, 0, duration - 500, 500);
+            SpriteTweener.TweenAlpha(_smoke00, 1, 0, duration - 500, null, 500);
 
             while (time < duration)
             {
@@ -164,7 +164,7 @@ namespace GXPEngine
             _cartoonCoinsExplosion.SetXY(0, 0);
             _cartoonCoinsExplosion.alpha = 1f;
 
-            SpriteTweener.TweenAlpha(_cartoonCoinsExplosion, 1, 0, duration - 500, 500);
+            SpriteTweener.TweenAlpha(_cartoonCoinsExplosion, 1, 0, duration - 500, null, 500);
 
             while (time < duration)
             {

@@ -25,9 +25,9 @@ namespace GXPEngine
             _scoreLabelEasyDraw.Text($"{_score:00000000000000}", 0, 0); //"00000000000000" 14 digits
         }
 
-        public void UpdateScore(uint score)
+        public void UpdateScore(uint score, int animDuration = 400)
         {
-            IntegerTweener.TweenInteger(this, (int)Score, (int)score);
+            IntegerTweener.TweenInteger(this, (int)Score, (int)score, animDuration);
         }
 
         public uint Score

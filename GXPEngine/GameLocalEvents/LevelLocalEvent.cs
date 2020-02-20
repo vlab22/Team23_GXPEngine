@@ -13,7 +13,9 @@ namespace GXPEngine.GameLocalEvents
             DRONE_DETECTED_ENEMY,
             DRONE_HIT_PLAYER,
             STORK_GET_POINTS_EVADE_DRONE,
-            HUNTER_HIT_PLAYER
+            HUNTER_HIT_PLAYER,
+            PLANE_HIT_PLAYER,
+            PIZZA_DELIVERED
         }
 
         public Level level;

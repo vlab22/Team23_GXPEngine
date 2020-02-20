@@ -17,6 +17,7 @@ namespace GXPEngine
             LOST_LOCK_ON_ENEMY,
             SHOOT,
             RECOVER_FROM_SHOOT,
+            END_LEVEL
         }
 
         private HunterState _state;
@@ -269,6 +270,27 @@ namespace GXPEngine
             //Return to scanning state
             _scanningForEnemyRoutine =
                 CoroutineManager.StartCoroutine(ScanningForEnemy(HunterState.SCANNING, true), this);
+        }
+
+        public void EndLevel()
+        {
+            _state = HunterState.END_LEVEL;
+            
+            HunterBehaviorListeners = null;
+
+            CoroutineManager.StopAllCoroutines(this);
+
+            CoroutineManager.StartCoroutine(EndLevelRoutine(), this);
+            
+        }
+
+        private IEnumerator EndLevelRoutine()
+        {
+            SpriteTweener.TweenAlpha(_crossHair, 1, 0, 400);
+
+            SpriteTweener.TweenAlpha(_hunterFollowRangeCone, _hunterFollowRangeCone.alpha, 0, 400);
+            
+            yield return null;
         }
 
         void Update()

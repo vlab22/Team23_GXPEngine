@@ -18,45 +18,53 @@ namespace GXPEngine
 
         private int _pizzaLives;
 
-        private bool _isLevelEndingByLost;
+        private bool _timerToDeliveryStarts;
+        private bool _timerToDeliveryPause;
+        private uint _levelTimeToDelivery;
+        private uint _levelTimer;
 
         private Dictionary<LevelLocalEvent.EventType, uint> _scoreValuesMap;
 
-        public LevelManager(Level pLevel)
+        public LevelManager(Level pLevel, uint pLevelTimeToDelivery = 30000)
         {
             _level = pLevel;
+            _levelTimeToDelivery = pLevelTimeToDelivery;
 
             LoadScoresValuesMap();
 
             LocalEvents.Instance.AddListener<LevelLocalEvent>(LevelLocalEventHandler);
 
-            CoroutineManager.StartCoroutine(WaitForHUDInstance(), this);
+            CoroutineManager.StartCoroutine(WaitForHudInstance(), this);
+
+            CoroutineManager.StartCoroutine(WaitToStartTimeCounter(), this);
         }
 
-        public int PizzaLives
+        private IEnumerator WaitToStartTimeCounter()
         {
-            get { return _pizzaLives; }
-            private set
-            {
-                _pizzaLives = value;
-                HUD.Instance.UpdatePizzaLives(_pizzaLives);
+            yield return new WaitForMilliSeconds(2000);
 
-                if (_pizzaLives <= 0 && _isLevelEndingByLost == false)
-                {
-                    _isLevelEndingByLost = true;
-                    EndLevelByLost();
-                }
-            }
+            _timerToDeliveryStarts = true;
         }
 
-        private IEnumerator WaitForHUDInstance()
+        void Update()
+        {
+            if (!this.Enabled || !_timerToDeliveryStarts || _timerToDeliveryPause) return;
+
+            _levelTimer += (uint) Time.deltaTime;
+
+            //Update Hud
+            float val = (float) _levelTimer / _levelTimeToDelivery;
+            HUD.Instance.Thermometer.Value = 1 - val;
+        }
+
+        private IEnumerator WaitForHudInstance()
         {
             while (HUD.Instance == null)
             {
                 yield return null;
             }
 
-            this.PizzaLives = 1;
+            this.PizzaLives = 3;
         }
 
         private void LevelLocalEventHandler(LevelLocalEvent e)
@@ -71,26 +79,58 @@ namespace GXPEngine
                     break;
                 case LevelLocalEvent.EventType.DRONE_DETECTED_ENEMY:
                     break;
+                case LevelLocalEvent.EventType.PLANE_HIT_PLAYER:
+                    PizzaLives--;
+                    break;
                 case LevelLocalEvent.EventType.DRONE_HIT_PLAYER:
                     PizzaLives--;
-                    
+                    break;
+                case LevelLocalEvent.EventType.HUNTER_HIT_PLAYER:
+                    PizzaLives--;
                     break;
                 case LevelLocalEvent.EventType.STORK_GET_POINTS_EVADE_DRONE:
                     if (_scoreValuesMap.TryGetValue(LevelLocalEvent.EventType.STORK_GET_POINTS_EVADE_DRONE,
                         out uint score))
                     {
                         _levelScore += score;
-                        
+
                         HUD.Instance.UpdateLevelScore(_levelScore);
                     }
 
                     break;
-                case LevelLocalEvent.EventType.HUNTER_HIT_PLAYER:
-                    PizzaLives--;
+                case LevelLocalEvent.EventType.PIZZA_DELIVERED:
+
+                    CoroutineManager.StartCoroutine(StartDeliveryToNextPoint(), this);
+
                     break;
                 default:
                     break;
             }
+        }
+
+        private IEnumerator StartDeliveryToNextPoint()
+        {
+            //Sum points
+            uint timeLeft = _levelTimeToDelivery - _levelTimer;
+            uint points = (uint)Mathf.Round(timeLeft * 0.001f * 1000);
+
+            _levelScore += points;
+            
+            _timerToDeliveryPause = true;
+
+            HUD.Instance.UpdateLevelScore(_levelScore, 1000);
+
+            yield return new WaitForMilliSeconds(1000);
+            
+            bool hasNextDelivery = _level.ActivateNextDeliveryPoint();
+
+            if (hasNextDelivery)
+            {
+                _levelTimer = 0;
+                _timerToDeliveryPause = false;
+            }
+
+            yield return null;
         }
 
         private void EndLevelByLost()
@@ -98,6 +138,8 @@ namespace GXPEngine
             //Send all drones away
             _level.DronesesManager.EndLevelAllDrones();
 
+            //Stop all hunters
+            _level.HuntersManager.EndLevelAllHunters();
         }
 
         protected override void OnDestroy()
@@ -140,5 +182,23 @@ namespace GXPEngine
                 _scoreValuesMap.Add(evt, score);
             }
         }
+
+        public int PizzaLives
+        {
+            get { return _pizzaLives; }
+            private set
+            {
+                _pizzaLives = value;
+                HUD.Instance.UpdatePizzaLives(_pizzaLives);
+
+                if (_pizzaLives <= 0 && _level.IsLevelEndingByLost == false)
+                {
+                    _level.IsLevelEndingByLost = true;
+                    EndLevelByLost();
+                }
+            }
+        }
+
+        public uint Timer => _levelTimeToDelivery - _levelTimer;
     }
 }

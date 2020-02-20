@@ -51,6 +51,18 @@ namespace GXPEngine
             }
         }
 
+        public void EndLevelAllHunters()
+        {
+            for (int i = 0; i < _hunters.Count; i++)
+            {
+                var hunter = _hunters[i];
+
+                if (!hunter.Enabled) continue;
+
+                hunter.EndLevel();
+            }
+        }
+        
         public void SetHuntersTarget(Stork stork)
         {
             for (int i = 0; i < _hunters.Count; i++)

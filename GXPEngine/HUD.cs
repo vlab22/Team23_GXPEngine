@@ -154,10 +154,10 @@ Turn is weird flapping one wing while the other is static";
 
             _hudThermometer.SetXY(game.width - (1920 - 1794), 28);
         }
-
-        public void UpdateLevelScore(uint newLevelScore)
+        
+        public void UpdateLevelScore(uint newLevelScore, int animDuration = 400)
         {
-            _hudScore.UpdateScore(newLevelScore);
+            _hudScore.UpdateScore(newLevelScore, animDuration);
         }
 
         public void UpdatePizzaLives(int lives)
@@ -257,5 +257,7 @@ Turn is weird flapping one wing while the other is static";
                 time += Time.deltaTime;
             } while (time < duration);
         }
+        
+        public HudThermometer Thermometer => _hudThermometer;
     }
 }

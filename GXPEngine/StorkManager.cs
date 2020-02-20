@@ -74,13 +74,19 @@ namespace GXPEngine
         {
             if (!_inCollisionWithDeliveryPoint && other is DeliveryPoint)
             {
-                //Get to end
+                if (!_level.IsLevelEnding)
+                {
+                    //Pizza delivered
+                    LocalEvents.Instance.Raise(new LevelLocalEvent(_level, LevelLocalEvent.EventType.PIZZA_DELIVERED));
 
-                //Drop the pizza to the center of the delivery point
-                var dropPoint = new Vector2(other.x, other.y);
-                CoroutineManager.StartCoroutine(DropPizzaRoutine(dropPoint), this);
+                    //Drop the pizza to the center of the delivery point
+                    var dropPoint = new Vector2(other.x, other.y);
+                    CoroutineManager.StartCoroutine(DropPizzaRoutine(dropPoint), this);
+                }
 
                 _inCollisionWithDeliveryPoint = true;
+
+                CoroutineManager.StartCoroutine(WaitDeliveryPointBeDisabled(other), this);
             }
             else if (!_inCollisionWithAirplane && other is CompoundCollider && other.parent is Airplane parent &&
                      parent != _lastAirplaneCollided)
@@ -115,6 +121,16 @@ namespace GXPEngine
             }
         }
 
+        private IEnumerator WaitDeliveryPointBeDisabled(GameObject other)
+        {
+            while (other.Enabled)
+            {
+                yield return null;
+            }
+
+            _inCollisionWithDeliveryPoint = false;
+        }
+
         private IEnumerator CollisionWithHunterBulletRoutine(HunterBullet bullet)
         {
             //Shake Camera
@@ -122,8 +138,9 @@ namespace GXPEngine
 
             LocalEvents.Instance.Raise(new LevelLocalEvent(_stork, bullet.Shooter, _level,
                 LevelLocalEvent.EventType.HUNTER_HIT_PLAYER));
-            
-            LocalEvents.Instance.Raise(new StorkLocalEvent(_stork, bullet.Shooter, StorkLocalEvent.Event.STORK_HIT_BY_HUNTER));
+
+            LocalEvents.Instance.Raise(new StorkLocalEvent(_stork, bullet.Shooter,
+                StorkLocalEvent.Event.STORK_HIT_BY_HUNTER));
 
             //Drop a pizza
             CoroutineManager.StartCoroutine(DropPizzaRoutine(_stork.Pos - _stork.Forward * 40f, -1), this);
@@ -165,10 +182,14 @@ namespace GXPEngine
 
             LocalEvents.Instance.Raise(new StorkLocalEvent(_stork, StorkLocalEvent.Event.STORK_HIT_BY_PLANE));
 
-            yield return new WaitForMilliSeconds(500);
+            if (!_level.IsLevelEnding)
+            {
+                //Drop a pizza
+                CoroutineManager.StartCoroutine(DropPizzaRoutine(_stork.Pos - _stork.Forward * 40f), this);
+            }
 
-            //Drop a pizza
-            CoroutineManager.StartCoroutine(DropPizzaRoutine(_stork.Pos - _stork.Forward * 40f), this);
+            LocalEvents.Instance.Raise(new LevelLocalEvent(_stork, plane, _level,
+                LevelLocalEvent.EventType.PLANE_HIT_PLAYER));
 
             yield return new WaitForMilliSeconds(1500);
 
