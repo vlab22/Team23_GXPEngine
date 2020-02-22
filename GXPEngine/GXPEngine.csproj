@@ -52,6 +52,7 @@
     <Compile Include="GameLocalEvents\LevelLocalEvent.cs" />
     <Compile Include="GameLocalEvents\StorkLocalEvent.cs" />
     <Compile Include="HUD.cs" />
+    <Compile Include="HudArrowToObjective.cs" />
     <Compile Include="HudScore.cs" />
     <Compile Include="HudSlider.cs" />
     <Compile Include="HudTextBoard.cs" />

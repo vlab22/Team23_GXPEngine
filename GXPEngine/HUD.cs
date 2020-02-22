@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using GXPEngine.Core;
 using GXPEngine.GameLocalEvents;
 using TiledMapParserExtended;
 
@@ -38,8 +39,8 @@ namespace GXPEngine
 
         private HudSlider _slider00;
         private HudSlider _slider01;
-
-
+        private HudArrowToObjective _hudArrowToObjective;
+        
         public HUD(Camera camera)
         {
             Instance = this;
@@ -48,6 +49,12 @@ namespace GXPEngine
 
             var objectsDepth0 = _mapData.ObjectGroups.FirstOrDefault(og => og.Name == "Depth 0");
 
+            _hudArrowToObjective = new HudArrowToObjective();
+            AddChild(_hudArrowToObjective);
+
+            _hudArrowToObjective.SetScaleXY(0.7f, 0.7f);
+            _hudArrowToObjective.SetXY(game.width * 0.5f, game.height * 0.5f);
+            
             //Hud Score set
             var hudData = objectsDepth0.Objects.FirstOrDefault(o => o.Name == "Score Bg");
             var hudScoreImage = _mapData.TileSets.FirstOrDefault(ts => ts.FirstGId == hudData.GID).Image.FileName;
@@ -149,6 +156,8 @@ Turn is weird flapping one wing while the other is static";
 
             _slider01.OnValueChanged += DebugChangeThermometerValue;
 
+            
+            
             _hudThermometer = new HudThermometer();
             AddChild(_hudThermometer);
 
@@ -259,5 +268,7 @@ Turn is weird flapping one wing while the other is static";
         }
         
         public HudThermometer Thermometer => _hudThermometer;
+
+        public HudArrowToObjective ArrowToObjective => _hudArrowToObjective;
     }
 }

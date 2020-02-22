@@ -76,6 +76,7 @@
         </e>
         <e p="GXPEngine.csproj" t="IncludeRecursive" />
         <e p="HUD.cs" t="Include" />
+        <e p="HudArrowToObjective.cs" t="Include" />
         <e p="HudScore.cs" t="Include" />
         <e p="HudSlider.cs" t="Include" />
         <e p="HudTextBoard.cs" t="Include" />

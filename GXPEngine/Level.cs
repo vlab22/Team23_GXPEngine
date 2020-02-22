@@ -25,6 +25,8 @@ namespace GXPEngine
         private HuntersManager _huntersManager;
 
         private AirplanesManager _airplanesManager;
+        
+        private bool _isLevelEndingByWon;
         private bool _isLevelEndingByLost;
 
         private DeliveryPoint[] _deliveryPoints;
@@ -61,16 +63,13 @@ namespace GXPEngine
             //Enable the first delivery point
             _deliveryPoints[0].SetActive(true);
 
-            var playerInput = new PlayerInput();
-            AddChild(playerInput);
-
             float storkMaxSpeed = spawnPointObject.GetFloatProperty("speed", 200);
 
             _stork = new Stork(storkMaxSpeed)
             {
                 x = _spawnPoint.x,
                 y = _spawnPoint.y,
-                StorkInput = playerInput,
+                rotation = spawnPointObject.rotation
             };
             AddChild(_stork);
 
@@ -182,8 +181,14 @@ namespace GXPEngine
 
         public AirplanesManager AirplanesManager => _airplanesManager;
 
-        public bool IsLevelEnding => _isLevelEndingByLost;
+        public bool IsLevelEnding => _isLevelEndingByLost || _isLevelEndingByWon;
 
+        public bool IsLevelEndingByWon
+        {
+            get { return _isLevelEndingByWon; }
+            set { _isLevelEndingByWon = value; }
+        }
+        
         public bool IsLevelEndingByLost
         {
             get { return _isLevelEndingByLost; }
@@ -191,5 +196,9 @@ namespace GXPEngine
         }
 
         public DeliveryPoint[] DeliveryPoints => _deliveryPoints;
+
+        public DeliveryPoint CurrentDeliveryPoint => _deliveryPoints[_currentDeliveryPoint];
+        
+        public Stork Stork => _stork;
     }
 }

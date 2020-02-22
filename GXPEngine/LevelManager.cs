@@ -44,6 +44,14 @@ namespace GXPEngine
             yield return new WaitForMilliSeconds(2000);
 
             _timerToDeliveryStarts = true;
+
+            var playerInput = new PlayerInput();
+            _level.AddChild(playerInput);
+
+            _level.Stork.StorkInput = playerInput;
+            
+            HUD.Instance.ArrowToObjective.Target = _level.CurrentDeliveryPoint;
+            HUD.Instance.ArrowToObjective.TargetOrigin = _level.Stork;
         }
 
         void Update()
@@ -112,22 +120,29 @@ namespace GXPEngine
         {
             //Sum points
             uint timeLeft = _levelTimeToDelivery - _levelTimer;
-            uint points = (uint)Mathf.Round(timeLeft * 0.001f * 1000);
+            uint points = (uint) Mathf.Round(timeLeft * 0.001f * 1000);
 
             _levelScore += points;
-            
+
             _timerToDeliveryPause = true;
 
             HUD.Instance.UpdateLevelScore(_levelScore, 1000);
 
             yield return new WaitForMilliSeconds(1000);
-            
+
             bool hasNextDelivery = _level.ActivateNextDeliveryPoint();
 
             if (hasNextDelivery)
             {
                 _levelTimer = 0;
                 _timerToDeliveryPause = false;
+                
+                HUD.Instance.ArrowToObjective.Target = _level.CurrentDeliveryPoint;
+            }
+            else
+            {
+                //Level end
+                CoroutineManager.StartCoroutine(EndLevelByWonRoutine(), this);
             }
 
             yield return null;
@@ -135,11 +150,26 @@ namespace GXPEngine
 
         private void EndLevelByLost()
         {
+            _level.IsLevelEndingByLost = true;
+            
             //Send all drones away
             _level.DronesesManager.EndLevelAllDrones();
 
             //Stop all hunters
             _level.HuntersManager.EndLevelAllHunters();
+        }
+
+        private IEnumerator EndLevelByWonRoutine()
+        {
+            _level.IsLevelEndingByWon = true;
+            
+            //Send all drones away
+            _level.DronesesManager.EndLevelAllDrones();
+
+            //Stop all hunters
+            _level.HuntersManager.EndLevelAllHunters();
+
+            yield break;
         }
 
         protected override void OnDestroy()
@@ -193,7 +223,6 @@ namespace GXPEngine
 
                 if (_pizzaLives <= 0 && _level.IsLevelEndingByLost == false)
                 {
-                    _level.IsLevelEndingByLost = true;
                     EndLevelByLost();
                 }
             }

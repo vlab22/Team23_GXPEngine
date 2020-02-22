@@ -562,6 +562,11 @@ namespace GXPEngine
 				return parent.TransformPoint (ret.x, ret.y);
 			}
 		}
+		
+		public virtual Vector2 TransformPoint(Vector2 pos)
+		{
+			return TransformPoint(pos.x, pos.y);
+		}
 
 		/// <summary>
 		/// Transforms a direction vector from local to global space.
