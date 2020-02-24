@@ -23,9 +23,9 @@ namespace GXPEngine
 
             _customColliderBounds = new Rectangle(-width * 0.25f, -height * 0.25f, width * 0.5f, height * 0.5f);
 
-            // var easy = new EasyDraw(100, 100);
-            // easy.Clear(Color.Black);
-            // AddChild(easy);
+            var easy = new EasyDraw(100, 100);
+            easy.Clear(Color.Black);
+            AddChild(easy);
 
             CoroutineManager.StartCoroutine(ResizeRoutine(), this);
         }

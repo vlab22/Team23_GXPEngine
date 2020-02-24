@@ -52,6 +52,7 @@ namespace GXPEngine
             
             HUD.Instance.ArrowToObjective.Target = _level.CurrentDeliveryPoint;
             HUD.Instance.ArrowToObjective.TargetOrigin = _level.Stork;
+            HUD.Instance.ArrowToObjective.Cam = MyGame.ThisInstance.Camera;
         }
 
         void Update()
