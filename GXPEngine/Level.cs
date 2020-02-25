@@ -31,6 +31,7 @@ namespace GXPEngine
 
         private DeliveryPoint[] _deliveryPoints;
         private int _currentDeliveryPoint;
+        private HUD _hud;
 
         public Level(FollowCamera pCam, MapGameObject pMap)
         {
@@ -50,8 +51,10 @@ namespace GXPEngine
             int dCounter = 0;
             foreach (var deliveryPointObj in deliveryPointObjects)
             {
+                uint deliveryTimer = (uint)(deliveryPointObj.GetIntProperty("timer", 60) * 1000);
+                
                 var deliveryPoint = new DeliveryPoint(deliveryPointObj.X, deliveryPointObj.Y,
-                    deliveryPointObj.Width, deliveryPointObj.Height);
+                    deliveryPointObj.Width, deliveryPointObj.Height, deliveryTimer);
                 AddChild(deliveryPoint);
 
                 deliveryPoint.SetActive(false);
@@ -98,7 +101,7 @@ namespace GXPEngine
 
                 _pizzasPool[i] = pizza;
             }
-
+            
             _airplanesManager = new AirplanesManager(this);
             _airplanesManager.SpawnAirplanes();
 
@@ -106,6 +109,8 @@ namespace GXPEngine
 
             _map.DrawBorders(this, 0.5f);
 
+            _map.DrawClouds(this);
+            
             CoroutineManager.StartCoroutine(SetCamTargetRoutine(_stork), this);
 
             AddChild(_cam);
@@ -113,7 +118,7 @@ namespace GXPEngine
             _cam.SetXY(_map.MapWidthInPixels * 0.5f, _map.MapHeightInPixels * 0.5f);
             _cam.Start();
 
-            var hud = new HUD(_cam);
+            _hud = new HUD(_cam);
         }
 
         public bool ActivateNextDeliveryPoint()
@@ -200,5 +205,7 @@ namespace GXPEngine
         public DeliveryPoint CurrentDeliveryPoint => _deliveryPoints[_currentDeliveryPoint];
         
         public Stork Stork => _stork;
+
+        public HUD Hud => _hud;
     }
 }

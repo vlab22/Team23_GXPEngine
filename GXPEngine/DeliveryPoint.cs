@@ -11,8 +11,11 @@ namespace GXPEngine
     {
         private Rectangle _customColliderBounds;
 
-        public DeliveryPoint(float pX, float pY, float pWidth, float pHeight) : base("data/Delivery Point.png")
+        private uint _timer;
+        
+        public DeliveryPoint(float pX, float pY, float pWidth, float pHeight, uint pTimer) : base("data/Delivery Point.png")
         {
+            _timer = pTimer;
             width = Mathf.Round(pWidth);
             height = Mathf.Round(pHeight);
 
@@ -23,12 +26,14 @@ namespace GXPEngine
 
             _customColliderBounds = new Rectangle(-width * 0.25f, -height * 0.25f, width * 0.5f, height * 0.5f);
 
-            var easy = new EasyDraw(100, 100);
-            easy.Clear(Color.Black);
-            AddChild(easy);
+            // var easy = new EasyDraw(100, 100);
+            // easy.Clear(Color.Black);
+            // AddChild(easy);
 
             CoroutineManager.StartCoroutine(ResizeRoutine(), this);
         }
+
+        public uint Timer => _timer;
 
         private IEnumerator ResizeRoutine()
         {

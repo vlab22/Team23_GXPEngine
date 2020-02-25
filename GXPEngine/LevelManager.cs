@@ -25,10 +25,22 @@ namespace GXPEngine
 
         private Dictionary<LevelLocalEvent.EventType, uint> _scoreValuesMap;
 
+        private int[] _cloudsIds = new int[]
+        {
+            65, 66,
+            81, 82,
+            97, 98
+        };
+
+        private int _cloudsFirstGid;
+        private int[,] _cloudsLayer;
+
         public LevelManager(Level pLevel, uint pLevelTimeToDelivery = 30000)
         {
             _level = pLevel;
             _levelTimeToDelivery = pLevelTimeToDelivery;
+
+            _cloudsFirstGid = pLevel.Map.MapData.TileSets.FirstOrDefault(ts => ts.Name == "Clouds Tileset").FirstGId;
 
             LoadScoresValuesMap();
 
@@ -43,16 +55,19 @@ namespace GXPEngine
         {
             yield return new WaitForMilliSeconds(2000);
 
+            _levelTimeToDelivery = _level.CurrentDeliveryPoint.Timer;
+
             _timerToDeliveryStarts = true;
 
             var playerInput = new PlayerInput();
             _level.AddChild(playerInput);
 
             _level.Stork.StorkInput = playerInput;
-            
+
             HUD.Instance.ArrowToObjective.Target = _level.CurrentDeliveryPoint;
             HUD.Instance.ArrowToObjective.TargetOrigin = _level.Stork;
             HUD.Instance.ArrowToObjective.Cam = MyGame.ThisInstance.Camera;
+            HUD.Instance.ArrowToObjective.Enabled = true;
         }
 
         void Update()
@@ -61,9 +76,18 @@ namespace GXPEngine
 
             _levelTimer += (uint) Time.deltaTime;
 
+            int cloudId = _level.Map.GetCloudLayerTileIdFromWorld(_level.Stork.x, _level.Stork.y);
+
+            if (IsInsideCloud(cloudId - _cloudsFirstGid))
+            {
+                Console.WriteLine($"{this}: cloudId: {cloudId - _cloudsFirstGid}");   
+            }
+
             //Update Hud
             float val = (float) _levelTimer / _levelTimeToDelivery;
             HUD.Instance.Thermometer.Value = 1 - val;
+
+            HUD.Instance.DebugTimer.SetText(Timer.ToString("00"));
         }
 
         private IEnumerator WaitForHudInstance()
@@ -137,13 +161,16 @@ namespace GXPEngine
             {
                 _levelTimer = 0;
                 _timerToDeliveryPause = false;
-                
+                _levelTimeToDelivery = _level.CurrentDeliveryPoint.Timer;
+
                 HUD.Instance.ArrowToObjective.Target = _level.CurrentDeliveryPoint;
             }
             else
             {
                 //Level end
                 CoroutineManager.StartCoroutine(EndLevelByWonRoutine(), this);
+
+                HUD.Instance.ArrowToObjective.Enabled = false;
             }
 
             yield return null;
@@ -152,7 +179,7 @@ namespace GXPEngine
         private void EndLevelByLost()
         {
             _level.IsLevelEndingByLost = true;
-            
+
             //Send all drones away
             _level.DronesesManager.EndLevelAllDrones();
 
@@ -163,7 +190,7 @@ namespace GXPEngine
         private IEnumerator EndLevelByWonRoutine()
         {
             _level.IsLevelEndingByWon = true;
-            
+
             //Send all drones away
             _level.DronesesManager.EndLevelAllDrones();
 
@@ -214,6 +241,11 @@ namespace GXPEngine
             }
         }
 
+        public bool IsInsideCloud(int tileId)
+        {
+            return Array.IndexOf(_cloudsIds, tileId) > -1;
+        }
+
         public int PizzaLives
         {
             get { return _pizzaLives; }
@@ -229,6 +261,6 @@ namespace GXPEngine
             }
         }
 
-        public uint Timer => _levelTimeToDelivery - _levelTimer;
+        public uint Timer => (_levelTimeToDelivery - _levelTimer) / 1000;
     }
 }

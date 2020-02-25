@@ -40,6 +40,8 @@ namespace GXPEngine
         private HudSlider _slider00;
         private HudSlider _slider01;
         private HudArrowToObjective _hudArrowToObjective;
+
+        private HudTextBoard _debugTimer;
         
         public HUD(Camera camera)
         {
@@ -48,12 +50,6 @@ namespace GXPEngine
             _mapData = TiledMapParserExtended.MapParser.ReadMap("HUD.tmx");
 
             var objectsDepth0 = _mapData.ObjectGroups.FirstOrDefault(og => og.Name == "Depth 0");
-
-            _hudArrowToObjective = new HudArrowToObjective();
-            AddChild(_hudArrowToObjective);
-
-            _hudArrowToObjective.SetScaleXY(0.7f, 0.7f);
-            _hudArrowToObjective.SetXY(game.width * 0.5f, game.height * 0.5f);
             
             //Hud Score set
             var hudData = objectsDepth0.Objects.FirstOrDefault(o => o.Name == "Score Bg");
@@ -137,7 +133,6 @@ Turn is weird flapping one wing while the other is static";
 
             AddChild(_centerTextBoard);
 
-
             _slider00 = new HudSlider(200, 22);
             AddChild(_slider00);
 
@@ -156,12 +151,22 @@ Turn is weird flapping one wing while the other is static";
 
             _slider01.OnValueChanged += DebugChangeThermometerValue;
 
-            
-            
             _hudThermometer = new HudThermometer();
             AddChild(_hudThermometer);
 
             _hudThermometer.SetXY(game.width - (1920 - 1794), 28);
+            
+            _hudArrowToObjective = new HudArrowToObjective();
+            AddChild(_hudArrowToObjective);
+
+            _hudArrowToObjective.SetScaleXY(0.4f, 0.4f);
+            _hudArrowToObjective.SetXY(game.width * 0.5f, game.height * 0.5f);
+            _hudArrowToObjective.SetActive(false);
+            
+            _debugTimer = new HudTextBoard(60, 60, 12);
+            _debugTimer.x = game.width - 60;
+            _debugTimer.y = 60;
+            AddChild(_debugTimer);
         }
         
         public void UpdateLevelScore(uint newLevelScore, int animDuration = 400)
@@ -270,5 +275,7 @@ Turn is weird flapping one wing while the other is static";
         public HudThermometer Thermometer => _hudThermometer;
 
         public HudArrowToObjective ArrowToObjective => _hudArrowToObjective;
+
+        public HudTextBoard DebugTimer => _debugTimer;
     }
 }

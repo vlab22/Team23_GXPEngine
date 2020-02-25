@@ -50,7 +50,9 @@ namespace GXPEngine
         private Dictionary<string, int> _tilesetIndexMap;
 
         private int _boundariesLayerIndex;
-        
+
+        private int _cloudsLayerIndex;
+
         //private int _gridWidth;
         //private int _gridHeight;
         //private int _gridsToDraw;
@@ -68,6 +70,7 @@ namespace GXPEngine
             _mapData = mapData;
 
             _boundariesLayerIndex = GetLayerIndex("boundaries");
+            _cloudsLayerIndex = GetLayerIndex("clouds");
 
             //_totalPixelsWidth = mapData.Width * mapData.TileWidth;
             //_totalPixelsHeight = mapData.Height * mapData.TileHeight;
@@ -266,7 +269,7 @@ namespace GXPEngine
                 Layer layer = _mapData.Layers[i];
                 if (layer.Visible)
                 {
-                    DrawLayer(i);
+                    DrawLayer(i, this);
                 }
             }
         }
@@ -274,12 +277,12 @@ namespace GXPEngine
         /// <summary>
         /// Draw a layer by index
         /// </summary>
-        /// <param name="index"></param>
-        public void DrawLayer(int index)
+        /// <param name="layerIndex"></param>
+        public void DrawLayer(int layerIndex, GameObject parent)
         {
             int tileWidth = _mapData.TileWidth;
             int tileHeight = _mapData.TileHeight;
-            int tileOrigin = _mapData.Layers[index].GetIntProperty("tileorigin", 0);
+            int tileOrigin = _mapData.Layers[layerIndex].GetIntProperty("tileorigin", 0);
 
             // To draw mapData layer with opacity
             float[][] matrixItems =
@@ -287,7 +290,7 @@ namespace GXPEngine
                 new float[] {1, 0, 0, 0, 0},
                 new float[] {0, 1, 0, 0, 0},
                 new float[] {0, 0, 1, 0, 0},
-                new float[] {0, 0, 0, _mapData.Layers[index].Opacity, 0},
+                new float[] {0, 0, 0, _mapData.Layers[layerIndex].Opacity, 0},
                 new float[] {0, 0, 0, 0, 1}
             };
             ColorMatrix colorMatrix = new ColorMatrix(matrixItems);
@@ -300,13 +303,13 @@ namespace GXPEngine
                 ColorAdjustType.Bitmap);
 
             //go through data and get the absolute ID, than with the absolute ID get the correspondent rectangle in tileset image
-            int rows = _tileArrays[index].GetLength(0);
-            int columns = _tileArrays[index].GetLength(1);
+            int rows = _tileArrays[layerIndex].GetLength(0);
+            int columns = _tileArrays[layerIndex].GetLength(1);
             for (int i = 0; i < rows; i++)
             {
                 for (int j = 0; j < columns; j++)
                 {
-                    int tileIndex = _tileArrays[index][i, j] - 1;
+                    int tileIndex = _tileArrays[layerIndex][i, j] - 1;
 
                     if (tileIndex < 0)
                     {
@@ -330,7 +333,7 @@ namespace GXPEngine
                         GraphicsUnit.Pixel,
                         imageAtt);
 
-                    AddChild(canvas);
+                    parent.AddChild(canvas);
                     canvas.SetXY(pt.X, pt.Y);
                 }
             }
@@ -557,7 +560,17 @@ namespace GXPEngine
         public int GetBoundariesTileId(Vector2 pos)
         {
             return GetTileIdFromWorld(_boundariesLayerIndex, pos.x, pos.y);
-        } 
+        }
+
+        public int GetCloudLayerTileIdFromWorld(float px, float py)
+        {
+            return GetTileIdFromWorld(_cloudsLayerIndex, px, py);
+        }
+
+        public void DrawClouds(GameObject parent)
+        {
+            DrawLayer(_cloudsLayerIndex, parent);
+        }
         
         public ObjectGroup ObjectGroup => _objectGroup;
 
