@@ -9,7 +9,7 @@ using Rectangle = GXPEngine.Core.Rectangle;
 
 namespace GXPEngine
 {
-    public class DroneGameObject : AnimationSprite
+    public class DroneGameObject : AnimationSprite, IHasDistanceToTarget
     {
         public enum DroneState
         {
@@ -68,6 +68,8 @@ namespace GXPEngine
         private int _returnToStartAfterChasing = 0;
 
         private IEnumerator _endLevelRoutine;
+
+        private Vector2 _distanceToTarget;
 
         public DroneGameObject(float pX, float pY, float pWidth, float pHeight, float pSpeed = 200,
             float pRotation = 0) : base(
@@ -170,7 +172,10 @@ namespace GXPEngine
             while (_state == DroneState.SEARCHING_ENEMY ||
                    _state == DroneState.RETURN_TO_START_POINT_AFTER_CHASING_AND_SEARCHING_ENEMY)
             {
-                float dist = DistanceTo(_enemy);
+                _distanceToTarget = _enemy.Pos - this._pos;
+                
+                float dist = _distanceToTarget.Magnitude;
+                
                 if (dist < _detectEnemyRange)
                 {
                     //Enemy Detected
@@ -269,19 +274,14 @@ namespace GXPEngine
 
         IEnumerator ChasingMovementRoutine(GameObject target)
         {
-            var targetPos = new Vector2();
-            var distance = new Vector2();
             var distanceNorm = new Vector2();
             float distanceMag = 0;
 
             while (_state == DroneState.CHASING_ENEMY && distanceMag < _stopChasingRange)
             {
-                targetPos.x = target.x;
-                targetPos.y = target.y;
-
-                distance = targetPos - _pos;
-                distanceNorm = distance.Normalized;
-                distanceMag = distance.Magnitude;
+                _distanceToTarget = target.Pos - _pos;
+                distanceNorm = _distanceToTarget.Normalized;
+                distanceMag = _distanceToTarget.Magnitude;
 
                 _currentSpeed = (_state == DroneState.SEARCHING_ENEMY) ? _waitingSpeed : _maxSpeed;
 
@@ -520,6 +520,8 @@ namespace GXPEngine
         }
 
         public uint Id => _id;
+
+        Vector2 IHasDistanceToTarget.Distance => _distanceToTarget;
     }
 
     internal class DroneFollowRangeCone : Sprite

@@ -6,7 +6,7 @@ using MathfExtensions;
 
 namespace GXPEngine
 {
-    public class HunterGameObject : AnimationSprite
+    public class HunterGameObject : AnimationSprite, IHasDistanceToTarget
     {
         public enum HunterState
         {
@@ -42,6 +42,7 @@ namespace GXPEngine
         private Vector2 _aimDistance;
 
         private HunterFollowRangeCone _hunterFollowRangeCone;
+        private Vector2 _distanceToTarget;
 
         public HunterGameObject(float pX, float pY, float pWidth, float pHeight,
             float pSightSpeed = 200) : base("data/Female Hunter.png", 1, 1,
@@ -102,8 +103,8 @@ namespace GXPEngine
             float distanceMag = float.MaxValue;
             do
             {
-                var distance = _enemy.Pos - _pos;
-                distanceMag = distance.Magnitude;
+                _distanceToTarget = _enemy.Pos - _pos;
+                distanceMag = _distanceToTarget.Magnitude;
 
                 if (distanceMag < _scanEnemyRange)
                 {
@@ -191,8 +192,8 @@ namespace GXPEngine
 
             do
             {
-                var distance = enemy.Pos - _pos;
-                float distanceMag = distance.Magnitude;
+                _distanceToTarget = enemy.Pos - _pos;
+                float distanceMag = _distanceToTarget.Magnitude;
 
                 localPos = InverseTransformPoint(enemy.x, enemy.y);
                 _crossHair.SetXY(localPos.x, localPos.y);
@@ -346,6 +347,8 @@ namespace GXPEngine
         }
 
         public float ScanEnemyRange => _scanEnemyRange;
+
+        public Vector2 Distance => _distanceToTarget;
     }
 
     internal class HunterFollowRangeCone : Sprite

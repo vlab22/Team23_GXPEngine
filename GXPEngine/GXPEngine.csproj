@@ -47,6 +47,7 @@
     <Compile Include="DroneGameObject.cs" />
     <Compile Include="DronesManager.cs" />
     <Compile Include="Easing.cs" />
+    <Compile Include="EnemiesSoundManager.cs" />
     <Compile Include="FollowCamera.cs" />
     <Compile Include="GameLocalEvents\GameLocalEvent.cs" />
     <Compile Include="GameLocalEvents\LevelLocalEvent.cs" />
@@ -63,8 +64,10 @@
     <Compile Include="HunterGameObject.cs" />
     <Compile Include="HuntersManager.cs" />
     <Compile Include="IGridDataUpdater.cs" />
+    <Compile Include="IHasDistanceToTarget.cs" />
     <Compile Include="IHasSpeed.cs" />
     <Compile Include="IntegerTweener.cs" />
+    <Compile Include="IOnUpdateListener.cs" />
     <Compile Include="IStorkInput.cs" />
     <Compile Include="Level.cs" />
     <Compile Include="LevelManager.cs" />
@@ -116,6 +119,7 @@
     <Compile Include="ParticleManager.cs" />
     <Compile Include="PizzaGameObject.cs" />
     <Compile Include="PlayerInput.cs" />
+    <Compile Include="SoundManager.cs" />
     <Compile Include="SpriteTweener.cs" />
     <Compile Include="StopWatchTool.cs" />
     <Compile Include="Stork.cs" />

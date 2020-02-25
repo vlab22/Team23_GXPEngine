@@ -48,7 +48,7 @@
  <objectgroup id="3" name="Object Layer 1">
   <object id="6" name="delivery point 00" gid="1" x="376.124" y="1060" width="512" height="512">
    <properties>
-    <property name="time" type="int" value="60"/>
+    <property name="timer" type="int" value="60"/>
    </properties>
   </object>
   <object id="8" name="airplane 0" gid="2" x="-923.714" y="1959.51" width="665.333" height="665.333" rotation="32.0003">

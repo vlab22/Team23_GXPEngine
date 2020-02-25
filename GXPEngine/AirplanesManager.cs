@@ -17,9 +17,12 @@ namespace GXPEngine
 
         private int _firstAirplaneIndex;
 
-        public AirplanesManager(Level pLevel) : base(false)
+        private EnemiesSoundManager _enemiesSoundManager;
+
+        public AirplanesManager(Level pLevel, EnemiesSoundManager pEnemiesSoundManager) : base(false)
         {
             _level = pLevel;
+            _enemiesSoundManager = pEnemiesSoundManager;
 
             _map = _level.Map;
 
@@ -28,6 +31,10 @@ namespace GXPEngine
             for (int i = 0; i < _airplanesPool.Length; i++)
             {
                 var airplane = new Airplane();
+                _enemiesSoundManager.CreateChannel(airplane);
+
+                airplane.OnUpdateListeners =
+                    airplane.OnUpdateListeners.Concat(new IOnUpdateListener[] {_enemiesSoundManager}).ToArray();
 
                 _level.AddChild(airplane);
 
@@ -60,7 +67,8 @@ namespace GXPEngine
 
             var airplane = GetAirplaneFromPool();
 
-            airplane.LoadStartupData(airData.X, airData.Y, airData.Width, airData.Height, _level, airSpeed,
+            airplane.LoadStartupData(airData.X, airData.Y, airData.Width, airData.Height, _level, _level.Stork,
+                airSpeed,
                 airData.rotation, lifeTime);
 
             airplane.SetActive(true);
@@ -83,7 +91,7 @@ namespace GXPEngine
             if (spawnFrequency > 0)
             {
                 yield return new WaitForMilliSeconds(spawnFrequency);
-                
+
                 SpawnAirplane(airData);
             }
         }

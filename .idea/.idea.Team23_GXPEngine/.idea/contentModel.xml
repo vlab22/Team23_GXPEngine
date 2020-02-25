@@ -15,6 +15,7 @@
         <e p="DroneGameObject.cs" t="Include" />
         <e p="DronesManager.cs" t="Include" />
         <e p="Easing.cs" t="Include" />
+        <e p="EnemiesSoundManager.cs" t="Include" />
         <e p="FollowCamera.cs" t="Include" />
         <e p="GameLocalEvents" t="Include">
           <e p="GameLocalEvent.cs" t="Include" />
@@ -87,8 +88,10 @@
         <e p="HunterGameObject.cs" t="Include" />
         <e p="HuntersManager.cs" t="Include" />
         <e p="IGridDataUpdater.cs" t="Include" />
+        <e p="IHasDistanceToTarget.cs" t="Include" />
         <e p="IHasSpeed.cs" t="Include" />
         <e p="IntegerTweener.cs" t="Include" />
+        <e p="IOnUpdateListener.cs" t="Include" />
         <e p="IStorkInput.cs" t="Include" />
         <e p="Level.cs" t="Include" />
         <e p="LevelManager.cs" t="Include" />
@@ -104,6 +107,7 @@
         <e p="ParticleManager.cs" t="Include" />
         <e p="PizzaGameObject.cs" t="Include" />
         <e p="PlayerInput.cs" t="Include" />
+        <e p="SoundManager.cs" t="Include" />
         <e p="SpriteTweener.cs" t="Include" />
         <e p="StopWatchTool.cs" t="Include" />
         <e p="Stork.cs" t="Include" />

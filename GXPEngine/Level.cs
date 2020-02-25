@@ -38,6 +38,9 @@ namespace GXPEngine
             _cam = pCam;
             _map = pMap;
 
+            var enemiesSoundManager = new EnemiesSoundManager();
+            AddChild(enemiesSoundManager);
+            
             var spawnPointObject = _map.ObjectGroup.Objects.FirstOrDefault(o => o.Name == "spawn point");
             _spawnPoint = new Vector2(spawnPointObject.X, spawnPointObject.Y);
 
@@ -102,7 +105,7 @@ namespace GXPEngine
                 _pizzasPool[i] = pizza;
             }
             
-            _airplanesManager = new AirplanesManager(this);
+            _airplanesManager = new AirplanesManager(this, enemiesSoundManager);
             _airplanesManager.SpawnAirplanes();
 
             AddChild(_airplanesManager);
