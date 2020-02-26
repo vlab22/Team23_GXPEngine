@@ -9,24 +9,39 @@ namespace GXPEngine
         private SoundManager _soundManager;
         private FollowCamera _cam;
 
-        private Dictionary<int, float> _soundMaxVolumeMap;
-        private Dictionary<int, float> _soundMaxDistanceMap;
+        private Dictionary<uint, float> _soundMaxVolumeMap;
+        private Dictionary<uint, float> _soundMaxDistanceMap;
 
         private Dictionary<GameObject, SoundChannel[]>
             _fxChannelEnemyMap = new Dictionary<GameObject, SoundChannel[]>();
+
+        private Dictionary<uint, IHasDistanceToTarget> _fxChannelDistanceMap =
+            new Dictionary<uint, IHasDistanceToTarget>();
+
+        private readonly Dictionary<Type, int> _channelsMaxQtdPerType = new Dictionary<Type, int>()
+        {
+            {typeof(Airplane), 5}
+        };
+
+        private Dictionary<Type, int> _channelsCounterPerType = new Dictionary<Type, int>()
+        {
+            {typeof(Airplane), 0}
+        };
 
         public EnemiesSoundManager() : base(false)
         {
             _soundManager = SoundManager.Instance;
 
-            _soundMaxVolumeMap = new Dictionary<int, float>()
+            _soundMaxVolumeMap = new Dictionary<uint, float>()
             {
-                {0, 0.7f}
+                {0, 0.2f},
+                {1, 0.3f}
             };
 
-            _soundMaxDistanceMap = new Dictionary<int, float>()
+            _soundMaxDistanceMap = new Dictionary<uint, float>()
             {
                 {0, 1000f},
+                {1, 500f},
             };
 
             CoroutineManager.StartCoroutine(Start(), this);
@@ -43,38 +58,57 @@ namespace GXPEngine
 
         public void CreateChannel(GameObject go)
         {
-            if (go is Airplane)
-            {
-                _soundManager.CreateFxChannel(go, new int[] {0});
-            }
+            // var goType = go.GetType();
+            //
+            // if (go is Airplane)
+            // {
+            //     _soundManager.CreateFxChannel(typeof(Airplane), new uint[] {0, 1, 2, 3});
+            //     _channelsCounterPerType[goType] += 1;
+            // }
         }
 
-        private void UpdateVolumesRelativeToDistanceToTarget(GameObject soundMaker, int soundId)
+        private void UpdateVolumesRelativeToDistanceToTarget(IHasDistanceToTarget iHasDistance, uint soundId)
         {
-            var iHasDistance = soundMaker as IHasDistanceToTarget;
+            var dist = iHasDistance.Distance.Magnitude;
+            float currentDistance = float.MaxValue;
 
-            float dist = iHasDistance.Distance.Magnitude;
-
-            float vol = 0;
-
-            if (dist > _soundMaxDistanceMap[soundId])
+            if (_fxChannelDistanceMap.TryGetValue(soundId, out var currentHasDistance))
             {
-                _soundManager.StopFx(soundMaker, soundId);
+                currentDistance = currentHasDistance.Distance.Magnitude;
+            }
+
+            if (dist <= currentDistance)
+            {
+                _fxChannelDistanceMap[soundId] = iHasDistance;
+                currentDistance = dist;
             }
             else
             {
-                vol = Mathf.Map(dist, _soundMaxDistanceMap[soundId], 0, 0, _soundMaxVolumeMap[soundId]);
-
-                _soundManager.SetFxVolume(soundMaker, soundId, vol);
+                // Console.WriteLine(
+                //     $"{iHasDistance.gameObject.name}_{iHasDistance.GetHashCode()}: dist: {dist:0.00} | currDist: {currentDistance:0.00} |  max: {_soundMaxDistanceMap[soundId]:0.00} | {Time.time}");
+                return;
             }
 
-            Console.WriteLine(
-                $"{this}: dist: {dist:0.00} | max: {_soundMaxDistanceMap[soundId]:0.00} | vol: {vol:0.00}");
+            float vol = 0;
+
+            if (currentDistance > _soundMaxDistanceMap[soundId])
+            {
+                _soundManager.SetFxVolume(soundId, 0);
+            }
+            else
+            {
+                vol = Mathf.Map(dist, _soundMaxDistanceMap[soundId], 0, 0f, _soundMaxVolumeMap[soundId]);
+                
+                _soundManager.SetFxVolume(soundId, vol);
+            }
+
+            // Console.WriteLine(
+            //     $"{iHasDistance.gameObject.name}_{iHasDistance.GetHashCode()}: dist: {dist:0.00} | currDist: {currentDistance:0.00} |  max: {_soundMaxDistanceMap[soundId]:0.00} | vol: {vol:0.00} | {Time.time}");
         }
 
         void IOnUpdateListener.OnUpdate(GameObject go, int intVal)
         {
-            UpdateVolumesRelativeToDistanceToTarget(go, intVal);
+            UpdateVolumesRelativeToDistanceToTarget((IHasDistanceToTarget) go, (uint) intVal);
         }
     }
 }

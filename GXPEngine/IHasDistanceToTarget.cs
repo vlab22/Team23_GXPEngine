@@ -5,5 +5,6 @@ namespace GXPEngine
     public interface IHasDistanceToTarget
     {
         Vector2 Distance { get; }
+        GameObject gameObject { get; }
     }
 }

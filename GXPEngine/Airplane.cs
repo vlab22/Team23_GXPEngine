@@ -90,6 +90,8 @@ namespace GXPEngine
         }
 
         Vector2 IHasDistanceToTarget.Distance => _distanceToTarget;
+        
+        GameObject IHasDistanceToTarget.gameObject => this;
 
         public IOnUpdateListener[] OnUpdateListeners
         {

@@ -8,12 +8,12 @@ using Rectangle = GXPEngine.Core.Rectangle;
 
 namespace GXPEngine
 {
-    public class Stork : Sprite, IHasSpeed
+    public class Stork : AnimationSprite, IHasSpeed
     {
         private AnimationSprite _body;
 
-        private AnimationSprite _leftWing;
-        private AnimationSprite _rightWing;
+        //private AnimationSprite _leftWing;
+        //private AnimationSprite _rightWing;
 
         private const int PRESSURE_TIME_SENSITIVITY = 200;
 
@@ -55,10 +55,14 @@ namespace GXPEngine
 
         private bool _inputEnabled;
 
-        public Stork(float pMaxSpeed = 200) : base("data/Stork Background.png")
+        private bool _isPushing;
+
+        private const int PUSH_FRAMECOUNT = 9;
+
+        public Stork(float pMaxSpeed = 200) : base("data/Stork 2.png", 5, 3, 12, false, true)
         {
             _maxSpeed = pMaxSpeed;
-            
+
             _inputEnabled = true;
 
             SetOrigin(85f / 2, 85f / 2);
@@ -68,16 +72,16 @@ namespace GXPEngine
             _body = new AnimationSprite("data/Stork00.png", 3, 1, -1, false, false);
             _body.SetOrigin(85f / 2, 85f / 2);
             _body.visible = false;
-            AddChild(_body);
+            //AddChild(_body);
 
-            _leftWing = new AnimationSprite("data/Stork_Left_Wing.png", 3, 1, -1, false, false);
-            _rightWing = new AnimationSprite("data/Stork_Right_Wing.png", 3, 1, -1, false, false);
-
-            _leftWing.SetOrigin(85f / 2, 85f / 2);
-            _rightWing.SetOrigin(85f / 2, 85f / 2);
-
-            AddChild(_leftWing);
-            AddChild(_rightWing);
+            // _leftWing = new AnimationSprite("data/Stork_Left_Wing.png", 3, 1, -1, false, false);
+            // _rightWing = new AnimationSprite("data/Stork_Right_Wing.png", 3, 1, -1, false, false);
+            //
+            // _leftWing.SetOrigin(85f / 2, 85f / 2);
+            // _rightWing.SetOrigin(85f / 2, 85f / 2);
+            //
+            // AddChild(_leftWing);
+            // AddChild(_rightWing);
         }
 
         private IEnumerator ResizeDebug()
@@ -112,7 +116,7 @@ namespace GXPEngine
 
             if (_leftWingPressure < PRESSURE_TIME_SENSITIVITY)
             {
-                _leftWing.SetFrame(1);
+                //SetFrame(0);
                 _leftWingTime = 0;
                 _leftPush = 0;
             }
@@ -120,18 +124,24 @@ namespace GXPEngine
             {
                 _leftWingTime += _leftWingPressure > 0 ? Time.deltaTime : -Time.deltaTime;
 
-                _leftPush = Easing.Ease(Easing.Equation.CubicEaseInOut, _leftWingTime, 0, _leftWing.frameCount,
+                _leftPush = Easing.Ease(Easing.Equation.CubicEaseInOut, _leftWingTime, 0, PUSH_FRAMECOUNT,
                     _wingAnimationSpeed);
-                _leftPush = Mathf.Clamp(_leftPush, 0, _leftWing.frameCount);
+                
+                _leftPush = Mathf.Clamp(_leftPush, 0, PUSH_FRAMECOUNT);
+
+                
                 int leftFrame = Mathf.Round(_leftPush);
 
+                _leftPush = Mathf.Clamp(_leftPush, 0, 3);
+                
                 if (_rightWingPressure > PRESSURE_TIME_SENSITIVITY)
-                    _leftWing.SetFrame(leftFrame);
+                    SetFrame(leftFrame);
+                
             }
 
             if (_rightWingPressure < PRESSURE_TIME_SENSITIVITY)
             {
-                _rightWing.SetFrame(1);
+                //SetFrame(0);
                 _rightWingTime = 0;
                 _rightPush = 0;
             }
@@ -139,13 +149,15 @@ namespace GXPEngine
             {
                 _rightWingTime += _rightWingPressure > 0 ? Time.deltaTime : -Time.deltaTime;
 
-                _rightPush = Easing.Ease(Easing.Equation.CubicEaseInOut, _rightWingTime, 0, _rightWing.frameCount,
+                _rightPush = Easing.Ease(Easing.Equation.CubicEaseInOut, _rightWingTime, 0, PUSH_FRAMECOUNT,
                     _wingAnimationSpeed);
-                _rightPush = Mathf.Clamp(_rightPush, 0, _rightWing.frameCount);
+                _rightPush = Mathf.Clamp(_rightPush, 0, PUSH_FRAMECOUNT);
                 int rightFrame = Mathf.Round(_rightPush);
 
+                _rightPush = Mathf.Clamp(_rightPush, 0, 3);
+                
                 if (_leftWingPressure >= PRESSURE_TIME_SENSITIVITY)
-                    _rightWing.SetFrame(rightFrame);
+                    SetFrame(rightFrame);
             }
 
             bool hasPressure = _leftPush > 0 || _rightPush > 0;
@@ -171,13 +183,22 @@ namespace GXPEngine
 
                     float right = _rightPush * pushForce;
                     _currentSpeed += right * Time.delta;
+
+                    if (!_isPushing)
+                    {
+                        var channel = SoundManager.Instance.SetFxVolume(2, 1f);
+                    }
+
+                    _isPushing = true;
                 }
                 else
                 {
                     _currentSpeed += _dampSpeed * Time.delta;
+
+                    _isPushing = false;
                 }
             }
-            
+
             TurnStork(Time.delta);
 
             _currentSpeed = Mathf.Clamp(_currentSpeed, _minSpeed, _maxSpeed);
@@ -186,7 +207,7 @@ namespace GXPEngine
             {
                 _iUpdater.NextPosition(_pos, _pos + _forward * _currentSpeed * Time.delta);
             }
-            
+
             if (_currentSpeed > 0 && IsMoveAllowed) //AllowMove will be calculated by a _iUpdater
             {
                 //var nextPos = _pos + _forward * _currentSpeed * Time.deltaTime * 0.001f;
@@ -198,9 +219,9 @@ namespace GXPEngine
             {
                 _iUpdater.OnMove(_pos, _lastPos);
             }
-
+            
             GL.glfwSetWindowTitle(
-                $"speed: {_currentSpeed:0.00} | left: {_leftPush:0.00} | right: {_rightPush:0.00} | angularPushDelta: {_angularPushDelta:0.00} | angularPush: {_angularPush:0.00} | leftPress: {_leftWingPressure:0.00} | pos: {_pos}");
+                $"speed: {_currentSpeed:0.00} | left: {_leftPush:0.00} | right: {_rightPush:0.00} | angularPushDelta: {_angularPushDelta:0.00} | angularPush: {_angularPush:0.00} | leftPress: {_leftWingPressure:0.00} | pos: {_pos} | frame: {_currentFrame}");
 
             DrawBoundBox();
         }
@@ -209,34 +230,36 @@ namespace GXPEngine
         {
             _angularPushDelta = _leftPush - _rightPush;
             float angularPushDeltaAbs = Mathf.Abs(_angularPushDelta);
-            
+
             //onsole.WriteLine($"{this}: angularpushDelta: {_angularPushDelta:0.00}");
+
+            bool hasPressure = (_leftPush > 0 || _rightPush > 0);
             
-            if (true)//angularPushDeltaAbs >= 0)
+            if (true) //angularPushDeltaAbs >= 0)
             {
                 _angularPush = _angularPushDelta * 15;
                 Turn(-1 * _angularPush * delta);
-                
+
                 if (_angularPushDelta > 0.050f)
                 {
                     _body.visible = true;
-                    _leftWing.visible = false;
-                    _rightWing.visible = false;
-                    _body.SetFrame(2);
+                    //_leftWing.visible = false;
+                    //_rightWing.visible = false;
+                    SetFrame(10);
                 }
                 else if (_angularPushDelta < -0.050f)
                 {
                     _body.visible = true;
-                    _leftWing.visible = false;
-                    _rightWing.visible = false;
-                    _body.SetFrame(1);
+                    //_leftWing.visible = false;
+                    //_rightWing.visible = false;
+                    SetFrame(11);
                 }
-                else
+                else if (!hasPressure)
                 {
                     _body.visible = false;
-                    _leftWing.visible = true;
-                    _rightWing.visible = true;
-                    _body.SetFrame(0);
+                    // _leftWing.visible = true;
+                    //_rightWing.visible = true; 
+                    SetFrame(0);
                 }
             }
             else
@@ -324,7 +347,7 @@ namespace GXPEngine
             get => _inputEnabled;
             set => _inputEnabled = value;
         }
-        
+
         public Vector2 Forward => _forward;
 
         public float CurrentSpeed => _currentSpeed;

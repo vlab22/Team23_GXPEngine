@@ -12,11 +12,13 @@ namespace GXPEngine
         Level _level;
         List<DroneGameObject> _drones;
         private IEnumerator _droneReleasePizzaRoutine;
+        private EnemiesSoundManager _enemiesSoundManager;
 
-        public DronesManager(Level pLevel) : base(false)
+        public DronesManager(Level pLevel, EnemiesSoundManager pEnemiesSoundManager) : base(false)
         {
             _level = pLevel;
             _drones = new List<DroneGameObject>();
+            _enemiesSoundManager = pEnemiesSoundManager;
 
             //CoroutineManager.StartCoroutine(Foo(), this);
         }
@@ -48,6 +50,7 @@ namespace GXPEngine
                     droneData.rotation);
 
                 drone.DroneBehaviorListener = this;
+                drone.OnUpdateListeners = drone.OnUpdateListeners.Concat(new IOnUpdateListener[] {_enemiesSoundManager}).ToArray();
 
                 _drones.Add(drone);
 

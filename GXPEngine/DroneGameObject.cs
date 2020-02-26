@@ -70,10 +70,20 @@ namespace GXPEngine
         private IEnumerator _endLevelRoutine;
 
         private Vector2 _distanceToTarget;
+        private IOnUpdateListener[] _onUpdateListeners = new IOnUpdateListener[0];
+        
+        private float[] pitchInterval = new float[]
+        {
+            1, 1.2f
+        };
 
+        private int _frameNumber;
+        private static int _FrameSpeed = 20;
+        private int _frameTimer;
+        
         public DroneGameObject(float pX, float pY, float pWidth, float pHeight, float pSpeed = 200,
             float pRotation = 0) : base(
-            "data/Drone spritesheet small.png", 3, 3, 5, false, true)
+            "data/Drone spritesheet small.png", 2, 2, 4, false, true)
         {
             _id = ++IdCounter;
             name = $"{this}_{_id}";
@@ -388,6 +398,24 @@ namespace GXPEngine
         {
             if (!this.Enabled) return;
 
+            if (_frameTimer >= _FrameSpeed)
+            {
+                SetFrame(++_frameNumber % frameCount);
+                _frameTimer = 0;
+            }
+
+            _frameTimer += Time.deltaTime;
+
+            for (int i = 0; i < _onUpdateListeners.Length; i++)
+            {
+                _onUpdateListeners[i].OnUpdate(this, 1);
+            }
+
+            if (_state == DroneState.END_LEVEL)
+            {
+                _distanceToTarget = _enemy.Pos - _pos;
+            }
+            
             _easyDrawDebug.visible = MyGame.Debug;
 
             if (MyGame.Debug)
@@ -522,6 +550,20 @@ namespace GXPEngine
         public uint Id => _id;
 
         Vector2 IHasDistanceToTarget.Distance => _distanceToTarget;
+
+        GameObject IHasDistanceToTarget.gameObject => this;
+        
+        public IOnUpdateListener[] OnUpdateListeners
+        {
+            get => _onUpdateListeners;
+            set => _onUpdateListeners = value;
+        }
+
+        public static int FrameSpeed
+        {
+            get => _FrameSpeed;
+            set => _FrameSpeed = value;
+        }
     }
 
     internal class DroneFollowRangeCone : Sprite

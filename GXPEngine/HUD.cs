@@ -147,9 +147,11 @@ Turn is weird flapping one wing while the other is static";
             _slider01.x = 50;
             _slider01.y = 50 + 34;
 
-            _slider01.OnValueChanged += ChangeDroneDetectRange;
+            //_slider01.OnValueChanged += ChangeDroneDetectRange;
 
-            _slider01.OnValueChanged += DebugChangeThermometerValue;
+            //_slider01.OnValueChanged += DebugChangeThermometerValue;
+
+            _slider01.OnValueChanged += ChangeDroneFrameSpeed;
 
             _hudThermometer = new HudThermometer();
             AddChild(_hudThermometer);
@@ -222,6 +224,15 @@ Turn is weird flapping one wing while the other is static";
 
                 drone.WaitingSpeed = 100 * val;
             }
+        }
+        
+        private void ChangeDroneFrameSpeed(float val)
+        {
+            int intVal = Mathf.Round(Mathf.Map(val, 0, 1, 5, 500));
+
+            DroneGameObject.FrameSpeed = intVal;
+            
+            Console.WriteLine($"{this}: framespeed: {intVal}");
         }
 
         private void DebugChangeThermometerValue(float val)

@@ -79,6 +79,8 @@ namespace GXPEngine
                     //Pizza delivered
                     LocalEvents.Instance.Raise(new LevelLocalEvent(_level, LevelLocalEvent.EventType.PIZZA_DELIVERED));
 
+                    SoundManager.Instance.SetFxVolume(5, 0.5f);
+                    
                     //Drop the pizza to the center of the delivery point
                     var dropPoint = new Vector2(other.x, other.y);
                     CoroutineManager.StartCoroutine(DropPizzaRoutine(dropPoint), this);

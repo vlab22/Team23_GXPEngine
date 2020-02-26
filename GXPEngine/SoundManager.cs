@@ -21,7 +21,12 @@ namespace GXPEngine
 
         private Sound[] _fxs = new Sound[]
         {
-            new Sound("data/AirplaneEngine.ogg", true, false) //0
+            new Sound("data/AirplaneEngine.ogg", true, false), //0
+            new Sound("data/Drone flying.wav", true, false), //1
+            new Sound("data/BirdFlap.wav", false, false), //2
+            new Sound("data/Sniper Shot.wav", false, false), //3
+            new Sound("data/Rifle Reload.wav", false, false), //4
+            new Sound("data/PizzaDeliveryPLIIIINNGGG.wav", false, false), //5
         };
 
         private Sound[] _explosionFxs = new Sound[]
@@ -39,73 +44,77 @@ namespace GXPEngine
             // new Sound("data/kids-boo.ogg", false, true), //5
         };
 
-        private Dictionary<GameObject, SoundChannel[]> _fxChannelsMap;
+        private Dictionary<Type, SoundChannel[]> _fxChannelsMap;
+        
+        private SoundChannel[] _fxChannels;
         private SoundChannel[] _fxExplosionChannels;
         private SoundChannel[] _fxHudChannels;
 
         private SoundManager()
         {
-            _fxChannelsMap = new Dictionary<GameObject, SoundChannel[]>();
+            _fxChannelsMap = new Dictionary<Type, SoundChannel[]>();
+           
+            _fxChannels = new SoundChannel[_fxs.Length];
             _fxExplosionChannels = new SoundChannel[_explosionFxs.Length];
             _fxHudChannels = new SoundChannel[_hudFxs.Length];
         }
 
-        // public void PlayFx(int index)
-        // {
-        //     index = index % _fxs.Length;
-        //
-        //     if (_fxChannelsMap[index] != null && _fxChannelsMap[index].IsPlaying)
-        //     {
-        //         _fxChannelsMap[index].Stop();
-        //     }
-        //
-        //     _fxChannelsMap[index] = _fxs[index].Play();
-        // }
-
-        public void CreateFxChannel(GameObject go, int[] soundIds)
+        public void PlayFx(int soundId)
         {
-            if (_fxChannelsMap.ContainsKey(go))
+            soundId = soundId % _fxs.Length;
+        
+            if (_fxChannels[soundId] != null && _fxChannels[soundId].IsPlaying)
+            {
+                _fxChannels[soundId].Stop();
+            }
+        
+            _fxChannels[soundId] = _fxs[soundId].Play();
+        }
+
+        public void CreateFxChannel(Type type, uint[] channelsIds)
+        {
+            if (_fxChannelsMap.ContainsKey(type))
             {
                 return;
             }
 
-            SoundChannel[] soundChannels = new SoundChannel[soundIds.Length];
-            for (int i = 0; i < soundIds.Length; i++)
+            SoundChannel[] soundChannels = new SoundChannel[channelsIds.Length];
+            for (int i = 0; i < channelsIds.Length; i++)
             {
-                var soundChannel = _fxs[i].Play(true);
-                soundChannel.Stop();
+                var soundChannel = _fxs[0].Play(true);
+                soundChannel.Volume = 0;
 
                 soundChannels[i] = soundChannel;
             }
 
-            _fxChannelsMap.Add(go, soundChannels);
+            _fxChannelsMap.Add(type, soundChannels);
         }
 
-        public void PlayFxChannel(GameObject go, int soundId)
+        // public void PlayFxChannel(GameObject go, int soundId)
+        // {
+        //     var channel = _fxChannelsMap[go][soundId];
+        //
+        //     if (channel.IsPlaying)
+        //     {
+        //         channel.Stop();
+        //     }
+        //
+        //     channel = _fxs[soundId].Play();
+        // }
+
+        // public void StopFxChannel(GameObject go, int soundId)
+        // {
+        //     var channel = _fxChannelsMap[go][soundId];
+        //
+        //     if (channel.IsPlaying)
+        //     {
+        //         channel.Stop();
+        //     }
+        // }
+
+        public bool IsFxPlaying(Type type, int soundId)
         {
-            var channel = _fxChannelsMap[go][soundId];
-
-            if (channel.IsPlaying)
-            {
-                channel.Stop();
-            }
-
-            channel = _fxs[soundId].Play();
-        }
-
-        public void StopFx(GameObject go, int soundId)
-        {
-            var channel = _fxChannelsMap[go][soundId];
-
-            if (channel.IsPlaying)
-            {
-                channel.Stop();
-            }
-        }
-
-        public bool IsFxPlaying(GameObject go, int soundId)
-        {
-            var channel = _fxChannelsMap[go][soundId];
+            var channel = _fxChannelsMap[type][soundId];
 
             return channel.IsPlaying;
         }
@@ -120,16 +129,25 @@ namespace GXPEngine
         //     _fxChannelsMap[index].Frequency = pitch;
         // }
 
-        public void SetFxVolume(GameObject go, int soundId, float vol)
+        public SoundChannel SetFxVolume(uint soundId, float vol)
         {
-            var channel = _fxChannelsMap[go][soundId];
-
-            if (!channel.IsPlaying)
+            if (_fxChannels[soundId] == null || _fxChannels[soundId].IsPlaying == false)
             {
-                channel = _fxs[soundId].Play();
+                _fxChannels[soundId] = _fxs[soundId].Play(true);
+            }
+
+            if (_fxChannels[soundId].IsPaused)
+            {
+                _fxChannels[soundId].Volume = vol;
+                _fxChannels[soundId].IsPaused = false;
             }
             
-            channel.Volume = vol;
+            if (_fxChannels[soundId].IsPlaying)
+            {
+                _fxChannels[soundId].Volume = vol;
+            }
+
+            return _fxChannels[soundId];
         }
 
         public void PlayExplosionFx(int index = -1)
@@ -198,12 +216,11 @@ namespace GXPEngine
         {
             foreach (var kv in _fxChannelsMap)
             {
-                if (kv.Value != null)
+                if (kv.Value == null) continue;
+                
+                for (int i = 0; i < kv.Value.Length; i++)
                 {
-                    for (int i = 0; i < kv.Value.Length; i++)
-                    {
-                        kv.Value[i].Stop();
-                    }
+                    kv.Value[i].Stop();
                 }
             }
         }
@@ -248,7 +265,9 @@ namespace GXPEngine
             // {
             //     for (int i = 0; i < kv.Value.Length; i++)
             //     {
-            //         Console.WriteLine($"{this}: {kv.Key.name} | {kv.Value[i].IsPlaying} | {kv.Value[i].IsPaused}");
+            //         if (kv.Value[i].IsPlaying == false) continue;
+            //         
+            //         Console.WriteLine($"{this}: {kv.Key.name} | {kv.Value[i].IsPlaying} | {kv.Value[i].IsPaused} | vol: {kv.Value[i].Volume}");
             //     }
             // }
         }

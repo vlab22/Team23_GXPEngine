@@ -31,7 +31,6 @@ namespace GXPEngine
             for (int i = 0; i < _airplanesPool.Length; i++)
             {
                 var airplane = new Airplane();
-                _enemiesSoundManager.CreateChannel(airplane);
 
                 airplane.OnUpdateListeners =
                     airplane.OnUpdateListeners.Concat(new IOnUpdateListener[] {_enemiesSoundManager}).ToArray();
@@ -66,7 +65,8 @@ namespace GXPEngine
             int spawnFrequency = (int) (airData.GetFloatProperty("spawn_frequency_time", 0) * 1000);
 
             var airplane = GetAirplaneFromPool();
-
+            _enemiesSoundManager.CreateChannel(airplane);
+            
             airplane.LoadStartupData(airData.X, airData.Y, airData.Width, airData.Height, _level, _level.Stork,
                 airSpeed,
                 airData.rotation, lifeTime);

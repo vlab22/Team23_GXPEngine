@@ -122,6 +122,8 @@ namespace GXPEngine
 
             SpriteTweener.TweenAlpha(_crossHair, 0, 1, 400);
 
+            SoundManager.Instance.SetFxVolume(4, 0.5f);
+            
             yield return new WaitForMilliSeconds(500);
 
             //Start Lock enemy
@@ -235,6 +237,8 @@ namespace GXPEngine
         {
             _state = HunterState.SHOOT;
 
+            SoundManager.Instance.PlayFx(3);
+            
             Console.WriteLine($"{this}: SHOOT!!!");
 
             for (int i = 0; i < _hunterBehaviorListeners.Length; i++)
@@ -349,6 +353,8 @@ namespace GXPEngine
         public float ScanEnemyRange => _scanEnemyRange;
 
         public Vector2 Distance => _distanceToTarget;
+        
+        GameObject IHasDistanceToTarget.gameObject => this;
     }
 
     internal class HunterFollowRangeCone : Sprite

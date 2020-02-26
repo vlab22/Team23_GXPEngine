@@ -91,7 +91,7 @@ namespace GXPEngine
             _huntersManager.SpawnHunters();
             _huntersManager.SetHuntersTarget(_stork);
 
-            _dronesesManager = new DronesManager(this);
+            _dronesesManager = new DronesManager(this, enemiesSoundManager);
             _dronesesManager.SpawnDrones();
 
             _dronesesManager.SetDronesTarget(_stork);
