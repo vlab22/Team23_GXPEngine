@@ -9,6 +9,8 @@
         <e p="AirplanesManager.cs" t="Include" />
         <e p="bin" t="ExcludeRecursive" />
         <e p="CanvasDebugger2.cs" t="Include" />
+        <e p="CloudGameObject.cs" t="Include" />
+        <e p="CloudsManager.cs" t="Include" />
         <e p="CompoundCollider.cs" t="Include" />
         <e p="DeliveryPoint.cs" t="Include" />
         <e p="DrawableTweener.cs" t="Include" />
@@ -22,6 +24,7 @@
           <e p="LevelLocalEvent.cs" t="Include" />
           <e p="StorkLocalEvent.cs" t="Include" />
         </e>
+        <e p="GameOverScreen.cs" t="Include" />
         <e p="gxpengine" t="Include">
           <e p="AddOns" t="Include">
             <e p="Camera.cs" t="Include" />
@@ -79,6 +82,7 @@
         <e p="HUD.cs" t="Include" />
         <e p="HudArrowToObjective.cs" t="Include" />
         <e p="HudScore.cs" t="Include" />
+        <e p="HudScreenFader.cs" t="Include" />
         <e p="HudSlider.cs" t="Include" />
         <e p="HudTextBoard.cs" t="Include" />
         <e p="HudThermometer.cs" t="Include" />
@@ -94,6 +98,7 @@
         <e p="IOnUpdateListener.cs" t="Include" />
         <e p="IStorkInput.cs" t="Include" />
         <e p="Level.cs" t="Include" />
+        <e p="LevelEndScreen.cs" t="Include" />
         <e p="LevelManager.cs" t="Include" />
         <e p="MapGameObject.cs" t="Include" />
         <e p="MathfExtensions.cs" t="Include" />
@@ -107,13 +112,16 @@
         <e p="ParticleManager.cs" t="Include" />
         <e p="PizzaGameObject.cs" t="Include" />
         <e p="PlayerInput.cs" t="Include" />
+        <e p="Screen.cs" t="Include" />
         <e p="SoundManager.cs" t="Include" />
         <e p="SpriteTweener.cs" t="Include" />
+        <e p="StartScreen.cs" t="Include" />
         <e p="StopWatchTool.cs" t="Include" />
         <e p="Stork.cs" t="Include" />
         <e p="StorkManager.cs" t="Include" />
         <e p="TiledMapParserExtended.cs" t="Include" />
         <e p="TmxFilesLoader.cs" t="Include" />
+        <e p="Tutorial01Screen.cs" t="Include" />
         <e p="Utils" t="Include">
           <e p="ColorTool.cs" t="Include" />
           <e p="CoroutineManager.cs" t="Include" />

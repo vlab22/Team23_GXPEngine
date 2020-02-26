@@ -25,6 +25,8 @@ namespace GXPEngine
         private HuntersManager _huntersManager;
 
         private AirplanesManager _airplanesManager;
+
+        private CloudsManager _cloudsManager;
         
         private bool _isLevelEndingByWon;
         private bool _isLevelEndingByLost;
@@ -77,7 +79,9 @@ namespace GXPEngine
                 y = _spawnPoint.y,
                 rotation = spawnPointObject.rotation
             };
+            
             AddChild(_stork);
+            _stork.SetScaleXY(1.5f, 1.5f);
 
             _storkManager = new StorkManager(_stork, this);
             AddChild(_storkManager);
@@ -111,8 +115,11 @@ namespace GXPEngine
             AddChild(_airplanesManager);
 
             _map.DrawBorders(this, 0.5f);
-
-            _map.DrawClouds(this);
+            
+            _cloudsManager = new CloudsManager(_map, this);
+            AddChild(_cloudsManager);
+            
+            _cloudsManager.SpawnClouds();
             
             CoroutineManager.StartCoroutine(SetCamTargetRoutine(_stork), this);
 
@@ -120,6 +127,9 @@ namespace GXPEngine
             _cam.Map = _map;
             _cam.SetXY(_map.MapWidthInPixels * 0.5f, _map.MapHeightInPixels * 0.5f);
             _cam.Start();
+            
+            _cam.AddChild(HudScreenFader.instance);
+            HudScreenFader.instance.SetXY(-game.width * 0.5f, -game.height * 0.5f);
 
             _hud = new HUD(_cam);
         }

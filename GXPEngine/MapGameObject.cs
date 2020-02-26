@@ -201,7 +201,6 @@ namespace GXPEngine
                 }
             }
 
-
             var drawWatch = StopwatchTool.StartWatch();
 
             DrawBackgroundLayers();
@@ -267,7 +266,7 @@ namespace GXPEngine
             for (int i = 0; i < _mapData.Layers.Length; i++)
             {
                 Layer layer = _mapData.Layers[i];
-                if (layer.Visible)
+                if (i != _cloudsLayerIndex && layer.Visible)
                 {
                     DrawLayer(i, this);
                 }
@@ -567,11 +566,16 @@ namespace GXPEngine
             return GetTileIdFromWorld(_cloudsLayerIndex, px, py);
         }
 
+        public short[,] GetCloudsTileArray()
+        {
+            return _tileArrays[_cloudsLayerIndex];
+        }
+
         public void DrawClouds(GameObject parent)
         {
             DrawLayer(_cloudsLayerIndex, parent);
         }
-        
+
         public ObjectGroup ObjectGroup => _objectGroup;
 
         public int MapWidthInPixels => _mapData.Width * _mapData.TileWidth;

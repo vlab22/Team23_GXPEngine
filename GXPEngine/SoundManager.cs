@@ -12,7 +12,7 @@ namespace GXPEngine
 
         private Sound[] _musics = new Sound[]
         {
-            // new Sound("data/Music1.ogg", true, true),
+            new Sound("data/Theme music.ogg", true, true),
             // new Sound("data/Music2.ogg", true, true),
             // new Sound("data/Music3.ogg", true, true),
         };
@@ -45,15 +45,16 @@ namespace GXPEngine
         };
 
         private Dictionary<Type, SoundChannel[]> _fxChannelsMap;
-        
+
         private SoundChannel[] _fxChannels;
         private SoundChannel[] _fxExplosionChannels;
         private SoundChannel[] _fxHudChannels;
+        private bool _isSoundEnabled = true;
 
         private SoundManager()
         {
             _fxChannelsMap = new Dictionary<Type, SoundChannel[]>();
-           
+
             _fxChannels = new SoundChannel[_fxs.Length];
             _fxExplosionChannels = new SoundChannel[_explosionFxs.Length];
             _fxHudChannels = new SoundChannel[_hudFxs.Length];
@@ -62,12 +63,12 @@ namespace GXPEngine
         public void PlayFx(int soundId)
         {
             soundId = soundId % _fxs.Length;
-        
+
             if (_fxChannels[soundId] != null && _fxChannels[soundId].IsPlaying)
             {
                 _fxChannels[soundId].Stop();
             }
-        
+
             _fxChannels[soundId] = _fxs[soundId].Play();
         }
 
@@ -131,6 +132,8 @@ namespace GXPEngine
 
         public SoundChannel SetFxVolume(uint soundId, float vol)
         {
+            if (_isSoundEnabled == false) return null;
+            
             if (_fxChannels[soundId] == null || _fxChannels[soundId].IsPlaying == false)
             {
                 _fxChannels[soundId] = _fxs[soundId].Play(true);
@@ -141,7 +144,7 @@ namespace GXPEngine
                 _fxChannels[soundId].Volume = vol;
                 _fxChannels[soundId].IsPaused = false;
             }
-            
+
             if (_fxChannels[soundId].IsPlaying)
             {
                 _fxChannels[soundId].Volume = vol;
@@ -191,7 +194,7 @@ namespace GXPEngine
             index = Mathf.Abs(index % _musics.Length);
 
             _currentMusicChannel = _musics[index].Play();
-            _currentMusicChannel.Volume = 0.6f;
+            _currentMusicChannel.Volume = 0.07f;
         }
 
         public void StopMusic()
@@ -214,15 +217,21 @@ namespace GXPEngine
 
         public void StopAllSounds()
         {
-            foreach (var kv in _fxChannelsMap)
+            for (int i = 0; i < _fxChannels.Length; i++)
             {
-                if (kv.Value == null) continue;
-                
-                for (int i = 0; i < kv.Value.Length; i++)
-                {
-                    kv.Value[i].Stop();
-                }
+                if (_fxChannels[i] != null)
+                    _fxChannels[i].Stop();
             }
+
+            // foreach (var kv in _fxChannelsMap)
+            // {
+            //     if (kv.Value == null) continue;
+            //     
+            //     for (int i = 0; i < kv.Value.Length; i++)
+            //     {
+            //         kv.Value[i].Stop();
+            //     }
+            // }
         }
 
         private IEnumerator FadeOutMusicRoutine(int duration)
@@ -275,6 +284,18 @@ namespace GXPEngine
         public Sound[] Fxs
         {
             get { return _fxs; }
+        }
+
+        public bool IsSoundEnabled
+        {
+            get => _isSoundEnabled;
+            set => _isSoundEnabled = value;
+        }
+
+        public void DisableAllSounds()
+        {
+            _isSoundEnabled = false;
+            StopAllSounds();
         }
     }
 }

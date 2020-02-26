@@ -27,9 +27,12 @@ namespace GXPEngine
 
         private int[] _cloudsIds = new int[]
         {
+            21,22,23,24,
+            37,38,39,40,
+            49,50,
             65, 66,
             81, 82,
-            97, 98
+            97, 98,
         };
 
         private int _cloudsFirstGid;
@@ -80,7 +83,7 @@ namespace GXPEngine
 
             if (IsInsideCloud(cloudId - _cloudsFirstGid))
             {
-                Console.WriteLine($"{this}: cloudId: {cloudId - _cloudsFirstGid}");   
+                //Console.WriteLine($"{this}: cloudId: {cloudId - _cloudsFirstGid} | {Time.time}");
             }
 
             //Update Hud
@@ -96,7 +99,7 @@ namespace GXPEngine
             {
                 yield return null;
             }
-
+            
             this.PizzaLives = 3;
         }
 
@@ -176,7 +179,7 @@ namespace GXPEngine
             yield return null;
         }
 
-        private void EndLevelByLost()
+        private IEnumerator EndLevelByLost()
         {
             _level.IsLevelEndingByLost = true;
 
@@ -185,6 +188,25 @@ namespace GXPEngine
 
             //Stop all hunters
             _level.HuntersManager.EndLevelAllHunters();
+
+            yield return new WaitForMilliSeconds(1400);
+
+            var gameOverScreen = new GameOverScreen();
+
+            HudScreenFader.instance.FadeInOut(MyGame.ThisInstance.Camera, 1400,
+                () =>
+                {
+                    MyGame.ThisInstance.UnLoadCurrentLevel();
+                    
+                    SoundManager.Instance.DisableAllSounds();
+                    
+                    _level.RemoveChild(MyGame.ThisInstance.Camera);
+                    HudScreenFader.instance.parent = MyGame.ThisInstance;
+                    HudScreenFader.instance.SetXY(0,0);
+                    MyGame.ThisInstance.AddChildAt(gameOverScreen, HudScreenFader.instance.Index - 1);
+                    
+                },
+                null, CenterMode.Center);
         }
 
         private IEnumerator EndLevelByWonRoutine()
@@ -197,7 +219,24 @@ namespace GXPEngine
             //Stop all hunters
             _level.HuntersManager.EndLevelAllHunters();
 
-            yield break;
+            yield return new WaitForMilliSeconds(3000);
+
+            var levelEndScreen = new LevelEndScreen();
+
+            HudScreenFader.instance.FadeInOut(MyGame.ThisInstance.Camera, 1400,
+                () =>
+                {
+                    MyGame.ThisInstance.UnLoadCurrentLevel();
+                    
+                    SoundManager.Instance.DisableAllSounds();
+                    
+                    _level.RemoveChild(MyGame.ThisInstance.Camera);
+                    HudScreenFader.instance.parent = MyGame.ThisInstance;
+                    HudScreenFader.instance.SetXY(0,0);
+                    MyGame.ThisInstance.AddChildAt(levelEndScreen, HudScreenFader.instance.Index - 1);
+                    
+                },
+                null, CenterMode.Center);
         }
 
         protected override void OnDestroy()
@@ -243,7 +282,7 @@ namespace GXPEngine
 
         public bool IsInsideCloud(int tileId)
         {
-            return Array.IndexOf(_cloudsIds, tileId) > -1;
+            return Array.BinarySearch(_cloudsIds, 0, _cloudsIds.Length, tileId) > -1;
         }
 
         public int PizzaLives
@@ -256,7 +295,7 @@ namespace GXPEngine
 
                 if (_pizzaLives <= 0 && _level.IsLevelEndingByLost == false)
                 {
-                    EndLevelByLost();
+                    CoroutineManager.StartCoroutine(EndLevelByLost(), this);
                 }
             }
         }

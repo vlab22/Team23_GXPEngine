@@ -45,7 +45,7 @@ namespace GXPEngine
         private Vector2 _distanceToTarget;
 
         public HunterGameObject(float pX, float pY, float pWidth, float pHeight,
-            float pSightSpeed = 200) : base("data/Female Hunter.png", 1, 1,
+            float pSightSpeed = 200) : base("data/Hunter.png", 1, 1,
             -1, false, false)
         {
             _scanEnemyRange = pWidth;

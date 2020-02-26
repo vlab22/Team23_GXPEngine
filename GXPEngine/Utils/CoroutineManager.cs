@@ -22,6 +22,8 @@ public static class CoroutineManager
 
     private static bool _isIterating;
 
+    private static bool _flagToClearAllRoutines;
+
     public static IEnumerator StartCoroutine(IEnumerator ie, GameObject invoker)
     {
         if (_isIterating)
@@ -161,6 +163,20 @@ public static class CoroutineManager
         routinesToRemove.Clear();
 
         _isIterating = false;
+
+        if (_flagToClearAllRoutines)
+        {
+            Console.WriteLine(string.Join(Environment.NewLine,routines.Select(kv => kv.ToString())));
+            
+            // routines.Clear();
+            // routinesToAdd.Clear();
+            // routinesToRemove.Clear();
+            // routineWaitMap.Clear();
+            // // routinesInvokerMap.Clear();
+            // // invokersMap.Clear();
+
+            _flagToClearAllRoutines = false;
+        }
     }
 
     private static void RemoveRoutine(IEnumerator ie, bool locked = false)
@@ -197,10 +213,7 @@ public static class CoroutineManager
 
     public static void ClearAllRoutines()
     {
-        routines.Clear();
-        routinesToAdd.Clear();
-        routinesToRemove.Clear();
-        routineWaitMap.Clear();
+        _flagToClearAllRoutines = true;
     }
 }
 

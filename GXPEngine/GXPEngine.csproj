@@ -41,6 +41,8 @@
     <Compile Include="Airplane.cs" />
     <Compile Include="AirplanesManager.cs" />
     <Compile Include="CanvasDebugger2.cs" />
+    <Compile Include="CloudGameObject.cs" />
+    <Compile Include="CloudsManager.cs" />
     <Compile Include="CompoundCollider.cs" />
     <Compile Include="DeliveryPoint.cs" />
     <Compile Include="DrawableTweener.cs" />
@@ -52,9 +54,11 @@
     <Compile Include="GameLocalEvents\GameLocalEvent.cs" />
     <Compile Include="GameLocalEvents\LevelLocalEvent.cs" />
     <Compile Include="GameLocalEvents\StorkLocalEvent.cs" />
+    <Compile Include="GameOverScreen.cs" />
     <Compile Include="HUD.cs" />
     <Compile Include="HudArrowToObjective.cs" />
     <Compile Include="HudScore.cs" />
+    <Compile Include="HudScreenFader.cs" />
     <Compile Include="HudSlider.cs" />
     <Compile Include="HudTextBoard.cs" />
     <Compile Include="HudThermometer.cs" />
@@ -70,6 +74,7 @@
     <Compile Include="IOnUpdateListener.cs" />
     <Compile Include="IStorkInput.cs" />
     <Compile Include="Level.cs" />
+    <Compile Include="LevelEndScreen.cs" />
     <Compile Include="LevelManager.cs" />
     <Compile Include="MapGameObject.cs" />
     <Compile Include="MathfExtensions.cs" />
@@ -119,13 +124,16 @@
     <Compile Include="ParticleManager.cs" />
     <Compile Include="PizzaGameObject.cs" />
     <Compile Include="PlayerInput.cs" />
+    <Compile Include="Screen.cs" />
     <Compile Include="SoundManager.cs" />
     <Compile Include="SpriteTweener.cs" />
+    <Compile Include="StartScreen.cs" />
     <Compile Include="StopWatchTool.cs" />
     <Compile Include="Stork.cs" />
     <Compile Include="StorkManager.cs" />
     <Compile Include="TiledMapParserExtended.cs" />
     <Compile Include="TmxFilesLoader.cs" />
+    <Compile Include="Tutorial01Screen.cs" />
     <Compile Include="Utils\ColorTool.cs" />
     <Compile Include="Utils\CoroutineManager.cs" />
   </ItemGroup>

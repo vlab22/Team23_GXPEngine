@@ -205,6 +205,8 @@ namespace GXPEngine
         public float Width => _easyDraw.width;
         public float Height => _easyDraw.height;
 
+        public EasyDraw EasyDraw => _easyDraw;
+
         public void Centralize()
         {
             Centralize(Game.main.width, Game.main.height);
