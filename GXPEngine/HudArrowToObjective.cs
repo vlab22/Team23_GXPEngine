@@ -15,6 +15,10 @@ namespace GXPEngine
 
         private GameObject _cam;
 
+        private int _animTime;
+        private const int ANIM_DURATION = 800;
+        private const int ANIM_OFFSET = 20;
+        
         public HudArrowToObjective() : base("data/Hud Arrow.png", false, false)
         {
             SetOrigin(width, height * 0.5f);
@@ -85,8 +89,28 @@ namespace GXPEngine
             }
             
             this.rotation = angle.RadToDegree();
+
             this.SetXY(nextPos.x, nextPos.y);
 
+            //Easing animation
+            float xPos = 0;
+            if (_animTime <= ANIM_DURATION * 0.5f)
+            {
+                xPos = Easing.Ease(Easing.Equation.QuadEaseOut, _animTime, 0, 1, ANIM_DURATION * 0.5f) * ANIM_OFFSET;
+            }
+            else if (_animTime <= ANIM_DURATION)
+            {
+                xPos = ANIM_OFFSET - Easing.Ease(Easing.Equation.QuadEaseIn, _animTime - ANIM_DURATION * 0.5f, 0, 1, ANIM_DURATION * 0.5f) * ANIM_OFFSET;
+            }
+            else
+            {
+                _animTime = 0;
+            }
+
+            _animTime += Time.deltaTime;
+
+            Move(xPos, 0);
+            
             // Console.WriteLine(
             //     $"{this}: angle: {angle.RadToDegree():0.00} |  pos: {_pos} | cam: {_cam.Pos} | vO: {viewPortOrigin} | vE: {viewPortEnd}");
 

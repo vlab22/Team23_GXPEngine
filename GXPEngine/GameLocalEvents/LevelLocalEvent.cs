@@ -13,6 +13,7 @@ namespace GXPEngine.GameLocalEvents
             DRONE_DETECTED_ENEMY,
             DRONE_HIT_PLAYER,
             STORK_GET_POINTS_EVADE_DRONE,
+            STORK_GET_POINTS_EVADE_HUNTER,
             HUNTER_HIT_PLAYER,
             PLANE_HIT_PLAYER,
             PIZZA_DELIVERED

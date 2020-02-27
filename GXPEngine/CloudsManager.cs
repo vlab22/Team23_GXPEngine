@@ -31,7 +31,7 @@ namespace GXPEngine
                     if (tile == 20 || tile == 50)
                     {
                         //Instantiate a horizontal cloud
-                        cloud = new CloudGameObject();
+                        cloud = new CloudGameObject(MRandom.Range(-1,0));
                         _level.AddChild(cloud);
 
                         float px = (col) * _map.MapData.TileWidth;

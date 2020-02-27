@@ -25,6 +25,7 @@
           <e p="StorkLocalEvent.cs" t="Include" />
         </e>
         <e p="GameOverScreen.cs" t="Include" />
+        <e p="GlobalVars.cs" t="Include" />
         <e p="gxpengine" t="Include">
           <e p="AddOns" t="Include">
             <e p="Camera.cs" t="Include" />
@@ -81,6 +82,7 @@
         <e p="GXPEngine.csproj" t="IncludeRecursive" />
         <e p="HUD.cs" t="Include" />
         <e p="HudArrowToObjective.cs" t="Include" />
+        <e p="HudPointsPopUp.cs" t="Include" />
         <e p="HudScore.cs" t="Include" />
         <e p="HudScreenFader.cs" t="Include" />
         <e p="HudSlider.cs" t="Include" />

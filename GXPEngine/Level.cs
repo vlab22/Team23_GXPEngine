@@ -131,7 +131,7 @@ namespace GXPEngine
             _cam.AddChild(HudScreenFader.instance);
             HudScreenFader.instance.SetXY(-game.width * 0.5f, -game.height * 0.5f);
 
-            _hud = new HUD(_cam);
+            _hud = new HUD(_cam, _stork);
         }
 
         public bool ActivateNextDeliveryPoint()

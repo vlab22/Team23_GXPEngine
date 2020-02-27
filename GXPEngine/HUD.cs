@@ -29,21 +29,16 @@ namespace GXPEngine
 
         public Map _mapData;
 
-        public static Color[] CarsColors = new Color[]
-        {
-            Color.DeepPink,
-            Color.OrangeRed,
-            Color.White,
-            Color.Yellow,
-        };
-
+        private HudPointsPopUp _hudPointsPopUp;
+        
+        private HudArrowToObjective _hudArrowToObjective;
+        
         private HudSlider _slider00;
         private HudSlider _slider01;
-        private HudArrowToObjective _hudArrowToObjective;
 
         private HudTextBoard _debugTimer;
         
-        public HUD(Camera camera)
+        public HUD(Camera camera, GameObject player)
         {
             Instance = this;
 
@@ -116,6 +111,10 @@ namespace GXPEngine
                 _pizzaLostLives[i] = pizzaLostHud;
             }
 
+            _hudPointsPopUp = new HudPointsPopUp();
+            AddChild(_hudPointsPopUp);
+            _hudPointsPopUp.Target = player;
+            
             _camera = camera;
             _camera.AddChild(this);
 
@@ -127,7 +126,7 @@ Turn is weird flapping one wing while the other is static";
 
             _centerTextBoard = new HudTextBoard(centerText, 312, 32, 20, CenterMode.Center, CenterMode.Center);
             _centerTextBoard.SetText(centerText);
-            _centerTextBoard.visible = true;
+            _centerTextBoard.visible = false;
             _centerTextBoard.Centralize();
             _centerTextBoard.y = Game.main.height - _centerTextBoard.Height;
 
@@ -288,5 +287,7 @@ Turn is weird flapping one wing while the other is static";
         public HudArrowToObjective ArrowToObjective => _hudArrowToObjective;
 
         public HudTextBoard DebugTimer => _debugTimer;
+
+        public HudPointsPopUp HudPointsPopUp => _hudPointsPopUp;
     }
 }

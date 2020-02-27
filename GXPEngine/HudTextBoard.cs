@@ -8,10 +8,10 @@ namespace GXPEngine
 {
     public class HudTextBoard : GameObject, IHasColor
     {
-        private Color _clearColor = Color.Black; //FromArgb(1, 1, 1, 0);
+        protected Color _clearColor = Color.Black; //FromArgb(1, 1, 1, 0);
         private EasyDraw _easyDraw;
 
-        private string _text = "";
+        protected string _text = "";
         private float _textX;
         private float _textY;
         private Color _mainColor = Color.White;
@@ -182,6 +182,11 @@ namespace GXPEngine
             _easyDraw.Clear(_clearColor);
             _easyDraw.Fill(_mainColor, _alpha);
             _easyDraw.Text(text, _textX, _textY);
+        }
+
+        public void SetClearColor(Color pClearColor)
+        {
+            _clearColor = pClearColor;
         }
 
         Color IHasColor.MainColor

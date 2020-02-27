@@ -340,14 +340,14 @@ namespace GXPEngine
         {
             _state = DroneState.RETURN_TO_START_POINT_AFTER_CHASING_AND_SEARCHING_ENEMY;
             _returnToStartPointRoutine = CoroutineManager.StartCoroutine(ReturnToStartPointRoutine(), this);
-
-            _returnToStartAfterChasing++;
-
-            if (_returnToStartAfterChasing == 1)
+            
+            //Only get points when evading the first time
+            if (_returnToStartAfterChasing == 0)
             {
                 LocalEvents.Instance.Raise(new LevelLocalEvent(_enemy, (GameObject) this, null,
                     LevelLocalEvent.EventType.STORK_GET_POINTS_EVADE_DRONE));
             }
+            _returnToStartAfterChasing++;
 
             _searchingRoutine = CoroutineManager.StartCoroutine(SearchingRoutine(_state), this);
 

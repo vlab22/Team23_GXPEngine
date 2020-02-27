@@ -39,6 +39,12 @@ namespace GXPEngine
                 case LevelLocalEvent.EventType.STORK_GET_POINTS_EVADE_DRONE:
                     PlayCoinsExplosion(e.stork);
                     break;
+                case LevelLocalEvent.EventType.STORK_GET_POINTS_EVADE_HUNTER:
+                    PlayCoinsExplosion(e.stork);
+                    break;
+                case LevelLocalEvent.EventType.PIZZA_DELIVERED:
+                    PlayCoinsExplosion(e.level.Stork);
+                    break;
                 default:
                    break;
             }

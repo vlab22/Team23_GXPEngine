@@ -50,7 +50,7 @@
   <object id="104" name="hunter" gid="4" x="-1147.39" y="3848.85" width="400" height="400"/>
   <object id="105" name="hunter" gid="4" x="1111.03" y="780.97" width="400" height="400"/>
   <object id="106" name="drone" gid="3" x="-1325.17" y="1345.5" width="335" height="335"/>
-  <object id="110" name="spawn point" gid="69" x="759.76" y="4547.64" width="128" height="128" rotation="-90">
+  <object id="110" name="spawn point" gid="69" x="1802.18" y="911.276" width="128" height="128" rotation="-90">
    <properties>
     <property name="speed" type="float" value="200"/>
    </properties>

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Drawing;
 using GXPEngine.Core;
+using GXPEngine.GameLocalEvents;
 using MathfExtensions;
 
 namespace GXPEngine
@@ -43,6 +44,8 @@ namespace GXPEngine
 
         private HunterFollowRangeCone _hunterFollowRangeCone;
         private Vector2 _distanceToTarget;
+
+        private int _lostLockOnEnemyCounter = 0;
 
         public HunterGameObject(float pX, float pY, float pWidth, float pHeight,
             float pSightSpeed = 200) : base("data/Hunter.png", 1, 1,
@@ -269,6 +272,15 @@ namespace GXPEngine
             SpriteTweener.TweenAlpha(_hunterFollowRangeCone, 0.4f, 0, 500);
 
             SpriteTweener.TweenAlpha(_crossHair, 1, 0, 400);
+
+            //Only get points when evading the first time
+            if (_lostLockOnEnemyCounter == 0)
+            {
+                LocalEvents.Instance.Raise(new LevelLocalEvent(_enemy, (GameObject) this, null,
+                    LevelLocalEvent.EventType.STORK_GET_POINTS_EVADE_HUNTER));
+            }
+
+            _lostLockOnEnemyCounter++;
 
             yield return new WaitForMilliSeconds(1000);
 

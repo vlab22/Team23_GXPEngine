@@ -680,6 +680,11 @@ namespace GXPEngine
                 return parent.InverseTransformPoint(ret.x, ret.y);
             }
         }
+        
+        public virtual Vector2 InverseTransformPoint(Vector2 pos)
+        {
+            return InverseTransformPoint(pos.x, pos.y);
+        }
 
         /// <summary>
         /// Transforms the vector from global into local space.

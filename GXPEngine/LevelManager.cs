@@ -12,8 +12,7 @@ namespace GXPEngine
     public class LevelManager : GameObject
     {
         private Level _level;
-
-        private uint _totalScore;
+        
         private uint _levelScore;
 
         private int _pizzaLives;
@@ -38,11 +37,14 @@ namespace GXPEngine
         private int _cloudsFirstGid;
         private int[,] _cloudsLayer;
 
-        public LevelManager(Level pLevel, uint pLevelTimeToDelivery = 30000)
+        public LevelManager(Level pLevel, uint pScore, uint pLevelTimeToDelivery = 30000)
         {
             _level = pLevel;
             _levelTimeToDelivery = pLevelTimeToDelivery;
 
+            _levelScore = pScore;
+            HUD.Instance.UpdateLevelScore(_levelScore);
+            
             _cloudsFirstGid = pLevel.Map.MapData.TileSets.FirstOrDefault(ts => ts.Name == "Clouds Tileset").FirstGId;
 
             LoadScoresValuesMap();
@@ -105,6 +107,8 @@ namespace GXPEngine
 
         private void LevelLocalEventHandler(LevelLocalEvent e)
         {
+            uint score;
+            
             switch (e.evt)
             {
                 case LevelLocalEvent.EventType.NONE:
@@ -126,11 +130,23 @@ namespace GXPEngine
                     break;
                 case LevelLocalEvent.EventType.STORK_GET_POINTS_EVADE_DRONE:
                     if (_scoreValuesMap.TryGetValue(LevelLocalEvent.EventType.STORK_GET_POINTS_EVADE_DRONE,
-                        out uint score))
+                        out score))
                     {
                         _levelScore += score;
 
                         HUD.Instance.UpdateLevelScore(_levelScore);
+                        HUD.Instance.HudPointsPopUp.Show((int)score);
+                    }
+
+                    break;
+                case LevelLocalEvent.EventType.STORK_GET_POINTS_EVADE_HUNTER:
+                    if (_scoreValuesMap.TryGetValue(LevelLocalEvent.EventType.STORK_GET_POINTS_EVADE_HUNTER,
+                        out score))
+                    {
+                        _levelScore += score;
+
+                        HUD.Instance.UpdateLevelScore(_levelScore);
+                        HUD.Instance.HudPointsPopUp.Show((int)score);
                     }
 
                     break;
@@ -157,7 +173,9 @@ namespace GXPEngine
             HUD.Instance.UpdateLevelScore(_levelScore, 1000);
 
             yield return new WaitForMilliSeconds(1000);
-
+            
+            HUD.Instance.HudPointsPopUp.Show((int)points);
+            
             bool hasNextDelivery = _level.ActivateNextDeliveryPoint();
 
             if (hasNextDelivery)
@@ -219,6 +237,8 @@ namespace GXPEngine
             //Stop all hunters
             _level.HuntersManager.EndLevelAllHunters();
 
+            MyGame.ThisInstance.TotalScore += _levelScore;
+            
             yield return new WaitForMilliSeconds(3000);
 
             var levelEndScreen = new LevelEndScreen();
