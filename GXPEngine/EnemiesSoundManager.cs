@@ -34,8 +34,8 @@ namespace GXPEngine
 
             _soundMaxVolumeMap = new Dictionary<uint, float>()
             {
-                {0, 0.2f},
-                {1, 0.3f}
+                {0, 0.2f}, //Airplane
+                {1, 0.05f}, //Drone
             };
 
             _soundMaxDistanceMap = new Dictionary<uint, float>()
@@ -84,8 +84,6 @@ namespace GXPEngine
             }
             else
             {
-                // Console.WriteLine(
-                //     $"{iHasDistance.gameObject.name}_{iHasDistance.GetHashCode()}: dist: {dist:0.00} | currDist: {currentDistance:0.00} |  max: {_soundMaxDistanceMap[soundId]:0.00} | {Time.time}");
                 return;
             }
 
@@ -98,7 +96,7 @@ namespace GXPEngine
             else
             {
                 vol = Mathf.Map(dist, _soundMaxDistanceMap[soundId], 0, 0f, _soundMaxVolumeMap[soundId]);
-                
+
                 _soundManager.SetFxVolume(soundId, vol);
             }
 

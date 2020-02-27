@@ -24,7 +24,7 @@ public class MyGame : Game
 #else
     public const int SCREEN_WIDTH = 1920;
     public const int SCREEN_HEIGHT = 1080;
-    public const bool FULLSCREEN = false;
+    public const bool FULLSCREEN = true;
 #endif
 
     //public const int SCREEN_WIDTH = 1080;
@@ -147,7 +147,8 @@ public class MyGame : Game
 
         if (Input.GetKeyDown(Key.R))
         {
-            ResetLevel(0);
+            TotalScore = 0;
+            LoadLevel(0);
         }
 
         if (Input.GetKeyDown(Key.O))
@@ -248,11 +249,11 @@ public class MyGame : Game
     {
         UnLoadCurrentLevel();
 
-        //var startScreen = new StartScreen();
-        //AddChildAt(startScreen, HudScreenFader.instance.Index - 1);
+        var startScreen = new StartScreen();
+        AddChildAt(startScreen, HudScreenFader.instance.Index - 1);
         
-        var gameOverScreen = new GameOverScreen();
-        AddChildAt(gameOverScreen, HudScreenFader.instance.Index - 1);
+        //var gameOverScreen = new GameOverScreen();
+        //AddChildAt(gameOverScreen, HudScreenFader.instance.Index - 1);
     }
 
     void LoadScoreBoardData()
@@ -295,6 +296,30 @@ public class MyGame : Game
 
         //Sort
         _scoreBoardList = _scoreBoardList.OrderByDescending(pd => pd.score).ToList();
+    }
+
+    public void SaveScoreBoard()
+    {
+        string filePath = "data/Players Score.txt";
+        
+        var playerScore = new PlayerScoreData()
+        {
+            name = "YO" + MRandom.Range(1,10),
+            score = _totalScore
+        };
+        
+        _scoreBoardList.Add(playerScore);
+
+        _scoreBoardList = _scoreBoardList.OrderByDescending(ps => ps.score).ToList();
+
+        string result = "";
+        for (int i = 0; i < _scoreBoardList.Count; i++)
+        {
+            var scoreData = _scoreBoardList[i];
+            result += $"{scoreData.name.Trim()}={scoreData.score}{Environment.NewLine}";
+        }
+        
+        File.WriteAllText(filePath, result);
     }
 
     public List<PlayerScoreData> ScoreBoardList => _scoreBoardList;

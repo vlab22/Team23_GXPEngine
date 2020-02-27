@@ -76,8 +76,6 @@ namespace GXPEngine
                 float xPos = _offsetAnim.x * Easing.Ease(Easing.Equation.QuadEaseOut, _offSetAnimTimer, 0, 1, _fadeInOutDuration);
                 float yPos = _offsetAnim.y * Easing.Ease(Easing.Equation.QuadEaseOut, _offSetAnimTimer, 0, 1, _fadeInOutDuration);
                 
-                Console.WriteLine($"{this}: {xPos:0.00} | {yPos:0.00}");
-                
                 SetXY(nextPos.x + xPos, nextPos.y + yPos);
                 
                 _offSetAnimTimer += Time.deltaTime;

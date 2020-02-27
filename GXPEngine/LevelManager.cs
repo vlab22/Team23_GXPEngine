@@ -37,13 +37,15 @@ namespace GXPEngine
         private int _cloudsFirstGid;
         private int[,] _cloudsLayer;
 
+        private uint _cloudPizzaColderSpeed = 10000;
+        
         public LevelManager(Level pLevel, uint pScore, uint pLevelTimeToDelivery = 30000)
         {
             _level = pLevel;
             _levelTimeToDelivery = pLevelTimeToDelivery;
 
-            _levelScore = pScore;
-            HUD.Instance.UpdateLevelScore(_levelScore);
+            LevelScore = pScore;
+            HUD.Instance.UpdateLevelScore(LevelScore);
             
             _cloudsFirstGid = pLevel.Map.MapData.TileSets.FirstOrDefault(ts => ts.Name == "Clouds Tileset").FirstGId;
 
@@ -83,9 +85,14 @@ namespace GXPEngine
 
             int cloudId = _level.Map.GetCloudLayerTileIdFromWorld(_level.Stork.x, _level.Stork.y);
 
+            
+            //Add to timer as penalty
             if (IsInsideCloud(cloudId - _cloudsFirstGid))
             {
-                //Console.WriteLine($"{this}: cloudId: {cloudId - _cloudsFirstGid} | {Time.time}");
+                uint tDelta = (uint)(_cloudPizzaColderSpeed * Time.delta);
+                _levelTimer += tDelta;
+                
+                Console.WriteLine($"{this}: {tDelta}");
             }
 
             //Update Hud
@@ -132,9 +139,9 @@ namespace GXPEngine
                     if (_scoreValuesMap.TryGetValue(LevelLocalEvent.EventType.STORK_GET_POINTS_EVADE_DRONE,
                         out score))
                     {
-                        _levelScore += score;
+                        LevelScore += score;
 
-                        HUD.Instance.UpdateLevelScore(_levelScore);
+                        HUD.Instance.UpdateLevelScore(LevelScore);
                         HUD.Instance.HudPointsPopUp.Show((int)score);
                     }
 
@@ -143,9 +150,9 @@ namespace GXPEngine
                     if (_scoreValuesMap.TryGetValue(LevelLocalEvent.EventType.STORK_GET_POINTS_EVADE_HUNTER,
                         out score))
                     {
-                        _levelScore += score;
+                        LevelScore += score;
 
-                        HUD.Instance.UpdateLevelScore(_levelScore);
+                        HUD.Instance.UpdateLevelScore(LevelScore);
                         HUD.Instance.HudPointsPopUp.Show((int)score);
                     }
 
@@ -166,11 +173,11 @@ namespace GXPEngine
             uint timeLeft = _levelTimeToDelivery - _levelTimer;
             uint points = (uint) Mathf.Round(timeLeft * 0.001f * 1000);
 
-            _levelScore += points;
+            LevelScore += points;
 
             _timerToDeliveryPause = true;
 
-            HUD.Instance.UpdateLevelScore(_levelScore, 1000);
+            HUD.Instance.UpdateLevelScore(LevelScore, 1000);
 
             yield return new WaitForMilliSeconds(1000);
             
@@ -206,8 +213,11 @@ namespace GXPEngine
 
             //Stop all hunters
             _level.HuntersManager.EndLevelAllHunters();
+            
+            //Cry 3 times
+            CoroutineManager.StartCoroutine(Cry3Times(), this);
 
-            yield return new WaitForMilliSeconds(1400);
+            yield return new WaitForMilliSeconds(3 * 1200);
 
             var gameOverScreen = new GameOverScreen();
 
@@ -227,6 +237,19 @@ namespace GXPEngine
                 null, CenterMode.Center);
         }
 
+        private IEnumerator Cry3Times()
+        {
+            int cryCounter = 0;
+            
+            while (cryCounter < 3)
+            {
+                SoundManager.Instance.PlayFx(6);
+                
+                yield return new WaitForMilliSeconds(1200);
+                cryCounter++;
+            }
+        }
+
         private IEnumerator EndLevelByWonRoutine()
         {
             _level.IsLevelEndingByWon = true;
@@ -236,8 +259,6 @@ namespace GXPEngine
 
             //Stop all hunters
             _level.HuntersManager.EndLevelAllHunters();
-
-            MyGame.ThisInstance.TotalScore += _levelScore;
             
             yield return new WaitForMilliSeconds(3000);
 
@@ -321,5 +342,16 @@ namespace GXPEngine
         }
 
         public uint Timer => (_levelTimeToDelivery - _levelTimer) / 1000;
+
+        public uint LevelScore
+        {
+            get => _levelScore;
+            protected set
+            {
+                _levelScore = value;
+
+                MyGame.ThisInstance.TotalScore += value;
+            }
+        }
     }
 }

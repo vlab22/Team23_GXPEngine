@@ -217,6 +217,8 @@ namespace GXPEngine
             _ledSprite.alpha = 1;
             _ledSprite.SetColor(1, 0, 0);
 
+            SoundManager.Instance.PlayFx(7);
+            
             Console.WriteLine($"{this.name} EnemyDetectedRoutine | {Time.time}");
 
             if (_hasDroneBehaviourListener)

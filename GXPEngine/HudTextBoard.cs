@@ -57,11 +57,20 @@ namespace GXPEngine
             {
                 _textX = _easyDraw.width * 0.5f;
             }
+            else if (hor == CenterMode.Max)
+            {
+                _textX = _easyDraw.width;
+            }
 
             if (ver == CenterMode.Center)
             {
                 _textY = _easyDraw.height * 0.5f;
             }
+            else if (ver == CenterMode.Max)
+            {
+                _textY = _easyDraw.height;
+            }
+
             
             SetText(_text);
         }

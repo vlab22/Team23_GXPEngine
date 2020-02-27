@@ -79,7 +79,7 @@ namespace GXPEngine
                     //Pizza delivered
                     LocalEvents.Instance.Raise(new LevelLocalEvent(_level, LevelLocalEvent.EventType.PIZZA_DELIVERED));
 
-                    SoundManager.Instance.SetFxVolume(5, 0.5f);
+                    SoundManager.Instance.PlayFx(5);
                     
                     //Drop the pizza to the center of the delivery point
                     var dropPoint = new Vector2(other.x, other.y);
@@ -96,6 +96,8 @@ namespace GXPEngine
                 _inCollisionWithAirplane = true;
                 _lastAirplaneCollided = parent;
 
+                SoundManager.Instance.PlayFx(6);
+                
                 //Lose Pizza
                 CoroutineManager.StartCoroutine(CollisionWithAirplaneRoutine(parent), this);
             }
@@ -106,6 +108,8 @@ namespace GXPEngine
                 _lastDroneCollided = drone;
                 _inCollisionWithDrone = true;
 
+                SoundManager.Instance.PlayFx(6);
+                
                 //Lose Pizza
                 CoroutineManager.StartCoroutine(CollisionWithDroneRoutine(drone), this);
             }
@@ -118,6 +122,8 @@ namespace GXPEngine
                 {
                     _lastBulletCollided = bullet;
 
+                    SoundManager.Instance.PlayFx(6);
+                    
                     CoroutineManager.StartCoroutine(CollisionWithHunterBulletRoutine(bullet), this);
                 }
             }

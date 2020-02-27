@@ -30,14 +30,14 @@ namespace GXPEngine
         public Map _mapData;
 
         private HudPointsPopUp _hudPointsPopUp;
-        
+
         private HudArrowToObjective _hudArrowToObjective;
-        
+
         private HudSlider _slider00;
         private HudSlider _slider01;
 
         private HudTextBoard _debugTimer;
-        
+
         public HUD(Camera camera, GameObject player)
         {
             Instance = this;
@@ -45,7 +45,7 @@ namespace GXPEngine
             _mapData = TiledMapParserExtended.MapParser.ReadMap("HUD.tmx");
 
             var objectsDepth0 = _mapData.ObjectGroups.FirstOrDefault(og => og.Name == "Depth 0");
-            
+
             //Hud Score set
             var hudData = objectsDepth0.Objects.FirstOrDefault(o => o.Name == "Score Bg");
             var hudScoreImage = _mapData.TileSets.FirstOrDefault(ts => ts.FirstGId == hudData.GID).Image.FileName;
@@ -114,7 +114,7 @@ namespace GXPEngine
             _hudPointsPopUp = new HudPointsPopUp();
             AddChild(_hudPointsPopUp);
             _hudPointsPopUp.Target = player;
-            
+
             _camera = camera;
             _camera.AddChild(this);
 
@@ -155,21 +155,21 @@ Turn is weird flapping one wing while the other is static";
             _hudThermometer = new HudThermometer();
             AddChild(_hudThermometer);
 
-            _hudThermometer.SetXY(game.width - (1920 - 1794), 28);
-            
+            _hudThermometer.SetXY(game.width - (1920 - 1731), 85);
+
             _hudArrowToObjective = new HudArrowToObjective();
             AddChild(_hudArrowToObjective);
 
             _hudArrowToObjective.SetScaleXY(0.4f, 0.4f);
             _hudArrowToObjective.SetXY(game.width * 0.5f, game.height * 0.5f);
             _hudArrowToObjective.SetActive(false);
-            
+
             _debugTimer = new HudTextBoard(60, 60, 12);
             _debugTimer.x = game.width - 60;
             _debugTimer.y = 60;
             AddChild(_debugTimer);
         }
-        
+
         public void UpdateLevelScore(uint newLevelScore, int animDuration = 400)
         {
             _hudScore.UpdateScore(newLevelScore, animDuration);
@@ -190,6 +190,29 @@ Turn is weird flapping one wing while the other is static";
                 _pizzaLostLives[i].SetActive(true);
                 _pizzaLives[i].SetActive(false);
             }
+
+            if (lives < 3 && lives > 0)
+                CoroutineManager.StartCoroutine(BlinkPizzaLives(lives), this);
+        }
+
+        IEnumerator BlinkPizzaLives(int lives)
+        {
+            int blink = 0;
+
+            while (blink < 4)
+            {
+                yield return new WaitForMilliSeconds(400);
+
+                _pizzaLostLives[lives].SetActive(false);
+                _pizzaLives[lives].SetActive(true);
+
+                yield return new WaitForMilliSeconds(400);
+
+                _pizzaLostLives[lives].SetActive(true);
+                _pizzaLives[lives].SetActive(false);
+
+                blink++;
+            }
         }
 
         public void Reset()
@@ -200,7 +223,7 @@ Turn is weird flapping one wing while the other is static";
                 _pizzaLostLives[i].SetActive(false);
             }
         }
-        
+
         private void ChangeDroneDetectRange(float val)
         {
             var allDrones = MyGame.ThisInstance.CurrentLevel.GetChildren(true)
@@ -224,13 +247,13 @@ Turn is weird flapping one wing while the other is static";
                 drone.WaitingSpeed = 100 * val;
             }
         }
-        
+
         private void ChangeDroneFrameSpeed(float val)
         {
             int intVal = Mathf.Round(Mathf.Map(val, 0, 1, 5, 500));
 
             DroneGameObject.FrameSpeed = intVal;
-            
+
             Console.WriteLine($"{this}: framespeed: {intVal}");
         }
 
@@ -281,7 +304,7 @@ Turn is weird flapping one wing while the other is static";
                 time += Time.deltaTime;
             } while (time < duration);
         }
-        
+
         public HudThermometer Thermometer => _hudThermometer;
 
         public HudArrowToObjective ArrowToObjective => _hudArrowToObjective;
