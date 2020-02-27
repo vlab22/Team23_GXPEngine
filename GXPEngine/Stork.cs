@@ -10,7 +10,7 @@ namespace GXPEngine
 {
     public class Stork : AnimationSprite, IHasSpeed
     {
-        private AnimationSprite _body;
+        //private AnimationSprite _body;
 
         //private AnimationSprite _leftWing;
         //private AnimationSprite _rightWing;
@@ -69,9 +69,11 @@ namespace GXPEngine
 
             _customColliderBounds = new Rectangle(13 - 85f / 2, 5 - 85f / 2, 43, 76);
 
-            _body = new AnimationSprite("data/Stork00.png", 3, 1, -1, false, false);
-            _body.SetOrigin(85f / 2, 85f / 2);
-            _body.visible = false;
+            IsMoveEnabled = true;
+
+            // _body = new AnimationSprite("data/Stork00.png", 3, 1, -1, false, false);
+            // _body.SetOrigin(85f / 2, 85f / 2);
+            // _body.visible = false;
             //AddChild(_body);
 
             // _leftWing = new AnimationSprite("data/Stork_Left_Wing.png", 3, 1, -1, false, false);
@@ -126,17 +128,16 @@ namespace GXPEngine
 
                 _leftPush = Easing.Ease(Easing.Equation.CubicEaseInOut, _leftWingTime, 0, PUSH_FRAMECOUNT,
                     _wingAnimationSpeed);
-                
+
                 _leftPush = Mathf.Clamp(_leftPush, 0, PUSH_FRAMECOUNT);
 
-                
+
                 int leftFrame = Mathf.Round(_leftPush);
 
                 _leftPush = Mathf.Clamp(_leftPush, 0, 3);
-                
+
                 if (_rightWingPressure > PRESSURE_TIME_SENSITIVITY)
                     SetFrame(leftFrame);
-                
             }
 
             if (_rightWingPressure < PRESSURE_TIME_SENSITIVITY)
@@ -155,7 +156,7 @@ namespace GXPEngine
                 int rightFrame = Mathf.Round(_rightPush);
 
                 _rightPush = Mathf.Clamp(_rightPush, 0, 3);
-                
+
                 if (_leftWingPressure >= PRESSURE_TIME_SENSITIVITY)
                     SetFrame(rightFrame);
             }
@@ -199,16 +200,17 @@ namespace GXPEngine
                 }
             }
 
-            TurnStork(Time.delta);
+            if (IsMoveEnabled)
+                TurnStork(Time.delta);
 
             _currentSpeed = Mathf.Clamp(_currentSpeed, _minSpeed, _maxSpeed);
 
-            if (_hasIGridDataUpdater)
+            if (_hasIGridDataUpdater && IsMoveEnabled)
             {
                 _iUpdater.NextPosition(_pos, _pos + _forward * _currentSpeed * Time.delta);
             }
 
-            if (_currentSpeed > 0 && IsMoveAllowed) //AllowMove will be calculated by a _iUpdater
+            if (_currentSpeed > 0 && IsMovingInGrid && IsMoveEnabled) //AllowMove will be calculated by a _iUpdater
             {
                 //var nextPos = _pos + _forward * _currentSpeed * Time.deltaTime * 0.001f;
                 Move(_currentSpeed * Time.delta, 0);
@@ -219,7 +221,7 @@ namespace GXPEngine
             {
                 _iUpdater.OnMove(_pos, _lastPos);
             }
-            
+
             GL.glfwSetWindowTitle(
                 $"speed: {_currentSpeed:0.00} | left: {_leftPush:0.00} | right: {_rightPush:0.00} | angularPushDelta: {_angularPushDelta:0.00} | angularPush: {_angularPush:0.00} | leftPress: {_leftWingPressure:0.00} | pos: {_pos} | frame: {_currentFrame}");
 
@@ -234,7 +236,7 @@ namespace GXPEngine
             //onsole.WriteLine($"{this}: angularpushDelta: {_angularPushDelta:0.00}");
 
             bool hasPressure = (_leftPush > 0 || _rightPush > 0);
-            
+
             if (true) //angularPushDeltaAbs >= 0)
             {
                 _angularPush = _angularPushDelta * 15;
@@ -242,21 +244,21 @@ namespace GXPEngine
 
                 if (_angularPushDelta > 0.050f)
                 {
-                    _body.visible = true;
+                    //_body.visible = true;
                     //_leftWing.visible = false;
                     //_rightWing.visible = false;
                     SetFrame(10);
                 }
                 else if (_angularPushDelta < -0.050f)
                 {
-                    _body.visible = true;
+                    //_body.visible = true;
                     //_leftWing.visible = false;
                     //_rightWing.visible = false;
                     SetFrame(11);
                 }
                 else if (!hasPressure)
                 {
-                    _body.visible = false;
+                    //_body.visible = false;
                     // _leftWing.visible = true;
                     //_rightWing.visible = true; 
                     SetFrame(0);
@@ -276,6 +278,11 @@ namespace GXPEngine
             {
                 _iColliderListener.OnCollisionWith(this, other);
             }
+        }
+        
+        public void SetSpeed(int i)
+        {
+            _currentSpeed = 0;
         }
 
         public override Vector2[] GetExtents()
@@ -317,10 +324,9 @@ namespace GXPEngine
 
         GameObject IHasSpeed.gameObject => this;
 
-        public bool IsMoveAllowed { get; set; }
-        public bool IsToCorrectPosition { get; set; }
+        public bool IsMovingInGrid { get; set; }
 
-        public Vector2 PositionCorrection { get; set; }
+        public bool IsMoveEnabled { get; set; }
 
         public IGridDataUpdater IUpdater
         {

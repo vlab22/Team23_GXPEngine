@@ -34,6 +34,7 @@ namespace GXPEngine
         private DeliveryPoint[] _deliveryPoints;
         private int _currentDeliveryPoint;
         private HUD _hud;
+        private TornadoManager _tornadoesManager;
 
         public Level(FollowCamera pCam, MapGameObject pMap)
         {
@@ -71,6 +72,13 @@ namespace GXPEngine
             //Enable the first delivery point
             _deliveryPoints[0].SetActive(true);
 
+            
+            //Add Tornados
+            _tornadoesManager = new TornadoManager(this, enemiesSoundManager);
+            AddChild(_tornadoesManager);
+            
+            _tornadoesManager.SpawnTornadoes();
+            
             float storkMaxSpeed = spawnPointObject.GetFloatProperty("speed", 200);
 
             _stork = new Stork(storkMaxSpeed)

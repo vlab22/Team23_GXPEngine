@@ -65,7 +65,6 @@ namespace GXPEngine
             int spawnFrequency = (int) (airData.GetFloatProperty("spawn_frequency_time", 0) * 1000);
 
             var airplane = GetAirplaneFromPool();
-            _enemiesSoundManager.CreateChannel(airplane);
             
             airplane.LoadStartupData(airData.X, airData.Y, airData.Width, airData.Height, _level, _level.Stork,
                 airSpeed,

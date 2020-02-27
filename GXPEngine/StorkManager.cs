@@ -28,7 +28,8 @@ namespace GXPEngine
         private bool _inCollisionWithBullet;
         private HunterBullet _lastBulletCollided;
 
-        private EasyDraw _storkOutOfMapCover;
+        private bool _inCollisionWithTornado;
+        private TornadoGameObject _lastTornadoCollided;
 
         public StorkManager(Stork pStork, Level pLevel) : base(false)
         {
@@ -38,12 +39,6 @@ namespace GXPEngine
             _stork.ColliderListener = this;
 
             _lastMarker = _level.GetChildren(false).Where(o => o is DeliveryPoint).LastOrDefault();
-
-            _storkOutOfMapCover = new EasyDraw(_stork.width, _stork.height, false);
-            _storkOutOfMapCover.SetOrigin(_stork.width * 0.5f, _stork.height * 0.5f);
-            _storkOutOfMapCover.Clear(Color.White);
-            _storkOutOfMapCover.SetActive(false);
-            AddChild(_storkOutOfMapCover);
         }
 
         void Update()
@@ -80,7 +75,7 @@ namespace GXPEngine
                     LocalEvents.Instance.Raise(new LevelLocalEvent(_level, LevelLocalEvent.EventType.PIZZA_DELIVERED));
 
                     SoundManager.Instance.PlayFx(5);
-                    
+
                     //Drop the pizza to the center of the delivery point
                     var dropPoint = new Vector2(other.x, other.y);
                     CoroutineManager.StartCoroutine(DropPizzaRoutine(dropPoint), this);
@@ -97,7 +92,7 @@ namespace GXPEngine
                 _lastAirplaneCollided = parent;
 
                 SoundManager.Instance.PlayFx(6);
-                
+
                 //Lose Pizza
                 CoroutineManager.StartCoroutine(CollisionWithAirplaneRoutine(parent), this);
             }
@@ -109,7 +104,7 @@ namespace GXPEngine
                 _inCollisionWithDrone = true;
 
                 SoundManager.Instance.PlayFx(6);
-                
+
                 //Lose Pizza
                 CoroutineManager.StartCoroutine(CollisionWithDroneRoutine(drone), this);
             }
@@ -123,9 +118,141 @@ namespace GXPEngine
                     _lastBulletCollided = bullet;
 
                     SoundManager.Instance.PlayFx(6);
-                    
+
                     CoroutineManager.StartCoroutine(CollisionWithHunterBulletRoutine(bullet), this);
                 }
+            }
+
+            if (!_inCollisionWithTornado && other is TornadoGameObject tornado && tornado != _lastTornadoCollided)
+            {
+                _inCollisionWithTornado = true;
+                _lastTornadoCollided = tornado;
+
+                CoroutineManager.StartCoroutine(CollisionWithTornadoRoutine(tornado), this);
+            }
+        }
+
+        private IEnumerator CollisionWithTornadoRoutine(TornadoGameObject tornado)
+        {
+            MyGame.ThisInstance.Camera.shakeDuration = 3000;
+
+            _stork.InputEnabled = false;
+            _stork.IsMoveEnabled = false;
+
+            _stork.SetSpeed(0);
+
+            //Turn stork
+            var turnStorkRoutine = CoroutineManager.StartCoroutine(TurnStorkInTornadoRoutine(), this);
+
+            //Snap to tornado
+            int snapTimer = 0;
+            const int snapDuration = 200;
+
+            var snapStartPos = _stork.Pos;
+
+            while (snapTimer < snapDuration)
+            {
+                float xPos = (tornado.Pos.x - snapStartPos.x) *
+                             Easing.Ease(Easing.Equation.QuadEaseOut, snapTimer, 0, 1, snapDuration);
+                float yPos = (tornado.Pos.y - snapStartPos.y) *
+                             Easing.Ease(Easing.Equation.QuadEaseOut, snapTimer, 0, 1, snapDuration);
+
+                _stork.SetXY(snapStartPos.x + xPos, snapStartPos.y + yPos);
+
+                snapTimer += Time.deltaTime;
+
+                yield return null;
+            }
+
+            //Keep stork in tornado
+            int stuckTimer = 0;
+            const int stuckDuration = 2000;
+            while (stuckTimer < stuckDuration)
+            {
+                _stork.SetXY(tornado.x, tornado.y);
+
+                stuckTimer += Time.deltaTime;
+                yield return null;
+            }
+
+            //Thrown Stork
+            
+            SoundManager.Instance.PlayFx(6);
+            
+            float throwAngle = 0;
+            if (tornado.ThrowAngleMin == tornado.ThrowAngleMax)
+            {
+                throwAngle = tornado.ThrowAngleMin;
+            }
+            else
+            {
+                throwAngle = MRandom.Range((float) tornado.ThrowAngleMin, (float) tornado.ThrowAngleMax);
+            }
+
+            throwAngle = throwAngle.DegToRad();
+
+            var throwDirection = new Vector2()
+            {
+                x = Mathf.Cos(throwAngle),
+                y = Mathf.Sin(throwAngle)
+            };
+
+            var throwStartPos = tornado.Pos;
+            var throwPos = throwStartPos + throwDirection * tornado.ThrowDistance;
+
+            int thrownTimer = 0;
+            int thrownDuration = 1000;
+            
+            float startScale = _stork.scale;
+            
+            Console.WriteLine($"{this}: throwAngle: {throwAngle.RadToDegree()}");
+
+            while (thrownTimer < thrownDuration)
+            {
+                float xPos = (throwPos.x - throwStartPos.x) *
+                             Easing.Ease(Easing.Equation.QuadEaseOut, thrownTimer, 0, 1, thrownDuration);
+                float yPos = (throwPos.y - throwStartPos.y) *
+                             Easing.Ease(Easing.Equation.QuadEaseOut, thrownTimer, 0, 1, thrownDuration);
+
+                _stork.SetXY(throwStartPos.x + xPos, throwStartPos.y + yPos);
+
+                float scale;
+                if (thrownTimer < thrownDuration * 0.5f)
+                {
+                    scale = startScale + Easing.Ease(Easing.Equation.QuadEaseOut, thrownTimer, 0, 1, thrownDuration * 0.5f);
+                }
+                else
+                {
+                    scale = startScale + 1 - Easing.Ease(Easing.Equation.QuadEaseIn, thrownTimer - thrownDuration * 0.5f, 0, 1, thrownDuration * 0.5f);
+                }
+                
+                _stork.SetScaleXY(scale,scale);
+                
+                thrownTimer += Time.deltaTime;
+                yield return null;
+            }
+            
+            _stork.SetScaleXY(startScale,startScale);
+
+            _inCollisionWithTornado = false;
+            _lastTornadoCollided = null;
+
+            _stork.InputEnabled = true;
+            _stork.IsMoveEnabled = true;
+        }
+
+        private IEnumerator TurnStorkInTornadoRoutine()
+        {
+            int turnTimer = 0;
+            int turnDuration = 2000;
+            float turnSpeed = -360;
+
+            while (turnTimer < turnDuration)
+            {
+                _stork.Turn(turnSpeed * Time.delta);
+
+                turnTimer += Time.deltaTime;
+                yield return null;
             }
         }
 
@@ -291,7 +418,7 @@ namespace GXPEngine
 
             if (nextTileIndex == -1)
             {
-                _stork.IsMoveAllowed = false;
+                _stork.IsMovingInGrid = false;
 
                 bool isOutOfHorLimits = nextPos.x < 0 || nextPos.x > _map.MapWidthInPixels;
                 bool isOutOfVerLimits = nextPos.y < 0 || nextPos.y > _map.MapHeightInPixels;
@@ -321,7 +448,7 @@ namespace GXPEngine
             }
             else
             {
-                _stork.IsMoveAllowed = true;
+                _stork.IsMovingInGrid = true;
             }
         }
     }

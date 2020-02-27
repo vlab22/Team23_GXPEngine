@@ -30,6 +30,7 @@ namespace GXPEngine
             new Sound("data/PizzaDeliveryPLIIIINNGGG.wav", false, false), //5
             new Sound("data/Bird Hit.wav", false, false), //6
             new Sound("data/Drone Lock.wav", false, false), //7
+            new Sound("data/whirlwind.wav", true, false), //8
         };
 
         private float[] _fxVolumes = new float[]
@@ -42,6 +43,7 @@ namespace GXPEngine
             0.10f, //5
             -1, //6
             0.05f, //7 Drone Detect Player
+            -1, //8 tornado
         };
 
         private Sound[] _explosionFxs = new Sound[]

@@ -87,12 +87,10 @@ namespace GXPEngine
 
             
             //Add to timer as penalty
-            if (IsInsideCloud(cloudId - _cloudsFirstGid))
+            if (_level.Stork.IsMoveEnabled && IsInsideCloud(cloudId - _cloudsFirstGid))
             {
                 uint tDelta = (uint)(_cloudPizzaColderSpeed * Time.delta);
                 _levelTimer += tDelta;
-                
-                Console.WriteLine($"{this}: {tDelta}");
             }
 
             //Update Hud

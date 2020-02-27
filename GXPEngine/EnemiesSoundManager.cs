@@ -11,22 +11,10 @@ namespace GXPEngine
 
         private Dictionary<uint, float> _soundMaxVolumeMap;
         private Dictionary<uint, float> _soundMaxDistanceMap;
-
-        private Dictionary<GameObject, SoundChannel[]>
-            _fxChannelEnemyMap = new Dictionary<GameObject, SoundChannel[]>();
+        
 
         private Dictionary<uint, IHasDistanceToTarget> _fxChannelDistanceMap =
             new Dictionary<uint, IHasDistanceToTarget>();
-
-        private readonly Dictionary<Type, int> _channelsMaxQtdPerType = new Dictionary<Type, int>()
-        {
-            {typeof(Airplane), 5}
-        };
-
-        private Dictionary<Type, int> _channelsCounterPerType = new Dictionary<Type, int>()
-        {
-            {typeof(Airplane), 0}
-        };
 
         public EnemiesSoundManager() : base(false)
         {
@@ -36,12 +24,14 @@ namespace GXPEngine
             {
                 {0, 0.2f}, //Airplane
                 {1, 0.05f}, //Drone
+                {8, 0.10f}, //Tornado
             };
 
             _soundMaxDistanceMap = new Dictionary<uint, float>()
             {
                 {0, 1000f},
                 {1, 500f},
+                {8, 800},
             };
 
             CoroutineManager.StartCoroutine(Start(), this);
@@ -49,24 +39,13 @@ namespace GXPEngine
 
         private IEnumerator Start()
         {
-            do
+            while (_cam == null)
             {
-                _cam = MyGame.ThisInstance.Camera;
                 yield return null;
-            } while (_cam == null);
+                _cam = MyGame.ThisInstance.Camera;
+            }
         }
-
-        public void CreateChannel(GameObject go)
-        {
-            // var goType = go.GetType();
-            //
-            // if (go is Airplane)
-            // {
-            //     _soundManager.CreateFxChannel(typeof(Airplane), new uint[] {0, 1, 2, 3});
-            //     _channelsCounterPerType[goType] += 1;
-            // }
-        }
-
+        
         private void UpdateVolumesRelativeToDistanceToTarget(IHasDistanceToTarget iHasDistance, uint soundId)
         {
             var dist = iHasDistance.Distance.Magnitude;

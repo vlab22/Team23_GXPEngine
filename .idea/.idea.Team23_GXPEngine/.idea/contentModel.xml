@@ -123,10 +123,13 @@
         <e p="StorkManager.cs" t="Include" />
         <e p="TiledMapParserExtended.cs" t="Include" />
         <e p="TmxFilesLoader.cs" t="Include" />
+        <e p="TornadoGameObject.cs" t="Include" />
+        <e p="TornadoManager.cs" t="Include" />
         <e p="Tutorial01Screen.cs" t="Include" />
         <e p="Utils" t="Include">
           <e p="ColorTool.cs" t="Include" />
           <e p="CoroutineManager.cs" t="Include" />
+          <e p="GeneralTools.cs" t="Include" />
         </e>
       </e>
       <e p="packages" t="ExcludeRecursive" />

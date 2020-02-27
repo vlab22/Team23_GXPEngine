@@ -135,9 +135,12 @@
     <Compile Include="StorkManager.cs" />
     <Compile Include="TiledMapParserExtended.cs" />
     <Compile Include="TmxFilesLoader.cs" />
+    <Compile Include="TornadoManager.cs" />
     <Compile Include="Tutorial01Screen.cs" />
     <Compile Include="Utils\ColorTool.cs" />
     <Compile Include="Utils\CoroutineManager.cs" />
+    <Compile Include="TornadoGameObject.cs" />
+    <Compile Include="Utils\GeneralTools.cs" />
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup>
