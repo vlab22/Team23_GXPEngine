@@ -25,7 +25,7 @@ namespace GXPEngine
             _shadowText = new HudTextBoard("+100", -1, -1, 50, 50, 18, CenterMode.Center, CenterMode.Center);
             _shadowText.EasyDraw.TextFont("data/Chantal W00 Medium.ttf", 18);
             _shadowText.SetClearColor(Color.FromArgb(0, 1, 1, 1));
-            ((IHasColor) _shadowText).MainColor = GlobalVars.Color2;
+            ((IHasColor) _shadowText).MainColor = GlobalVars.Skim;
 
             AddChild(_shadowText);
 

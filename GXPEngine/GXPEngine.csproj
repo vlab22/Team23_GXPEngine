@@ -127,6 +127,7 @@
     <Compile Include="PizzaGameObject.cs" />
     <Compile Include="PlayerInput.cs" />
     <Compile Include="Screen.cs" />
+    <Compile Include="SmallSnowFlakeParticle.cs" />
     <Compile Include="SoundManager.cs" />
     <Compile Include="SpriteTweener.cs" />
     <Compile Include="StartScreen.cs" />

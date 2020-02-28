@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.1" orientation="orthogonal" renderorder="right-up" compressionlevel="0" width="16" height="40" tilewidth="128" tileheight="128" infinite="0" nextlayerid="22" nextobjectid="112">
+<map version="1.2" tiledversion="1.3.1" orientation="orthogonal" renderorder="right-up" compressionlevel="0" width="16" height="40" tilewidth="128" tileheight="128" infinite="0" nextlayerid="22" nextobjectid="120">
  <tileset firstgid="1" name="DeliveryPointTileset" tilewidth="512" tileheight="512" tilecount="1" columns="1">
   <image source="data/Delivery Point.png" width="512" height="512"/>
  </tileset>
@@ -21,47 +21,45 @@
  <tileset firstgid="70" name="Clouds Tileset" tilewidth="128" tileheight="128" tilecount="256" columns="16">
   <image source="data/Clouds - Spritesheet.png" width="2048" height="2048"/>
  </tileset>
+ <tileset firstgid="326" name="Tornado" tilewidth="300" tileheight="300" tilecount="1" columns="1">
+  <image source="data/Tornado - Tiled.png" width="300" height="300"/>
+ </tileset>
  <imagelayer id="2" name="background image 0" opacity="0.49">
   <image source="data/map tile 2048x2048.png" width="2048" height="2048"/>
  </imagelayer>
- <imagelayer id="17" name="background image 1" opacity="0.49" offsetx="2048" offsety="0">
+ <imagelayer id="17" name="background image 1" visible="0" opacity="0.49" offsetx="2048" offsety="0">
   <image source="data/map tile 2048x2048.png" width="2048" height="2048"/>
  </imagelayer>
  <imagelayer id="18" name="background image 2" opacity="0.49" offsetx="0" offsety="2048">
   <image source="data/map tile 2048x2048.png" width="2048" height="2048"/>
  </imagelayer>
- <imagelayer id="19" name="background image 3" opacity="0.49" offsetx="2048" offsety="2048">
+ <imagelayer id="19" name="background image 3" visible="0" opacity="0.49" offsetx="2048" offsety="2048">
   <image source="data/map tile 2048x2048.png" width="2048" height="2048"/>
  </imagelayer>
  <imagelayer id="20" name="background image 4" opacity="0.49" offsetx="0" offsety="4096">
   <image source="data/map tile 2048x2048.png" width="2048" height="2048"/>
  </imagelayer>
- <imagelayer id="21" name="background image 5" opacity="0.49" offsetx="2048" offsety="4096">
+ <imagelayer id="21" name="background image 5" visible="0" opacity="0.49" offsetx="2048" offsety="4096">
   <image source="data/map tile 2048x2048.png" width="2048" height="2048"/>
  </imagelayer>
  <objectgroup id="3" name="Object Layer 1">
-  <object id="6" name="delivery point 00" gid="1" x="1360.12" y="648" width="512" height="512">
+  <object id="6" name="delivery point 00" gid="1" x="1338.12" y="546" width="512" height="512">
    <properties>
-    <property name="timer" type="int" value="60"/>
+    <property name="timer" type="int" value="30"/>
    </properties>
   </object>
-  <object id="101" name="drone" gid="3" x="-1315.72" y="2266.35" width="335" height="335"/>
-  <object id="102" name="drone" gid="3" x="1326.71" y="1661.26" width="335" height="335"/>
-  <object id="104" name="hunter" gid="4" x="-1147.39" y="3848.85" width="400" height="400"/>
-  <object id="105" name="hunter" gid="4" x="1111.03" y="780.97" width="400" height="400"/>
-  <object id="106" name="drone" gid="3" x="-1325.17" y="1345.5" width="335" height="335"/>
-  <object id="110" name="spawn point" gid="69" x="1383.76" y="4859.64" width="128" height="128" rotation="-90">
+  <object id="102" name="drone" gid="3" x="356.41" y="1486.47" width="335" height="335"/>
+  <object id="106" name="drone" gid="3" x="688.648" y="3547.8" width="335" height="335"/>
+  <object id="110" name="spawn point" gid="69" x="950.665" y="5017.34" width="128" height="128" rotation="-90">
    <properties>
     <property name="speed" type="float" value="200"/>
    </properties>
   </object>
-  <object id="111" name="airplane 0" gid="2" x="-708.666" y="1915.33" width="665.333" height="665.333" rotation="32.0003">
-   <properties>
-    <property name="life_time" type="float" value="17"/>
-    <property name="spawn_frequency_time" type="float" value="12"/>
-    <property name="speed" type="float" value="200"/>
-   </properties>
-  </object>
+  <object id="114" name="drone" gid="3" x="223.409" y="4223.41" width="335" height="335"/>
+  <object id="115" name="drone" gid="3" x="220.379" y="2808.26" width="335" height="335"/>
+  <object id="116" name="drone" gid="3" x="787.045" y="2305.23" width="335" height="335"/>
+  <object id="117" name="drone" gid="3" x="950.682" y="805.227" width="335" height="335"/>
+  <object id="118" name="drone" gid="3" x="1105.23" y="1259.77" width="335" height="335"/>
  </objectgroup>
  <layer id="12" name="boundaries" width="16" height="40">
   <data encoding="csv">
@@ -107,47 +105,47 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer id="16" name="clouds" width="16" height="40" opacity="0.73">
+ <layer id="16" name="clouds" width="16" height="40">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,90,91,92,93,94,0,0,0,0,0,0,0,0,0,
+0,0,106,107,108,109,110,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,90,91,92,93,94,0,
+0,0,0,0,0,0,0,0,0,0,106,90,91,92,93,94,
+90,91,92,93,94,0,0,0,0,0,0,106,107,108,109,110,
+106,107,108,109,110,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,90,91,92,93,94,0,0,119,120,0,
+0,0,0,0,0,0,106,107,108,90,91,92,93,135,136,0,
+0,0,0,0,0,0,0,0,0,106,107,108,109,151,119,120,
+0,0,0,0,0,0,0,0,0,0,0,0,0,167,135,136,
+0,0,0,0,0,0,0,0,0,0,0,0,0,183,151,152,
+0,0,0,0,0,0,0,0,0,0,119,120,0,0,167,168,
+0,0,90,91,92,93,94,0,0,0,135,136,0,0,183,184,
+0,0,106,107,108,109,110,0,0,0,151,152,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,167,168,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,183,184,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,119,120,0,0,0,0,
+0,0,0,0,0,0,0,0,0,119,135,136,0,0,0,0,
+0,0,0,0,0,0,0,0,0,135,151,152,0,0,0,0,
+90,91,92,93,94,0,0,0,0,151,167,168,0,0,0,0,
+106,119,120,109,110,0,0,0,0,167,90,91,92,93,94,0,
+0,135,136,0,0,0,0,0,90,183,106,107,108,109,110,0,
+0,151,152,0,0,0,0,0,106,107,108,109,110,0,0,0,
+0,167,168,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,183,184,0,0,119,120,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,135,136,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,151,90,91,92,93,94,0,0,0,0,0,
+0,0,0,0,0,167,106,107,108,109,110,0,0,0,0,0,
+0,0,0,0,0,183,184,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,74,75,76,77,78,0,0,0,0,0,
-0,0,0,0,0,0,90,91,92,93,94,0,0,0,0,0,
-0,0,0,0,0,0,106,107,108,109,110,74,75,76,77,78,
-0,0,0,0,0,0,122,123,124,125,126,90,91,92,93,94,
-0,0,0,0,0,0,0,0,0,0,0,106,107,108,109,110,
-0,0,0,0,0,0,0,0,0,0,0,122,123,124,125,126,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,74,75,76,77,78,0,0,0,0,0,0,
-0,102,103,104,105,90,91,92,93,94,0,0,0,0,126,0,
-0,118,119,120,121,106,107,108,109,110,0,0,0,0,0,0,
-0,134,135,136,137,122,123,124,125,126,0,0,0,0,0,0,
-0,150,151,152,153,0,0,0,0,0,0,0,0,0,0,0,
-0,166,167,168,169,0,0,0,0,0,0,0,0,0,0,0,
-0,182,183,184,185,105,0,0,0,0,0,0,0,0,0,0,
-0,0,118,119,120,121,0,0,0,0,0,0,0,0,0,0,
-0,0,134,135,136,137,138,0,0,0,0,0,0,0,0,0,
-0,0,150,151,152,153,154,0,0,0,0,0,0,0,0,0,
-0,0,166,167,168,169,170,0,0,0,0,0,0,0,0,0,
-0,102,182,183,184,185,186,0,0,0,0,0,0,0,0,0,
-0,118,119,120,121,0,0,0,0,0,0,0,0,0,0,0,
-0,134,135,136,137,138,0,0,0,0,0,0,0,0,0,0,
-0,150,151,152,153,154,0,0,0,0,0,0,0,0,0,0,
-0,166,167,168,169,170,0,0,0,0,0,0,0,0,0,0,
-0,182,183,184,185,186,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,119,120,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,135,136,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,151,152,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,167,168,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,183,184,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>

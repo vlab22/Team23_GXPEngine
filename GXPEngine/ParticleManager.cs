@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using GXPEngine.Core;
 using GXPEngine.GameLocalEvents;
 
 namespace GXPEngine
@@ -13,6 +14,12 @@ namespace GXPEngine
 
         private AnimationSprite _cartoonCoinsExplosion;
         private IEnumerator _cartoonCoinsExplosionRoutine;
+        
+        private SmallSnowFlakeParticle[] _smallSnowFlakes;
+        private IEnumerator _smallSnowFlakesRoutine;
+        
+        private SmallSnowFlakeParticle[] _smallSnowFlakes2;
+        private IEnumerator _smallSnowFlakesRoutine2;
 
         public ParticleManager()
         {
@@ -27,6 +34,20 @@ namespace GXPEngine
             _cartoonCoinsExplosion = new AnimationSprite("data/cartoon coin explosion_image.png", 8, 4, -1, false, false);
             _cartoonCoinsExplosion.SetOrigin(_cartoonCoinsExplosion.width / 2f, _cartoonCoinsExplosion.height / 2f);
             _cartoonCoinsExplosion.SetActive(false);
+            
+            _smallSnowFlakes= new SmallSnowFlakeParticle[20];
+            for (int i = 0; i < _smallSnowFlakes.Length; i++)
+            {
+                var snow = new SmallSnowFlakeParticle();
+                _smallSnowFlakes[i] = snow;
+            }
+            
+            _smallSnowFlakes2= new SmallSnowFlakeParticle[20];
+            for (int i = 0; i < _smallSnowFlakes2.Length; i++)
+            {
+                var snow = new SmallSnowFlakeParticle();
+                _smallSnowFlakes2[i] = snow;
+            }
             
             LocalEvents.Instance.AddListener<StorkLocalEvent>(StorkLocalEventHandler);
             LocalEvents.Instance.AddListener<LevelLocalEvent>(LevelLocalEventHandler);
@@ -188,6 +209,60 @@ namespace GXPEngine
 
             stork.RemoveChild(_cartoonCoinsExplosion);
             _cartoonCoinsExplosion.SetActive(false);
+        }
+
+        public void SmallSnowFlakesParticles(GameObject target, float range = 30, int duration = 1000)
+        {
+            _smallSnowFlakesRoutine = CoroutineManager.StartCoroutine(SmallSnowFlakesParticlesRoutine(target, range, duration), this);
+        }
+
+        IEnumerator SmallSnowFlakesParticlesRoutine(GameObject target, float range, int duration)
+        {
+            while (target?.parent != null)
+            {
+                for (int i = 0; i < _smallSnowFlakes.Length; i++)
+                {
+                    var pos = MRandom.InsideUnitCircle() * range;
+                    var snow = _smallSnowFlakes[i];
+
+                    target.parent.AddChild(snow);
+                    snow.Show(target, pos, Vector2.zero);
+
+                    yield return new WaitForMilliSeconds(duration / _smallSnowFlakes.Length);
+                }
+            }
+        }
+
+        public void StopSmallSnowFlakesParticles()
+        {
+            CoroutineManager.StopCoroutine(_smallSnowFlakesRoutine);
+        }
+        
+        public void SmallSnowFlakesParticles2(GameObject target, Vector2 offset, float range = 30, int duration = 1000)
+        {
+            _smallSnowFlakesRoutine2 = CoroutineManager.StartCoroutine(SmallSnowFlakesParticlesRoutine2(target, offset, range, duration), this);
+        }
+
+        IEnumerator SmallSnowFlakesParticlesRoutine2(GameObject target, Vector2 offset, float range, int duration)
+        {
+            while (target?.parent != null)
+            {
+                for (int i = 0; i < _smallSnowFlakes2.Length; i++)
+                {
+                    var pos = MRandom.InsideUnitCircle() * range;
+                    var snow = _smallSnowFlakes2[i];
+
+                    target.parent.AddChild(snow);
+                    snow.Show(target, pos, offset);
+
+                    yield return new WaitForMilliSeconds(duration / _smallSnowFlakes2.Length);
+                }
+            }
+        }
+
+        public void StopSmallSnowFlakesParticles2()
+        {
+            CoroutineManager.StopCoroutine(_smallSnowFlakesRoutine2);
         }
 
         public void Reset()

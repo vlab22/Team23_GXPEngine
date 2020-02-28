@@ -17,7 +17,7 @@ namespace GXPEngine
         private const string FONT_PATH = "data/Chantal W00 Medium.ttf";
         private const int FONT_SIZE = 32;
 
-        private const int SCOREBOARD_X = 700;
+        private const int SCOREBOARD_X = 760;
 
         public GameOverScreen() : base("data/GameOver Screen.png")
         {
@@ -27,11 +27,11 @@ namespace GXPEngine
                 CenterMode.Center);
             AddChild(_scoreTitle);
             _scoreTitle.SetClearColor(Color.FromArgb(0, 1, 1, 1));
-            ((IHasColor) _scoreTitle).MainColor = GlobalVars.Color2;
+            ((IHasColor) _scoreTitle).MainColor = GlobalVars.DarkBlue;
 
             _scoreTitle.EasyDraw.TextFont(FONT_PATH, FONT_SIZE);
             _scoreTitle.SetText("Score Board");
-            _scoreTitle.Centralize();
+            _scoreTitle.x = SCOREBOARD_X + 60;
             _scoreTitle.y = 100;
 
             _scoreTitle.EasyDraw.TextFont(FONT_PATH, FONT_SIZE);
@@ -68,15 +68,29 @@ namespace GXPEngine
                 hudScoreText.SetClearColor(Color.FromArgb(0, 1, 1, 1));
 
                 ((IHasColor) hudScoreText).MainColor =
-                    (scoreData.name == "you") ? GlobalVars.Color1 : GlobalVars.Color2;
+                    (scoreData.name == "you") ? GlobalVars.DimGreen : GlobalVars.DarkBlue;
 
                 hudScoreText.EasyDraw.TextFont(FONT_PATH, FONT_SIZE);
 
                 hudScoreText.SetText(text);
-                hudScoreText.Centralize();
 
-                hudScoreText.x = SCOREBOARD_X;
-                hudScoreText.y = 200 + i * 40;
+                if (scoreData.name == "you")
+                {
+                    hudScoreText.EasyDraw.SetOrigin(hudScoreText.EasyDraw.width * 0.5f,
+                        hudScoreText.EasyDraw.height * 0.5f);
+                
+                    hudScoreText.x = SCOREBOARD_X + hudScoreText.EasyDraw.width * 0.5f;
+                    hudScoreText.y = 210 + i * 40 + hudScoreText.EasyDraw.height * 0.5f;
+
+                    //Anim score
+                    float mScale = hudScoreText.EasyDraw.scale;
+                    SpriteTweener.TweenScalePingPong(hudScoreText.EasyDraw, mScale, mScale * 1.02f, 200);
+                }
+                else
+                {
+                    hudScoreText.x = SCOREBOARD_X;
+                    hudScoreText.y = 200 + i * 40;
+                }
             }
 
             //Get player position, if greater than 10, put it at the end
@@ -92,15 +106,21 @@ namespace GXPEngine
                 AddChild(hudScoreText);
                 hudScoreText.SetClearColor(Color.FromArgb(0, 1, 1, 1));
 
-                ((IHasColor) hudScoreText).MainColor = GlobalVars.Color1;
+                ((IHasColor) hudScoreText).MainColor = GlobalVars.DimGreen;
 
                 hudScoreText.EasyDraw.TextFont(FONT_PATH, FONT_SIZE);
 
                 hudScoreText.SetText(text);
-                hudScoreText.Centralize();
 
-                hudScoreText.x = SCOREBOARD_X;
-                hudScoreText.y = 200 + 30 + first10Scores.Count * 40;
+                hudScoreText.EasyDraw.SetOrigin(hudScoreText.EasyDraw.width * 0.5f,
+                    hudScoreText.EasyDraw.height * 0.5f);
+                
+                hudScoreText.x = SCOREBOARD_X + hudScoreText.EasyDraw.width * 0.5f;
+                hudScoreText.y = 200 + 30 + first10Scores.Count * 40 + hudScoreText.EasyDraw.height * 0.5f;
+
+                //Anim score
+                float mScale = hudScoreText.EasyDraw.scale;
+                SpriteTweener.TweenScalePingPong(hudScoreText.EasyDraw, mScale, mScale * 1.02f, 200);
             }
 
             MyGame.ThisInstance.SaveScoreBoard();
@@ -111,7 +131,7 @@ namespace GXPEngine
         private IEnumerator WaitSomeTimeToEnableInput()
         {
             SoundManager.Instance.PlayMusic(1);
-            
+
             yield return new WaitForMilliSeconds(1200);
 
             _buttonPressed = false; //reenable input

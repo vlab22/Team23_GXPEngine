@@ -156,6 +156,7 @@ Turn is weird flapping one wing while the other is static";
             AddChild(_hudThermometer);
 
             _hudThermometer.SetXY(game.width - (1920 - 1731), 85);
+            _hudThermometer.SetOriginToCenter();
 
             _hudArrowToObjective = new HudArrowToObjective();
             AddChild(_hudArrowToObjective);

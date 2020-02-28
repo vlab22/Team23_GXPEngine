@@ -115,6 +115,7 @@
         <e p="PizzaGameObject.cs" t="Include" />
         <e p="PlayerInput.cs" t="Include" />
         <e p="Screen.cs" t="Include" />
+        <e p="SmallSnowFlakeParticle.cs" t="Include" />
         <e p="SoundManager.cs" t="Include" />
         <e p="SpriteTweener.cs" t="Include" />
         <e p="StartScreen.cs" t="Include" />

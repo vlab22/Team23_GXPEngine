@@ -17,9 +17,7 @@ namespace GXPEngine
             _animationDirection = pAnimationDirection;
             _animationSpeed = 300 * frameCount;
 
-            // var easy = new EasyDraw(width, height);
-            // easy.Clear(0,0,0);
-            // AddChild(easy);
+            alpha = 0.85f;
         }
 
         void Update()

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using GXPEngine.Core;
 using GXPEngine.GameLocalEvents;
 using GXPEngine.Managers;
 using TiledMapParserExtended;
@@ -22,6 +23,8 @@ namespace GXPEngine
         private uint _levelTimeToDelivery;
         private uint _levelTimer;
 
+        private bool _isLevelEndingTimesUp;
+
         private Dictionary<LevelLocalEvent.EventType, uint> _scoreValuesMap;
 
         private int[] _cloudsIds = new int[]
@@ -38,7 +41,8 @@ namespace GXPEngine
         private int[,] _cloudsLayer;
 
         private uint _cloudPizzaColderSpeed = 10000;
-        
+        private bool _isInsideCloudFrame;
+
         public LevelManager(Level pLevel, uint pScore, uint pLevelTimeToDelivery = 30000)
         {
             _level = pLevel;
@@ -60,6 +64,8 @@ namespace GXPEngine
 
         private IEnumerator WaitToStartTimeCounter()
         {
+            SoundManager.Instance.PlayMusic(2, 0.014f);
+            
             yield return new WaitForMilliSeconds(2000);
 
             _levelTimeToDelivery = _level.CurrentDeliveryPoint.Timer;
@@ -80,17 +86,40 @@ namespace GXPEngine
         void Update()
         {
             if (!this.Enabled || !_timerToDeliveryStarts || _timerToDeliveryPause) return;
+            
+            if (!_isLevelEndingTimesUp && _levelTimer > _levelTimeToDelivery)
+            {
+                //Game Over
+                _isLevelEndingTimesUp = true;
 
+                CoroutineManager.StartCoroutine(EndLevelByLost(), this);
+                
+                return;
+            }
+            
             _levelTimer += (uint) Time.deltaTime;
 
             int cloudId = _level.Map.GetCloudLayerTileIdFromWorld(_level.Stork.x, _level.Stork.y);
-
             
             //Add to timer as penalty
             if (_level.Stork.IsMoveEnabled && IsInsideCloud(cloudId - _cloudsFirstGid))
             {
                 uint tDelta = (uint)(_cloudPizzaColderSpeed * Time.delta);
                 _levelTimer += tDelta;
+
+                if (!_isInsideCloudFrame)
+                {
+                    _isInsideCloudFrame = true;
+                    
+                    ParticleManager.Instance.SmallSnowFlakesParticles(_level.Stork);
+                    ParticleManager.Instance.SmallSnowFlakesParticles2(HUD.Instance.Thermometer, Vector2.right * 10 + Vector2.up * 165);
+                }
+            }
+            else
+            {
+                _isInsideCloudFrame = false;
+                ParticleManager.Instance.StopSmallSnowFlakesParticles();
+                ParticleManager.Instance.StopSmallSnowFlakesParticles2();
             }
 
             //Update Hud
@@ -98,6 +127,13 @@ namespace GXPEngine
             HUD.Instance.Thermometer.Value = 1 - val;
 
             HUD.Instance.DebugTimer.SetText(Timer.ToString("00"));
+
+
+            if (Input.GetKeyDown(Key.K))
+            {
+                ParticleManager.Instance.SmallSnowFlakesParticles(_level.Stork);
+                ParticleManager.Instance.SmallSnowFlakesParticles2(HUD.Instance.Thermometer, Vector2.right * 20 + Vector2.up * 170);
+            }
         }
 
         private IEnumerator WaitForHudInstance()
@@ -169,7 +205,7 @@ namespace GXPEngine
         {
             //Sum points
             uint timeLeft = _levelTimeToDelivery - _levelTimer;
-            uint points = (uint) Mathf.Round(timeLeft * 0.001f * 1000);
+            uint points = (uint) Mathf.Round(timeLeft * 0.001f * 40 + 200);
 
             LevelScore += points;
 
@@ -204,6 +240,8 @@ namespace GXPEngine
 
         private IEnumerator EndLevelByLost()
         {
+            Console.WriteLine($"{this}: EndLevelByLost");
+            
             _level.IsLevelEndingByLost = true;
 
             //Send all drones away
@@ -215,6 +253,13 @@ namespace GXPEngine
             //Cry 3 times
             CoroutineManager.StartCoroutine(Cry3Times(), this);
 
+            if (_isLevelEndingTimesUp)
+            {
+                //PingPong scale Thermometer
+                float mScale = HUD.Instance.Thermometer.scale;
+                SpriteTweener.TweenScalePingPong(HUD.Instance.Thermometer, mScale, mScale * 1.10f, 300);
+            }
+            
             yield return new WaitForMilliSeconds(3 * 1200);
 
             var gameOverScreen = new GameOverScreen();

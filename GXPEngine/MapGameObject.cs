@@ -566,6 +566,13 @@ namespace GXPEngine
             return GetTileIdFromWorld(_cloudsLayerIndex, px, py);
         }
 
+        public void SetCloudsTileArray(int col, int row, short tileVal)
+        {
+            if (col < 0 || col > _mapData.Width || row < 0 || row > _mapData.Height) return;
+
+            _tileArrays[_cloudsLayerIndex][col, row] = tileVal;
+        }
+        
         public short[,] GetCloudsTileArray()
         {
             return _tileArrays[_cloudsLayerIndex];
@@ -580,6 +587,17 @@ namespace GXPEngine
 
         public int MapWidthInPixels => _mapData.Width * _mapData.TileWidth;
         public int MapHeightInPixels => _mapData.Height * _mapData.TileHeight;
+
+        /// <summary>
+        /// All the tiles layers in a mu;tidimensional array, example:
+        /// [0][12,23] = 47 //means that the tile id in layer "0", at column "12" and row "23" is "47"
+        /// This array is used to get the tile data of a layer at some position
+        /// </summary>
+        public short[][,] TileArrays
+        {
+            get => _tileArrays;
+            set => _tileArrays = value;
+        }
     }
 
     /// <summary>

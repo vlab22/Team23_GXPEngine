@@ -9,10 +9,12 @@ namespace GXPEngine
     {
         static Dictionary<Sprite, IEnumerator> _alphaRoutinesMap = new Dictionary<Sprite, IEnumerator>();
         static Dictionary<Sprite, IEnumerator> _colorRoutinesMap = new Dictionary<Sprite, IEnumerator>();
+        static Dictionary<Sprite, IEnumerator> _scaleRoutinesMap = new Dictionary<Sprite, IEnumerator>();
 
         public delegate void OnTweenComplete(GameObject g);
-        
-        public static void TweenAlpha(Sprite sprite, float from, float to, int duration, OnTweenComplete onComplete = null, int delay = 0, Easing.Equation equation = Easing.Equation.QuadEaseOut)
+
+        public static void TweenAlpha(Sprite sprite, float from, float to, int duration,
+            OnTweenComplete onComplete = null, int delay = 0, Easing.Equation equation = Easing.Equation.QuadEaseOut)
         {
             if (_alphaRoutinesMap.ContainsKey(sprite))
             {
@@ -20,11 +22,13 @@ namespace GXPEngine
                 _alphaRoutinesMap.Remove(sprite);
             }
 
-            var ie = CoroutineManager.StartCoroutine(TweenAlphaRoutine(sprite, from, to, duration, delay, onComplete, equation), null);
+            var ie = CoroutineManager.StartCoroutine(
+                TweenAlphaRoutine(sprite, from, to, duration, delay, onComplete, equation), null);
             _alphaRoutinesMap.Add(sprite, ie);
         }
 
-        private static IEnumerator TweenAlphaRoutine(Sprite sprite, float from, float to, int duration, int delay, OnTweenComplete onComplete,
+        private static IEnumerator TweenAlphaRoutine(Sprite sprite, float from, float to, int duration, int delay,
+            OnTweenComplete onComplete,
             Easing.Equation equation)
         {
             //TODO: remove this call to WaitForMilliSeconds and implement it in the while loop to prevent another instantiation of a yield
@@ -111,5 +115,68 @@ namespace GXPEngine
 
             sprite.color = to;
         }
+
+        public static void TweenScale(Sprite sprite, float from, float to, int duration,
+            OnTweenComplete onComplete = null, int delay = 0, Easing.Equation equation = Easing.Equation.QuadEaseOut)
+        {
+            if (_scaleRoutinesMap.ContainsKey(sprite))
+            {
+                CoroutineManager.StopCoroutine(_scaleRoutinesMap[sprite]);
+                _scaleRoutinesMap.Remove(sprite);
+            }
+
+            var ie = CoroutineManager.StartCoroutine(
+                TweenScaleRoutine(sprite, from, to, duration, delay, onComplete, equation), null);
+            _scaleRoutinesMap.Add(sprite, ie);
+        }
+
+        private static IEnumerator TweenScaleRoutine(Sprite sprite, float from, float to, int duration, int delay,
+            OnTweenComplete onComplete,
+            Easing.Equation equation)
+        {
+            //TODO: remove this call to WaitForMilliSeconds and implement it in the while loop to prevent another instantiation of a yield
+            if (delay > 0)
+                yield return new WaitForMilliSeconds(delay);
+
+            int time = 0;
+
+            sprite.SetScaleXY(from, from);
+
+            float fromDir = from > to ? from : 0;
+            float toDir = from > to ? 0 : from;
+
+            float scale = sprite.scale;
+            
+            while (time < duration)
+            {
+                scale = toDir + Easing.Ease(equation, time, fromDir, to - from, duration);
+
+                sprite.SetScaleXY(scale,scale);
+                
+                time += Time.deltaTime;
+                yield return null;
+            }
+
+            sprite.SetScaleXY(to, to);
+
+            if (onComplete != null)
+            {
+                onComplete.Invoke(sprite);
+            }
+        }
+
+        public static void TweenScalePingPong(Sprite sprite, float from, float to, int duration,
+            OnTweenComplete onComplete = null, int delay = 0, Easing.Equation equation = Easing.Equation.QuadEaseOut)
+        {
+            if (sprite == null || sprite.Destroyed) return;
+            
+            SpriteTweener.TweenScale(sprite, from, to, duration, go =>
+            {
+                SpriteTweener.TweenScale(sprite, to, from, duration, go1 =>
+                {
+                    TweenScalePingPong(sprite, from, to, duration, null, delay, equation);
+                });
+            });
+        } 
     }
 }

@@ -14,6 +14,7 @@ namespace GXPEngine
         {
             new Sound("data/Theme music.ogg", true, true),
             new Sound("data/Game over.mp3", true, true),
+            new Sound("data/in-game.ogg", true, true),
             // new Sound("data/Music2.ogg", true, true),
             // new Sound("data/Music3.ogg", true, true),
         };
@@ -31,6 +32,7 @@ namespace GXPEngine
             new Sound("data/Bird Hit.wav", false, false), //6
             new Sound("data/Drone Lock.wav", false, false), //7
             new Sound("data/whirlwind.wav", true, false), //8
+            new Sound("data/Stork Sucked by Tornado.wav", false, false), //9
         };
 
         private float[] _fxVolumes = new float[]
@@ -44,6 +46,7 @@ namespace GXPEngine
             -1, //6
             0.05f, //7 Drone Detect Player
             -1, //8 tornado
+            0.20f, //9
         };
 
         private Sound[] _explosionFxs = new Sound[]

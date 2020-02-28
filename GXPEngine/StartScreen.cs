@@ -6,36 +6,24 @@ namespace GXPEngine
 {
     public class StartScreen : Screen
     {
-        private HudTextBoard _startText;
+        private Sprite _startText;
 
         private bool _buttonPressed;
         
         public StartScreen() : base("data/Startscreen Bg.png")
         {
-            _startText = new HudTextBoard("Flap Wings to Start", 0,0,32, Color.FromArgb(0,1,1,1));
-            _startText.SetText("Flap Wings to Start");
+            //1260 207
+            
+            _startText = new Sprite("data/Start Screen - pressstart.png", true, false);
             AddChild(_startText);
-            _startText.Centralize();
+            _startText.SetOrigin(_startText.width * 0.5f, _startText.height * 0.5f);
+            _startText.SetXY(1260, 207);
 
+
+            float mScale = _startText.scale;
+            SpriteTweener.TweenScalePingPong(_startText, mScale, mScale * 1.02f, 300);
+            
             SoundManager.Instance.PlayMusic(0);
-            
-            CoroutineManager.StartCoroutine(BlinkText(), this);
-        }
-
-        IEnumerator BlinkText()
-        {
-            int blinkDuration = 800;
-            
-            while (true)
-            {
-
-                SpriteTweener.TweenAlpha(_startText.EasyDraw, 1, 0.2f, blinkDuration/2, o =>
-                {
-                    SpriteTweener.TweenAlpha(_startText.EasyDraw, 0.2f, 1, blinkDuration/2);
-                });
-                
-                yield return new WaitForMilliSeconds(blinkDuration);
-            }
         }
 
         void Update()

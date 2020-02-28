@@ -327,6 +327,8 @@ namespace GXPEngine
         public bool IsMovingInGrid { get; set; }
 
         public bool IsMoveEnabled { get; set; }
+        
+        public bool IsCollisionDisabled { get; set; }
 
         public IGridDataUpdater IUpdater
         {
@@ -361,6 +363,6 @@ namespace GXPEngine
 
     public interface IColliderListener
     {
-        void OnCollisionWith(GameObject go, GameObject other);
+        void OnCollisionWith(Stork stork, GameObject other);
     }
 }

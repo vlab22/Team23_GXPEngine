@@ -41,31 +41,7 @@ namespace GXPEngine
             _lastMarker = _level.GetChildren(false).Where(o => o is DeliveryPoint).LastOrDefault();
         }
 
-        void Update()
-        {
-            if (!Enabled) return;
-
-
-            // var posForward = _stork.Pos + _stork.Forward * _stork.width * 0.5f;
-            // var posBack = _stork.Pos - _stork.Forward * _stork.width * 0.5f;
-            //
-            // int tileIndexForward = _map.GetTileIdFromWorld(0, posForward.x, posForward.y);
-            // int tileIndexBack= _map.GetTileIdFromWorld(0, posBack.x, posBack.y);
-            // Vector2 pF = _map.WorldToTilePoint(posForward.x, posForward.y);
-            // Vector2 pB = _map.WorldToTilePoint(posBack.x, posBack.y);
-            //
-            //
-            // //If stork is out of map, draw a white canvas over ir
-            // if (tileIndexForward == -1 || tileIndexBack == -1)
-            // {
-            //     _storkOutOfMapCover.SetActive(true);
-            //     _storkOutOfMapCover.SetXY(_stork.x, _stork.y);
-            // }
-
-            //Console.WriteLine($"{this}: tileIndex: {tileIndexForward} | pF: {pF} | tileBack: {tileIndexBack} | pB: {pB}");
-        }
-
-        void IColliderListener.OnCollisionWith(GameObject go, GameObject other)
+        void IColliderListener.OnCollisionWith(Stork stork, GameObject other)
         {
             if (!_inCollisionWithDeliveryPoint && other is DeliveryPoint)
             {
@@ -85,7 +61,7 @@ namespace GXPEngine
 
                 CoroutineManager.StartCoroutine(WaitDeliveryPointBeDisabled(other), this);
             }
-            else if (!_inCollisionWithAirplane && other is CompoundCollider && other.parent is Airplane parent &&
+            else if (!_stork.IsCollisionDisabled && !_inCollisionWithAirplane && other is CompoundCollider && other.parent is Airplane parent &&
                      parent != _lastAirplaneCollided)
             {
                 _inCollisionWithAirplane = true;
@@ -97,7 +73,7 @@ namespace GXPEngine
                 CoroutineManager.StartCoroutine(CollisionWithAirplaneRoutine(parent), this);
             }
 
-            if (!_inCollisionWithDrone && other is DroneGameObject drone && drone != _lastDroneCollided &&
+            if (!_stork.IsCollisionDisabled && !_inCollisionWithDrone && other is DroneGameObject drone && drone != _lastDroneCollided &&
                 drone.State != DroneGameObject.DroneState.RETURN_TO_START_POINT_AFTER_HIT)
             {
                 _lastDroneCollided = drone;
@@ -109,7 +85,7 @@ namespace GXPEngine
                 CoroutineManager.StartCoroutine(CollisionWithDroneRoutine(drone), this);
             }
 
-            if (!_inCollisionWithBullet && other is HunterBullet bullet && bullet != _lastBulletCollided)
+            if (!_stork.IsCollisionDisabled && !_inCollisionWithBullet && other is HunterBullet bullet && bullet != _lastBulletCollided)
             {
                 _inCollisionWithBullet = true;
 
@@ -123,7 +99,7 @@ namespace GXPEngine
                 }
             }
 
-            if (!_inCollisionWithTornado && other is TornadoGameObject tornado && tornado != _lastTornadoCollided)
+            if (!_stork.IsCollisionDisabled && !_inCollisionWithTornado && other is TornadoGameObject tornado && tornado != _lastTornadoCollided)
             {
                 _inCollisionWithTornado = true;
                 _lastTornadoCollided = tornado;
@@ -138,7 +114,8 @@ namespace GXPEngine
 
             _stork.InputEnabled = false;
             _stork.IsMoveEnabled = false;
-
+            _stork.IsCollisionDisabled = true;
+            
             _stork.SetSpeed(0);
 
             //Turn stork
@@ -149,6 +126,8 @@ namespace GXPEngine
             const int snapDuration = 200;
 
             var snapStartPos = _stork.Pos;
+            
+            SoundManager.Instance.PlayFx(9);
 
             while (snapTimer < snapDuration)
             {
@@ -239,6 +218,7 @@ namespace GXPEngine
 
             _stork.InputEnabled = true;
             _stork.IsMoveEnabled = true;
+            _stork.IsCollisionDisabled = false;
         }
 
         private IEnumerator TurnStorkInTornadoRoutine()

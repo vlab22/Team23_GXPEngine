@@ -249,6 +249,14 @@ namespace GXPEngine
             _bounds.x = -x;
             _bounds.y = -y;
         }
+        
+        public void SetOriginToCenter(bool reposition = true)
+        {
+            SetOrigin(width * 0.5f, height * 0.5f);
+            
+            if (reposition)
+            Translate(width * 0.5f, height * 0.5f);
+        }
 
         //------------------------------------------------------------------------------------------------------------------------
         //														Mirror
